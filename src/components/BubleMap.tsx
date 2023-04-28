@@ -44,9 +44,8 @@ class BubleMap extends React.Component {
   };
 
   constructor(props: any) {
-      super(props);
-
-      this.chartRef = React.createRef<ChartJS>();
+    super(props);
+    this.chartRef = React.createRef<ChartJS>();
   }
 
   componentDidMount() {
@@ -109,7 +108,7 @@ class BubleMap extends React.Component {
       return <p>Chargement...</p>
 
     return (
-      <Paper>
+      <Paper sx={{ height: '100%' }}>
         <Chart ref={this.chartRef} type='bubbleMap' data={this.data} options={{
           showOutline: true,
           // showGraticule: true,

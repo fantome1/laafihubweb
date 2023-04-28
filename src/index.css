@@ -66,3 +66,52 @@
 .infrastructures_list_table tbody tr:not(:last-child) {
   border-bottom: 1px solid #ddd;
 }
+
+
+
+
+.styled-table {
+  width: 100%;
+  text-align: center;
+}
+
+.styled-table td, th {
+  height: 32px;
+}
+
+.styled-table th {
+  position: relative;
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.styled-table td {
+  font-size: 12px;
+}
+
+.styled-table thead tr {
+  background-color: var(--primary);
+}
+
+.styled-table tbody tr:nth-child(2n+1) {
+  background-color: #D7EDF0;
+}
+
+.styled-table tbody tr:nth-child(2n) {
+  background-color: #fff;
+}
+
+.styled-table th:not(:last-child)::after {
+  content: '';
+  width: 1px;
+  background-color: white;
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: 0;
+}
+
+.styled-table td:not(:last-child) {
+  border-right: 2px solid #49CDDD;
+}

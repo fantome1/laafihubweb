@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Box, IconButton, Menu, MenuItem, Paper, Tooltip, Typography } from "@mui/material";
+import { Menu, MenuItem, Typography } from "@mui/material";
 
 const actions = [
     'View Profile',
