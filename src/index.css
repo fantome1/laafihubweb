@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --primary: #63A8A2;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.unstyled-select {
+  border: 0;
+  background: transparent;
+  /* appearance: none;
+  -webkit-appearance: none; */
+  outline: none;
+}
+
+
+
+
+/* ************************************************************************************************************ */
+/* ************************************************************************************************************ */
+/* ********************************************* SIDE BAR ***************************************************** */
+/* ************************************************************************************************************ */
+/* ************************************************************************************************************ */
+
+.selected-side-bar-item {
+  background-color: #000000;
+  border-right: 6px solid var(--primary);
+}
+
+
+.infrastructures_list_table {
+  width: 100%;
+}
+
+.infrastructures_list_table thead tr th {
+  font-weight: 400;
+}
+
+.infrastructures_list_table td {
+  color: #212121;
+  text-align: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.infrastructures_list_table td:not(:last-child) {
+  border-right: 2px solid #999;
+}
+
+.infrastructures_list_table tbody tr:not(:last-child) {
+  border-bottom: 1px solid #ddd;
+}
