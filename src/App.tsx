@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { EditProfilPage } from "./pages/EditProfilPage";
 import { OrganizationPage } from "./pages/OrganizationPage";
+import { SuperAdminDashboardPage } from "./pages/SuperAdminDashbaordPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path={routes.HOME} element={<LayoutBase />}>
           <Route index element={<DashboardPage />} />
           <Route path={routes.ORGANIZATION} element={<OrganizationPage />} />
+          <Route path={routes.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboardPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

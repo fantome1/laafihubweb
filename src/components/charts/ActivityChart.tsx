@@ -1,14 +1,16 @@
 import {
     Chart as ChartJS,
     BarElement,
-    CategoryScale
+    CategoryScale,
+    LinearScale
   } from 'chart.js';
 import React from 'react';
 import { Chart } from 'react-chartjs-2';
 
 ChartJS.register(
     BarElement,
-    CategoryScale
+    CategoryScale,
+    LinearScale
 );
 
 class ActivityChart extends React.Component {
