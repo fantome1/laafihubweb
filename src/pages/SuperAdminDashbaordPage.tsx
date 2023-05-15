@@ -1,8 +1,6 @@
 import React from "react";
 import { Paper } from "@mui/material";
-import { MapContainer, TileLayer } from "react-leaflet";
 import { NearMap } from "../components/NearMap";
-import { ActivityList } from "../components/ActivityList";
 import { EntityCountCard } from "../components/EntityCountCard";
 
 class SuperAdminDashboardPage extends React.Component {
@@ -71,40 +69,100 @@ class SuperAdminDashboardPage extends React.Component {
 
                 {/* Map row */}
                 <div className="flex mt-4">
-
                     <div className="flex flex-col space-y-2 w-[50%] pr-4">
                         <EntityCountCard
-                            iconUrl="/icons/entity_count_card/notification.svg"
-                            label="Alerts"
-                            count="060"
+                            iconUrl="/icons/super_admin/user.svg"
+                            label="Users"
+                            count="012"
+                            iconSize={36}
+                            elevation={0}
                             items={[
-                                { label: 'Temperature', count: '020' },
-                                { label: 'Humidity', count: '020' },
-                                { label: 'UX Exposure', count: '020' },
+                                { label: 'Supervisors', count: '020' },
+                                { label: 'Agents', count: '020' },
+                                { label: 'Guests', count: '020' },
                             ]}
                         />
-                        
+
                         <EntityCountCard
-                            iconUrl="/icons/entity_count_card/notification.svg"
-                            label="Alerts"
+                            iconUrl="/icons/super_admin/device.svg"
+                            label="Devices"
                             count="060"
+                            iconSize={36}
+                            elevation={0}
                             items={[
-                                { label: 'Temperature', count: '020' },
-                                { label: 'Humidity', count: '020' },
-                                { label: 'UX Exposure', count: '020' },
+                                { label: 'Gateways', count: '020' },
+                                { label: 'Centrals', count: '020' },
+                                { label: 'Monitors', count: '020' },
                             ]}
                         />
                     </div>
 
-
-
                     <div className="w-[50%]"><NearMap /></div>
-                </div>        
+                </div>
+
+                <div className="flex space-x-2 mt-4">
+                    <div className="w-[30%]">
+                        <table className="styled-table">
+                                <thead>
+                                    <tr>{['User Name', 'Role'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                </thead>
+                                <tbody>
+                                    {Array.from({ length: 14 }, (_, index) => (
+                                        <tr key={index}>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                        </table>
+                    </div>
+
+                    <div className="w-[70%]">
+                        <table className="styled-table">
+                                <thead>
+                                    <tr>{['Device ID', 'Device Name', 'Type', 'Registration status', 'Status'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                </thead>
+                                <tbody>
+                                    {Array.from({ length: 14 }, (_, index) => (
+                                        <tr key={index}>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: randomRegistrationStatus(index + 1).color }}>{randomRegistrationStatus(index + 1).label}</div></div></td>
+                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: randomStatus(index + 1).color }}>{randomStatus(index + 1).label}</div></div></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                        </table>
+                    </div>
+                </div>     
 
             </div>
         );
     }
 
 }
+
+function randomRegistrationStatus(index: number) {
+    if (index % 4 == 0)
+        return { label: 'Not enrolled', color: '#999999' };
+    return { label: 'Enrolled', color: '#3C4858' }
+}
+
+function randomStatus(index: number) {
+    const r = index % 3;
+
+    switch(r) {
+        case 1:
+            return { label: 'Connected', color: '#309E3A' };
+        case 2:
+            return { label: 'Disconnected', color: '#D80303' };
+        default:
+            return { label: 'Inactive', color: '#FE9B15' };
+    }
+}
+
+
+
 
 export { SuperAdminDashboardPage };

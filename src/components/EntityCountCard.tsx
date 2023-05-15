@@ -10,15 +10,16 @@ type Props = {
         label: string
         count: string
     }[]
+    iconSize?: number;
+    elevation?: number;
 };
 
 function EntityCountCard(props: Props) {
     return (
-        <Paper sx={{ width: props.fullWidth ? '100%' : props.width }} className={`p-3`}>
-
+        <Paper elevation={props.elevation ?? 1} sx={{ width: props.fullWidth ? '100%' : props.width }} className={`p-3`}>
             <div className="flex justify-between">
                 <div className="flex items-center">
-                    <img src={props.iconUrl} width={28} alt="" />
+                    <img src={props.iconUrl} width={props.iconSize ?? 28} alt="" />
                     <p className="ml-3 text-2xl text-neutral-400">{props.label}</p>
                 </div>
                 <div className="flex flex-col items-center">
@@ -35,8 +36,6 @@ function EntityCountCard(props: Props) {
                     </div>
                 ))}
             </div>
-
-
 
         </Paper>
     );

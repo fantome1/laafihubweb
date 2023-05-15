@@ -86,6 +86,14 @@
   font-weight: 600;
 }
 
+.styled-table th:first-child {
+  border-top-left-radius: 4px;
+}
+.styled-table th:last-child {
+  border-top-right-radius: 4px;
+}
+
+
 .styled-table td {
   font-size: 12px;
 }
