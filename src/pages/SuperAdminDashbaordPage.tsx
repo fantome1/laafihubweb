@@ -5,10 +5,6 @@ import { EntityCountCard } from "../components/EntityCountCard";
 
 class SuperAdminDashboardPage extends React.Component {
 
-    constructor(props: any) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
@@ -16,7 +12,7 @@ class SuperAdminDashboardPage extends React.Component {
                 <div className="flex space-x-4 mt-12">
                     {/* Infrastruture name */}
                     <div className="grow">
-                        <div className="h-[128px] grow flex flex-col justify-between bg-white px-4 rounded-md">
+                        <div className="h-[120px] grow flex flex-col justify-between bg-white px-4 rounded-md">
                             <div className="relative">
                                 <Paper elevation={2} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
                                     <img src="/icons/organization/infrastructure.svg" alt="" />
@@ -39,7 +35,7 @@ class SuperAdminDashboardPage extends React.Component {
 
                     {/* details canrd and edit, enroll buttons */}
                     <div className="flex grow space-x-2">
-                        <div className="grow h-[128px] flex flex-col bg-white px-4 rounded-md">
+                        <div className="grow h-[120px] flex flex-col bg-white px-4 rounded-md">
                             <p className="text-[#3C4858] mt-2">Details</p>
 
                             <div className="grow flex flex-col justify-around mt-4 mb-4">
@@ -55,12 +51,12 @@ class SuperAdminDashboardPage extends React.Component {
                             </div>
                         </div>
 
-                        <div className="flex flex-col justify-center items-center w-[128px] h-[128px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                        <div className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                             <img src="/icons/super_admin/edit.svg" alt="" />
                             <p className="text-2xl text-white">Edit</p>
                         </div>
 
-                        <div className="flex flex-col justify-center items-center w-[128px] h-[128px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                        <div className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                             <img src="/icons/super_admin/edit.svg" alt="" />
                             <p className="text-2xl text-white">Enroll</p>
                         </div>

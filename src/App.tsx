@@ -7,6 +7,7 @@ import { SignUpPage } from "./pages/SignUpPage";
 import { EditProfilPage } from "./pages/EditProfilPage";
 import { OrganizationPage } from "./pages/OrganizationPage";
 import { SuperAdminDashboardPage } from "./pages/SuperAdminDashbaordPage";
+import { SuperAdminUsersPage } from "./pages/SuperAdminUsersPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route index element={<DashboardPage />} />
           <Route path={routes.ORGANIZATION} element={<OrganizationPage />} />
           <Route path={routes.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboardPage />} />
+          <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
