@@ -54,7 +54,7 @@ class SuperAdminUsersPage extends React.Component {
                             </div>
                         </div>
                     </div>
-                        
+
                     <div className="flex justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                         <img src="/icons/super_admin_users/add.svg" alt="" width={36} />
                         <p className="text-xl text-white">Create</p>

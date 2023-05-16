@@ -8,6 +8,7 @@ import { EditProfilPage } from "./pages/EditProfilPage";
 import { OrganizationPage } from "./pages/OrganizationPage";
 import { SuperAdminDashboardPage } from "./pages/SuperAdminDashbaordPage";
 import { SuperAdminUsersPage } from "./pages/SuperAdminUsersPage";
+import { LaafiMonitorPage } from "./pages/LaafiMonitorPage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path={routes.ORGANIZATION} element={<OrganizationPage />} />
           <Route path={routes.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboardPage />} />
           <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />
+          <Route path={routes.LAAFI_MONITOR} element={<LaafiMonitorPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
