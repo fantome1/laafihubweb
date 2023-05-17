@@ -9,6 +9,8 @@ import { OrganizationPage } from "./pages/OrganizationPage";
 import { SuperAdminDashboardPage } from "./pages/SuperAdminDashbaordPage";
 import { SuperAdminUsersPage } from "./pages/SuperAdminUsersPage";
 import { LaafiMonitorPage } from "./pages/LaafiMonitorPage";
+import { LaafiMonitorDeviceDataPage } from "./pages/LaafMonitorDeviceDataPage";
+import { AnotherLaafiMonitorPage } from "./pages/AnotherLaafiMonitorPage";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
           <Route path={routes.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboardPage />} />
           <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />
           <Route path={routes.LAAFI_MONITOR} element={<LaafiMonitorPage />} />
+          <Route path={routes.LAAFI_MONITOR_DEVICE_DATA} element={<LaafiMonitorDeviceDataPage />} />
+          <Route path={routes.ANOTHER_LAAFI_MONITOR} element={<AnotherLaafiMonitorPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

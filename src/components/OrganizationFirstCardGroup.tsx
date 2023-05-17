@@ -1,6 +1,6 @@
 import Paper from "@mui/material/Paper";
 import React from "react";
-import { DeviceUsageChart } from "./charts/DeviceUsageChart";
+import { DeviceUsageChart } from "./charts/Charts";
 import { ActivityChart } from "./charts/ActivityChart";
 
 
