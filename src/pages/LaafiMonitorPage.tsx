@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material";
 import React from "react";
-import { DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2 } from "../components/charts/Charts";
+import { DeviceStatusChart, DeviceUsageChart2 } from "../components/charts/Charts";
 
 class LaafiMonitorPage extends React.Component {
 
@@ -28,7 +28,7 @@ class LaafiMonitorPage extends React.Component {
                                 </div>
                         </div>
                         <div className="flex items-end py-4">
-                                <p className="text-4xl text-[#3C4858]">003</p>
+                            <p className="text-4xl text-[#3C4858]">003</p>
                         </div>
                     </div>
 
@@ -79,8 +79,7 @@ class LaafiMonitorPage extends React.Component {
                     </div>
                 </div>
 
-
-                {/* Second first */}
+                {/* Second row */}
                 <div className="flex space-x-4 mt-4">
                     {/* table */}
                     <div className="grow">
@@ -103,7 +102,7 @@ class LaafiMonitorPage extends React.Component {
                             </tbody>
                         </table>
                     </div>
-                    
+
                     {/* Pie charts and group */}
                     <div className="w-[380px]">
                         {/* Pie chart */}
@@ -134,8 +133,6 @@ class LaafiMonitorPage extends React.Component {
                         </div>
                     </div>
                 </div>
-                
-
 
             </div>
         );

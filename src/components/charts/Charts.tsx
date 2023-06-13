@@ -6,7 +6,8 @@ import {
     Title,
     Tooltip,
     PointElement,
-    LineElement
+    LineElement,
+    DoughnutController
   } from 'chart.js';
 import React from 'react';
 import { Chart } from 'react-chartjs-2';
@@ -19,7 +20,8 @@ ChartJS.register(
     Tooltip,
     PointElement,
     LineElement,
-    ChartDataLabels
+    ChartDataLabels,
+    DoughnutController
 );
 
 class DeviceUsageChart extends React.Component {
@@ -53,6 +55,9 @@ class DeviceUsageChart extends React.Component {
                             labels: {
                                 boxWidth: 10
                             }
+                        },
+                        datalabels: {
+                            display: false
                         }
                     }
                 }} />
@@ -92,6 +97,9 @@ class DeviceUsageChart2 extends React.Component {
                             labels: {
                                 boxWidth: 10
                             }
+                        },
+                        datalabels: {
+                            display: false
                         }
                     }
                 }} />
@@ -131,6 +139,8 @@ class DeviceStatusChart extends React.Component {
                             labels: {
                                 boxWidth: 10
                             }
+                        }, datalabels: {
+                            display: false
                         }
                     }
                 }} />
@@ -168,6 +178,9 @@ class TemperatureChart extends React.Component {
                     plugins: {
                         legend: {
                             display: false,
+                        },
+                        datalabels: {
+                            display: false
                         }
                     }
                 }} />
@@ -217,8 +230,11 @@ class TemperatureLineChart extends React.Component {
                     plugins: {
                         legend: {
                             display: false,
+                        },
+                        datalabels: {
+                            display: false
                         }
-                    }
+                    },
                 }} />
             </div>
         );
