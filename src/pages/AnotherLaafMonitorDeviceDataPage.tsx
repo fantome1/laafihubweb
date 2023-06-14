@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material";
 import React from "react";
-import { DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2 } from "../components/charts/Charts";
+import { DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2, GroupedBarChart, GroupedBarChart2, TemperatureCurveChart } from "../components/charts/Charts";
 
 class AnotherLaafiMonitorDeviceDataPage extends React.Component {
 
@@ -101,6 +101,44 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
                     </div>
                 </div>
 
+                {/* Second Row */}
+                <div className="flex mt-4">
+                    {/* Temperature Chart */}
+                    <div style={{ flex: '1 1 0' }}>
+                        <Paper className="py-4" elevation={0}>
+                            {/* FIXME remove chart borders */}
+                            <TemperatureCurveChart />
+
+                            <div className="flex bg-[#D7EDF0] h-[74px] rounded-[8px] text-[#3C4858] font-medium mt-4 mx-4">
+                                {[{ label: "Monitor count", value: "020" }, { label: "Average Temp", value: "12.54° C" }, { label: "Max Temp", value: "45.54° C" }, { label: "Min Temp", value: "05.54° C" }].map(e => (
+                                    <div className="grow flex flex-col justify-center items-center">
+                                        <p className="text-sm">{e.label}</p>
+                                        <p className="text-4xl">{e.value}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </Paper>
+                    </div>
+                    
+                    {/* Pie charts and bar chart */}
+                    <div className="flex" style={{ flex: '1 1 0' }}>
+                        {/* Pie chart */}
+                        <div className="grow">
+
+                        </div>
+                        
+                        {/* Bar charts */}
+                        <div>
+                            <Paper className="p-4">
+                                <GroupedBarChart />
+                            </Paper>
+
+                            <Paper className="p-4">
+                                <GroupedBarChart2 />
+                            </Paper>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );

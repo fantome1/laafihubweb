@@ -7,10 +7,11 @@ import {
     Tooltip,
     PointElement,
     LineElement,
-    DoughnutController
+    DoughnutController,
+    Filler
   } from 'chart.js';
 import React from 'react';
-import { Chart } from 'react-chartjs-2';
+import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
@@ -21,7 +22,8 @@ ChartJS.register(
     PointElement,
     LineElement,
     ChartDataLabels,
-    DoughnutController
+    DoughnutController,
+    Filler
 );
 
 class DeviceUsageChart extends React.Component {
@@ -293,4 +295,223 @@ class ConnectionStatusChart extends React.Component {
     }
 }
 
-export { DeviceUsageChart, DeviceUsageChart2, DeviceStatusChart, TemperatureChart, TemperatureLineChart, ConnectionStatusChart };
+class TemperatureCurveChart extends React.Component {
+
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            data: {
+                labels: [],
+                datasets: []
+            }
+        };
+    }
+
+    componentDidMount(): void {
+        const ctx = document.getElementById('canvas').getContext("2d");
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, '#ff6384');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        const data = {
+            labels: ['15h26m45s', '15h27m45s', '15h28m13s', '15h29m45s', '15h30m45s', '15h31m45s', '15h32m45s', '15h33m45s', '15h34m45s'],
+            datasets: [
+                {
+                    data: [39, 39, 39, 39, 39, 39, 39, 39, 39],
+                    borderColor: '#ff6384',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                },
+                {
+                    data: [34, 34, 34, 34, 34, 34, 34, 34, 34],
+                    borderColor: '#ff6384',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                },
+                {
+                    data: [37, 38, 38, 41, 42, 42, 39, 40, 38],
+                    borderColor: '#ff6384',
+                    backgroundColor: gradient,
+                    fill: 'origin',
+                    pointRadius: 0,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
+                },
+            ]
+        };
+
+        this.setState({ data });
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Line id={'canvas'} data={this.state.data} options={{
+                    responsive: true,
+                    scales: {
+                        x: {
+                            // ticks: {
+                            //     display: false
+                            // },
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            
+                            // gridLines: { display: false }
+                        },
+                        y: {
+                            grid: {
+                                // display: false,
+                                drawBorder: false,
+                                // drawOnChartArea: false
+                            },
+                            // ticks: {
+                                // beginAtZero:true
+                                // display: false
+                                // maxTicksLimit: 6
+                            // },
+                            suggestedMin: 30,
+                            suggestedMax: 45
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        datalabels: {
+                            display: false
+                        }
+                    }
+                }} />
+            </div>
+        );
+    }
+}
+
+class GroupedBarChart extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        labels: ["0", "1", "2", "3"],
+        datasets: [
+            {
+                backgroundColor: '#69ADA7',
+                data: [640, 670, 40, 190]
+            }, {
+                backgroundColor: '#3C4858',
+                data: [400, 60, 280, 0]
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='bar' data={this.data} options={{
+                    responsive: true,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            // ticks: {
+                            //     display: false
+                            // }
+                        },
+                        y: {
+                            // ticks: {
+                            //     display: false
+                            // }
+                            suggestedMax: 800
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        datalabels: {
+                            display: false
+                        }
+                    },
+                }} />
+            </div>
+        );
+    }
+}
+
+class GroupedBarChart2 extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        labels: ["0", "1", "2", "3"],
+        datasets: [
+            {
+                backgroundColor: '#00A6F9',
+                data: [640, 670, 40, 190]
+            }, {
+                backgroundColor: '#192F5D',
+                data: [400, 60, 280, 620]
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='bar' data={this.data} options={{
+                    responsive: true,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            // ticks: {
+                            //     display: false
+                            // }
+                        },
+                        y: {
+                            // ticks: {
+                            //     display: false
+                            // }
+                            suggestedMax: 800
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        datalabels: {
+                            display: false
+                        }
+                    },
+                }} />
+            </div>
+        );
+    }
+}
+
+export {
+    DeviceUsageChart,
+    DeviceUsageChart2,
+    DeviceStatusChart,
+    TemperatureChart,
+    TemperatureLineChart,
+    ConnectionStatusChart,
+    TemperatureCurveChart,
+    GroupedBarChart,
+    GroupedBarChart2
+};
