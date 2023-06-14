@@ -163,6 +163,7 @@ class TemperatureChart extends React.Component {
               rotation: -140,
               borderWidth: [0, 0],
               data: [3.5, 3],
+              borderRadius: 1000,
               backgroundColor: ['#69ADA7', '#23C4D81F'],
             }
         ]
@@ -177,6 +178,47 @@ class TemperatureChart extends React.Component {
             <div className='h-full'>
                 <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        datalabels: {
+                            display: false
+                        }
+                    }
+                }} />
+            </div>
+        );
+    }
+}
+
+class TemperatureChart2 extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        datasets: [
+            {
+              cutout: 40, 
+              circumference: 280,
+              rotation: -140,
+              borderWidth: [0, 0],
+              data: [3.5, 3],
+              borderRadius: 1000,
+              backgroundColor: ['#24C5D9', '#d0f2f6'],
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                    // responsive: true,
                     plugins: {
                         legend: {
                             display: false,
@@ -310,9 +352,16 @@ class TemperatureCurveChart extends React.Component {
 
     componentDidMount(): void {
         const ctx = document.getElementById('canvas').getContext("2d");
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
         gradient.addColorStop(0, '#ff6384');
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        // const {height: graphHeight} = myChartRef.canvas;
+        // let gradientLine = myChartRef
+        //     .createLinearGradient(0, 0, 0, graphHeight);
+        // gradientLine.addColorStop(0, "rgb(255, 0, 110, 0.2)");
+        // gradientLine.addColorStop(0.5, "rgb(255, 0, 110, 0.35)");
+        // gradientLine.addColorStop(1, "rgb(255, 0, 110, 0.7)");
 
         const data = {
             labels: ['15h26m45s', '15h27m45s', '15h28m13s', '15h29m45s', '15h30m45s', '15h31m45s', '15h32m45s', '15h33m45s', '15h34m45s'],
@@ -351,11 +400,15 @@ class TemperatureCurveChart extends React.Component {
             <div className='h-full'>
                 <Line id={'canvas'} data={this.state.data} options={{
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         x: {
-                            // ticks: {
-                            //     display: false
-                            // },
+                            ticks: {
+                                // display: false
+                                font: {
+                                    size: 12
+                                }
+                            },
                             grid: {
                                 display: false,
                                 drawBorder: false,
@@ -509,6 +562,7 @@ export {
     DeviceUsageChart2,
     DeviceStatusChart,
     TemperatureChart,
+    TemperatureChart2,
     TemperatureLineChart,
     ConnectionStatusChart,
     TemperatureCurveChart,

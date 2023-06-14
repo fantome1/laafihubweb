@@ -1,6 +1,7 @@
 import { Paper } from "@mui/material";
 import React from "react";
-import { DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2, GroupedBarChart, GroupedBarChart2, TemperatureCurveChart } from "../components/charts/Charts";
+import { DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2, GroupedBarChart, GroupedBarChart2, TemperatureChart, TemperatureChart2, TemperatureCurveChart } from "../components/charts/Charts";
+import { NearMap } from "../components/NearMap";
 
 class AnotherLaafiMonitorDeviceDataPage extends React.Component {
 
@@ -27,8 +28,12 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
                                     </div>
                                 </div>
                         </div>
-                        <div className="flex py-4">
+                        <div className="flex justify-between py-4">
                             <p className="text-xl text-[#999999]">Activies ID: <span className="text-[#3C4858]">LF-A-637</span></p>
+                            <div className="flex">
+                                <p className="text-[#309E3A] cursor-pointer"><span className="material-symbols-rounded">play_circle</span></p>
+                                <p className="ml-4 text-[#999999] cursor-pointer"><span className="material-symbols-rounded">stop_circle</span></p>
+                            </div>
                         </div>
                     </div>
 
@@ -102,16 +107,16 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
                 </div>
 
                 {/* Second Row */}
-                <div className="flex mt-4">
+                <div className="flex mt-4 space-x-2">
                     {/* Temperature Chart */}
                     <div style={{ flex: '1 1 0' }}>
                         <Paper className="py-4" elevation={0}>
                             {/* FIXME remove chart borders */}
-                            <TemperatureCurveChart />
+                            <div className="h-[180px]"><TemperatureCurveChart /></div>
 
                             <div className="flex bg-[#D7EDF0] h-[74px] rounded-[8px] text-[#3C4858] font-medium mt-4 mx-4">
                                 {[{ label: "Monitor count", value: "020" }, { label: "Average Temp", value: "12.54° C" }, { label: "Max Temp", value: "45.54° C" }, { label: "Min Temp", value: "05.54° C" }].map(e => (
-                                    <div className="grow flex flex-col justify-center items-center">
+                                    <div key={e.label} className="grow flex flex-col justify-center items-center">
                                         <p className="text-sm">{e.label}</p>
                                         <p className="text-4xl">{e.value}</p>
                                     </div>
@@ -119,24 +124,102 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
                             </div>
                         </Paper>
                     </div>
-                    
+
                     {/* Pie charts and bar chart */}
-                    <div className="flex" style={{ flex: '1 1 0' }}>
+                    <div className="flex space-x-2" style={{ flex: '1 1 0' }}>
                         {/* Pie chart */}
                         <div className="grow">
+                            <Paper elevation={0} className="flex flex-col justify-between h-full p-4">
+                                <div>
+                                    <p className="text-[#3C4858] text-right mb-4">All assigned assets</p>
+                                    <div className="flex divide-x">
+                                        <div className="grow flex flex-col items-center">
+                                            <div className="relative w-[104px] h-[104px]">
+                                                <TemperatureChart2 />
+                                                <div className="text-[#3C4858]" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'  }}>
+                                                    <span className="text-3xl">20</span>
+                                                    <span className="text-xl">/33</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-[#999999] mt-2">Connected devices</p>
+                                        </div>
+                                        <div className="grow flex flex-col items-center">
+                                            <div className="relative w-[104px] h-[104px]">
+                                                <TemperatureChart2 />
+                                                <div className="text-[#3C4858]" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'  }}>
+                                                    <span className="text-3xl">05</span>
+                                                    <span className="text-xl">/20</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-[#999999] mt-2">Active agents</p>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div className="flex divide-x mt-6 pt-2 border-t">
+                                    {[{label: 'Monitors', count: '003', total: '/10'}, {label: 'Centrals', count: '003', total: '/10'}, {label: 'Gateways', count: '003', total: '/10'}].map(v => (
+                                        <div key={v.label} className="grow flex flex-col justify-center items-center">
+                                            <p className='text-xs text-[#999999]'>{v.label}</p>
+                                            <p className="text-[#3C4858]"><span className=" text-xl">{v.count}</span><span>{v.total}</span></p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Paper>
                         </div>
                         
                         {/* Bar charts */}
-                        <div>
-                            <Paper className="p-4">
+                        <div className="flex flex-col space-y-2">
+                            <Paper className="h-[148px] p-2" elevation={0}>
                                 <GroupedBarChart />
                             </Paper>
 
-                            <Paper className="p-4">
+                            <Paper className="h-[148px] p-2" elevation={0}>
                                 <GroupedBarChart2 />
                             </Paper>
                         </div>
+                    </div>
+                </div>
+
+                {/* Last row */}
+                <div className="flex space-x-2 mt-4">
+                    <div style={{ flex: '1 1 0' }}>
+                        <table className="styled-table">
+                                    <thead>
+                                        <tr>{['Device ID', 'Temp', 'Hum %', 'Cover status', 'Agent', 'Bridge Status'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                    </thead>
+                                    <tbody>
+                                        {Array.from({ length: 14 }, (_, index) => (
+                                            <tr key={index}>
+                                                <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: getDeviceCellColor(index) }}>{getRandomDeviceId()}</div></div></td>
+                                                <td>{Math.trunc(Math.random() * 50) + 30}</td>
+                                                <td>{Math.trunc(Math.random() * 50) + 10}</td>
+                                                <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: '#D80303' }}>Opened</div></div></td>
+                                                <td className="text-[#3C4858] font-medium">SAWADOGO Issouffou</td>
+                                                <td><div className="flex justify-center">{getBridgeStatus(index)}</div></td>
+                                                {/* <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: randomStatus(index + 1).color }}>{randomStatus(index + 1).label}</div></div></td> */}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                            </table>
+                    </div>
+
+                    {/* Exposure card and Map */}
+                    <div style={{ flex: '1 1 0' }}>
+                        <Paper elevation={0} className="flex flex-col h-[112px] p-2">
+                            <p className="text-[#3C4858] mb-2">Exposure</p>
+                            <div className="flex divide-x grow">
+                                {/* Frame icon */}
+                                <div className="px-8"><img src="/icons/frame.svg" alt="" /></div>
+                                <div className="flex grow divide-x">{[{ label: 'Exposure count', value: '060' }, { label: 'Duration Max', value: '60 min' }, { label: 'Duration Min', value: '03 min' }, { label: 'Average Duration', value: '03 min' }].map(d => (
+                                    <div key={d.label} className="grow pl-2">
+                                        <p className="text-sm text-[#A2A2A2]">{d.label}</p>
+                                        <p className="text-xl text-[#3C4858] pt-2">{d.value}</p>
+                                    </div>
+                                ))}</div>
+                            </div>
+                        </Paper>
+
+                        <div className="mt-2 h-[300px]"><NearMap /></div>
                     </div>
                 </div>
 
@@ -144,5 +227,55 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
         );
     }
 }
+
+
+function getDeviceCellColor(index: number) {
+    return ((index + 1) % 3 == 0) ? '#999999' : '#3C4858'
+}
+
+function getRandomDeviceId() {
+    const suffix = Math.trunc(Math.random() * 80) + 10;
+    return `LM00${suffix}`;
+}
+
+function getBridgeStatus(index: number) {
+    switch((index + 1) % 2) {
+        case 0:
+            return <BridgeStatus1 />;
+        case 1:
+            return <BridgeStatus2 />
+    }
+}
+
+function BridgeStatus1() {
+    return (
+        <div className="flex items-center space-x-2">
+            <div><img src="icons/laafi_monitor/android.svg" alt="" /></div>
+
+            <div className="flex justify-between items-center border border-[#999999] rounded-md px-2 py-[2px]">
+                <div className="w-[24px]"><img src="icons/laafi_monitor/signal_cellular.svg" alt="" /></div>
+                <div className="w-[24px]"><img src="icons/laafi_monitor/wifi.svg" alt="" /></div>
+                <div><img src="icons/laafi_monitor/battery.svg" alt="" /></div>
+                <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
+            </div>
+        </div>
+    );
+}
+
+function BridgeStatus2() {
+    return (
+        <div className="flex items-center space-x-2">
+            <div><img src="icons/laafi_monitor/wifi_router.svg" alt="" /></div>
+
+            <div className="flex justify-between items-center border border-[#999999] rounded-md px-2 py-[2px]">
+                <div className="w-[24px]"><img src="icons/laafi_monitor/wifi.svg" alt="" /></div>
+                <div className="w-[24px]"><img src="icons/laafi_monitor/wired_network_connection.svg" alt="" /></div>
+                <div><img src="icons/laafi_monitor/battery.svg" alt="" /></div>
+                <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
+            </div>
+        </div>
+    );
+}
+
 
 export { AnotherLaafiMonitorDeviceDataPage };
