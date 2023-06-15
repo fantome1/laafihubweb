@@ -5,7 +5,7 @@ import { Utils } from "../services/utils";
 
 type Props = {
 
-}
+};
 
 class OrganizationPage extends React.Component<Props> {
 

@@ -12,6 +12,8 @@ import { LaafiMonitorPage } from "./pages/LaafiMonitorPage";
 import { LaafiMonitorDeviceDataPage } from "./pages/LaafMonitorDeviceDataPage";
 import { AnotherLaafiMonitorPage } from "./pages/AnotherLaafiMonitorPage";
 import { AnotherLaafiMonitorDeviceDataPage } from "./pages/AnotherLaafMonitorDeviceDataPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
+import { NotificationsPage2 } from "./pages/NotificationsPage2";
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path={routes.LAAFI_MONITOR_DEVICE_DATA} element={<LaafiMonitorDeviceDataPage />} />
           <Route path={routes.ANOTHER_LAAFI_MONITOR} element={<AnotherLaafiMonitorPage />} />
           <Route path={routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA} element={<AnotherLaafiMonitorDeviceDataPage />} />
+          <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />
+          <Route path={routes.NOTIFICATIONS_2} element={<NotificationsPage2 />} />
         </Route>
       </Routes>
     </BrowserRouter>

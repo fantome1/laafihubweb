@@ -11,6 +11,8 @@ const routes = {
     LAAFI_MONITOR_DEVICE_DATA: '/laafi-monitor-device-data',
     ANOTHER_LAAFI_MONITOR: '/another-laafi-monitor',
     ANOTHER_LAAFI_MONITOR_DEVICE_DATA: '/another-laafi-monitor-device-data',
+    NOTIFICATIONS: '/notifications',
+    NOTIFICATIONS_2: '/notifications-2'
 };
 
 export { routes };

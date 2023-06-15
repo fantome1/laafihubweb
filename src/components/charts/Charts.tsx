@@ -48,19 +48,16 @@ class DeviceUsageChart extends React.Component {
         return (
             <div className='h-full'>
                 <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
-                    // responsive: true,
+                    responsive: true,
+                    // maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
                             position: 'right',
                             maxWidth: 180,
-                            labels: {
-                                boxWidth: 10
-                            }
+                            labels: { boxWidth: 10 }
                         },
-                        datalabels: {
-                            display: false
-                        }
+                        datalabels: { display: false }
                     }
                 }} />
             </div>
@@ -103,6 +100,45 @@ class DeviceUsageChart2 extends React.Component {
                         datalabels: {
                             display: false
                         }
+                    }
+                }} />
+            </div>
+        );
+    }
+}
+
+class DeviceUsageChart3 extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        labels: ['Enrolled', 'Disabled'],
+        datasets: [
+            {
+              data: [3, 3],
+              backgroundColor: ['#F2994A', '#F5DBC4'],
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                    responsive: true,
+                    // maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            maxWidth: 180,
+                            labels: { boxWidth: 10 }
+                        },
+                        datalabels: { display: false }
                     }
                 }} />
             </div>
@@ -560,6 +596,7 @@ class GroupedBarChart2 extends React.Component {
 export {
     DeviceUsageChart,
     DeviceUsageChart2,
+    DeviceUsageChart3,
     DeviceStatusChart,
     TemperatureChart,
     TemperatureChart2,

@@ -50,4 +50,42 @@ class ActivityChart extends React.Component {
     }
 }
 
-export { ActivityChart };
+class ActivityChart2 extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A'],
+        datasets: [
+            {
+              data: [16, 20, 4, 15, 13, 10, 8, 14, 2],
+              backgroundColor: '#49CDDD',
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='bar' data={this.data} options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { display: false }
+                        }
+                    }
+                }} />
+            </div>
+        );
+    }
+}
+
+export { ActivityChart, ActivityChart2 };

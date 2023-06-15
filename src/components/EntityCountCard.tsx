@@ -3,7 +3,7 @@ import { Card, Paper } from "@mui/material";
 type Props = {
     width?: number
     fullWidth?: boolean
-    iconUrl: string
+    iconUrl?: string
     label: string
     count: string
     items: {
@@ -19,7 +19,7 @@ function EntityCountCard(props: Props) {
         <Paper elevation={props.elevation ?? 1} sx={{ width: props.fullWidth ? '100%' : props.width }} className={`p-3`}>
             <div className="flex justify-between">
                 <div className="flex items-center">
-                    <img src={props.iconUrl} width={props.iconSize ?? 28} alt="" />
+                    {props.iconUrl && <img src={props.iconUrl} width={props.iconSize ?? 28} alt="" />}
                     <p className="ml-3 text-2xl text-neutral-400">{props.label}</p>
                 </div>
                 <div className="flex flex-col items-center">

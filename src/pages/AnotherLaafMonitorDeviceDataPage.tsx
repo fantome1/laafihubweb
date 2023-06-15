@@ -15,18 +15,18 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
                     {/* First card */}
                     <div className="h-[120px] grow flex flex-col justify-between bg-white px-4 rounded-md">
                         <div className="relative">
-                                <Paper elevation={2} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
-                                    <img src="icons/laafi_monitor/devce.svg" alt="" />
-                                </Paper>
+                            <Paper elevation={2} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
+                                <img src="icons/laafi_monitor/devce.svg" alt="" />
+                            </Paper>
 
-                                <div className="flex items-center h-[56px]">
-                                    <div className="flex items-center h-full">
-                                        <div className="w-[80px] mr-4"></div> {/* ml marge de l'icone a gauche, 68px (largeur) taille de l'icone */}
-                                        <div className="flex flex-col justify-around h-full">
-                                            <p className="text-2xl text-[#3C4858]">Activity</p>
-                                        </div>
+                            <div className="flex items-center h-[56px]">
+                                <div className="flex items-center h-full">
+                                    <div className="w-[80px] mr-4"></div> {/* ml marge de l'icone a gauche, 68px (largeur) taille de l'icone */}
+                                    <div className="flex flex-col justify-around h-full">
+                                        <p className="text-2xl text-[#3C4858]">Activity</p>
                                     </div>
                                 </div>
+                            </div>
                         </div>
                         <div className="flex justify-between py-4">
                             <p className="text-xl text-[#999999]">Activies ID: <span className="text-[#3C4858]">LF-A-637</span></p>
@@ -228,7 +228,6 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component {
     }
 }
 
-
 function getDeviceCellColor(index: number) {
     return ((index + 1) % 3 == 0) ? '#999999' : '#3C4858'
 }
@@ -276,6 +275,5 @@ function BridgeStatus2() {
         </div>
     );
 }
-
 
 export { AnotherLaafiMonitorDeviceDataPage };
