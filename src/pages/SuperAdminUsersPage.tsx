@@ -27,7 +27,7 @@ class SuperAdminUsersPage extends React.Component {
                     <div className="h-[120px] grow flex justify-between bg-white px-4 rounded-md">
                         <div className="relative">
                             <Paper elevation={0} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
-                                <img src="/icons/super_admin_users/user.svg" alt="" />
+                                <span className="material-symbols-outlined text-[36px] text-white">account_circle</span>
                             </Paper>
 
                             <div className="flex items-center h-[56px]">
@@ -56,7 +56,7 @@ class SuperAdminUsersPage extends React.Component {
                     </div>
 
                     <div className="flex justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
-                        <img src="/icons/super_admin_users/add.svg" alt="" width={36} />
+                        <span className="material-symbols-outlined text-[36px] text-white">add</span>
                         <p className="text-xl text-white">Create</p>
                     </div>
                 </div>
@@ -78,14 +78,13 @@ class SuperAdminUsersPage extends React.Component {
                                             <td>MS Burkina Faso</td>
                                             <td>LM0077</td>
                                             <td></td>
-                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><img src={'icons/super_admin_users/delete.svg'} /></div></div></td>
+                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span className="material-symbols-rounded text-[#999999]">delete_forever</span></div></div></td>
                                         </tr>
                                     ))}
                                 </tbody>
                         </table>
                     </div>
 
-                    
                     <div className="w-[30%]">
                         <Paper className="p-3" elevation={0}>
                             {/* header */}
@@ -133,7 +132,7 @@ class SuperAdminUsersPage extends React.Component {
                                     {Array.from({ length: 6 }, _ => (
                                         <div className="flex bg-[var(--primary)] h-[26px] rounded">
                                             <div className="grow"></div>
-                                            <div className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><img src="icons/super_admin_users/delete_white.svg" alt="" /></div>
+                                            <div className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
                                         </div>
                                     ))}
                                 </div>

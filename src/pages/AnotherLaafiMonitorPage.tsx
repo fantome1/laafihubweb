@@ -16,20 +16,20 @@ class AnotherLaafiMonitorPage extends React.Component {
                     <div className="h-[120px] grow flex justify-between bg-white px-4 rounded-md">
                         <div className="relative">
                                 <Paper elevation={2} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
-                                    <img src="icons/laafi_monitor/activities.svg" alt="" />
+                                    <span className="material-symbols-rounded text-white text-[36px]">finance</span>
                                 </Paper>
 
                                 <div className="flex items-center h-[56px]">
                                     <div className="flex items-center h-full">
                                         <div className="w-[80px] mr-4"></div> {/* ml marge de l'icone a gauche, 68px (largeur) taille de l'icone */}
                                         <div className="flex flex-col justify-around h-full">
-                                            <p className="text-2xl text-[#3C4858]">{/* name */}</p>
+                                            <p className="text-2xl text-[#3C4858]">Activities</p>
                                         </div>
                                     </div>
                                 </div>
                         </div>
                         <div className="flex items-end py-4">
-                                <p className="text-4xl text-[#3C4858]">{/* count */}</p>
+                            <p className="text-4xl text-[#3C4858]">{/* count */}</p>
                         </div>
                     </div>
 
@@ -68,7 +68,7 @@ class AnotherLaafiMonitorPage extends React.Component {
 
                     {/* Create button */}
                     <div className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
-                        <img src="/icons/super_admin_users/add.svg" alt="" width={42} />
+                        <span className="material-symbols-rounded text-white text-[42px]">add</span>
                         <p className="text-xl text-white">Create</p>
                     </div>
                 </div>
@@ -80,18 +80,24 @@ class AnotherLaafiMonitorPage extends React.Component {
                     <div className="grow">
                         <table className="styled-table">
                             <thead>
-                                <tr>{['', 'Activities', '', 'Connection type', 'Mode', 'Infrastructure name', 'Groups',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                <tr>{['', 'Activities', '', 'Connection type', 'Mode', 'Infrastructure name', 'Status',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                             </thead>
                             <tbody>
                                 {Array.from({ length: 13 }, (e, index) => (
                                     <tr key={index}>
-                                        <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#69ADA7', '#D80303', '#999999'][index % 3] }}></div></div></td>
+                                        <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#7EC381', '#D80303', '#999999'][index % 3] }}></div></div></td>
                                         <td></td>
                                         <td>LM0077</td>
                                         <td></td>
                                         <td></td>
                                         <td>MS Burkina Faso</td>
-                                        <td>Bob Bobar</td>
+                                        <td>
+                                            <div className="flex justify-center items-center space-x-1">
+                                                <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#309E3A]' : 'text-[#999999]'}`}>play_circle</span>
+                                                <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#999999]' : 'text-[#0038FF]'}`}>stop_circle</span>
+                                                <span className="material-symbols-rounded text-[20px] text-[#D80303]">delete_forever</span>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -107,7 +113,7 @@ class AnotherLaafiMonitorPage extends React.Component {
                         </div>
 
                         {/* Group */}
-                        <div className='bg-white rounded-lg mt-2'>
+                        <div className='bg-white rounded-lg mt-2 pb-4'>
                             <AnotherActivityList
                                 data={[
                                     { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)] },
@@ -126,6 +132,10 @@ class AnotherLaafiMonitorPage extends React.Component {
             </div>
         );
     }
+}
+
+function isPlaying(index: number) {
+    return index >= 2;
 }
 
 export { AnotherLaafiMonitorPage };

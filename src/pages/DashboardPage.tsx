@@ -4,6 +4,7 @@ import { EntityCountCard } from "../components/EntityCountCard";
 import { InfrastructurePerCountry } from "../components/InfrastructurePerCountry";
 import { BubleMap } from "../components/BubleMap";
 import { ActivityList } from "../components/ActivityList";
+import { DeviceUsageChart3, DeviceUsageChart4, DeviceUsageChart5 } from "../components/charts/Charts";
 
 class DashboardPage extends React.Component {
 
@@ -20,7 +21,7 @@ class DashboardPage extends React.Component {
 
                     <EntityCountCard
                         width={280}
-                        iconUrl="/icons/entity_count_card/notification.svg"
+                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">notifications</span>}
                         label="Alerts"
                         count="060"
                         items={[
@@ -32,9 +33,9 @@ class DashboardPage extends React.Component {
 
                     <EntityCountCard
                         width={280}
-                        iconUrl="/icons/entity_count_card/device.svg"
+                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices</span>}
                         label="Devices"
-                        count="0005"
+                        count="005"
                         items={[
                             { label: 'Monitors', count: '020' },
                             { label: 'Centrals', count: '020' },
@@ -44,7 +45,7 @@ class DashboardPage extends React.Component {
 
                     <EntityCountCard
                         width={310}
-                        iconUrl="/icons/entity_count_card/user.svg"
+                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">person</span>}
                         label="Users"
                         count="012"
                         items={[
@@ -57,7 +58,7 @@ class DashboardPage extends React.Component {
 
                     <EntityCountCard
                         width={280}
-                        iconUrl="/icons/entity_count_card/infrastructure.svg"
+                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">apartment</span>}
                         label="Assets"
                         count="003"
                         items={[
@@ -98,8 +99,26 @@ class DashboardPage extends React.Component {
                         />
                     </div>
 
-                    <div style={{ flex: '1 1 0' }}>
-                        <Paper className="h-full"></Paper>
+                    <div className="flex flex-col" style={{ flex: '1 1 0', backgroundColor: '#fff', borderRadius: '4px' }}>
+                        <div className="bg-[var(--primary)] py-1 text-center" style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
+                            <p className="text-lg text-white font-medium">Devices</p>
+                        </div>
+
+                        <div className="flex p-4 grow">
+                            <div className="w-[50%] flex flex-col justify-between">
+                                <p className="text-xl text-[#3C4858]">Devices status</p>
+                                <div className="flex justify-center items-center">
+                                    <div className="w-[80%] border-r"><DeviceUsageChart4 /></div>
+                                </div>
+                            </div>
+
+                            <div className="w-[50%] w-[50%] flex flex-col justify-between">
+                                <p className="text-xl text-[]">Devices usage</p>
+                                <div className="flex justify-center items-center">
+                                    <div className="w-[80%]"><DeviceUsageChart5 /></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

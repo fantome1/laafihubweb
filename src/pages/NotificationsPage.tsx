@@ -47,7 +47,6 @@ class NotificationsPage extends React.Component {
                                 <EntityCountCard
                                     fullWidth
                                     elevation={0}
-                                    // iconUrl="/icons/entity_count_card/user.svg"
                                     label="Alerts"
                                     count="060"
                                     items={[

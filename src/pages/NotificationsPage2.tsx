@@ -47,7 +47,6 @@ class NotificationsPage2 extends React.Component {
                             <EntityCountCard
                                 fullWidth
                                 elevation={0}
-                                // iconUrl="/icons/entity_count_card/user.svg"
                                 label="Alerts"
                                 count="060"
                                 items={[
@@ -74,7 +73,6 @@ class NotificationsPage2 extends React.Component {
                                 <DeviceUsageChart3 />
                             </div>
                         </div>
-
                     </div>
 
                     {/* Map */}
@@ -82,7 +80,6 @@ class NotificationsPage2 extends React.Component {
                         <BubleMap />
                     </div>
                 </div>
-
 
                 {/* Table */}
                 <div className="mt-4">

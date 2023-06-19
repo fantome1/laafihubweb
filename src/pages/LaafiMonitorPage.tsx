@@ -1,5 +1,5 @@
-import { Paper } from "@mui/material";
 import React from "react";
+import { Paper } from "@mui/material";
 import { DeviceStatusChart, DeviceUsageChart2 } from "../components/charts/Charts";
 
 class LaafiMonitorPage extends React.Component {
@@ -15,7 +15,8 @@ class LaafiMonitorPage extends React.Component {
                     <div className="h-[120px] grow flex justify-between bg-white px-4 rounded-md">
                         <div className="relative">
                                 <Paper elevation={2} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
-                                    <img src="icons/laafi_monitor/devce.svg" alt="" />
+                                    {/* <img src="icons/laafi_monitor/devce.svg" alt="" /> */}
+                                    <span className="material-symbols-rounded text-[42px] text-white">devices</span>
                                 </Paper>
 
                                 <div className="flex items-center h-[56px]">
@@ -67,13 +68,13 @@ class LaafiMonitorPage extends React.Component {
 
                     {/* Button add monitor and add group */}
                     <div className="flex flex-col justify-between">
-                        <div className="flex justify-center items-center w-[120px] h-[68px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
-                            <img src="/icons/super_admin_users/add.svg" alt="" width={36} />
+                        <div className="flex items-center w-[120px] h-[68px] px-2 cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                            <span className="material-symbols-rounded text-[28px] text-white">add</span>
                             <p className="text-xl text-white">Monitor</p>
                         </div>
 
-                        <div className="flex justify-center items-center w-[120px] h-[46px] cursor-pointer" style={{ backgroundColor: '#00A6F9', borderRadius: '6px' }}>
-                            <img src="/icons/super_admin_users/add.svg" alt="" width={36} />
+                        <div className="flex items-center w-[120px] h-[46px] px-2 cursor-pointer" style={{ backgroundColor: '#00A6F9', borderRadius: '6px' }}>
+                            <span className="material-symbols-rounded text-[28px] text-white">add</span>
                             <p className="text-xl text-white">Group</p>
                         </div>
                     </div>
@@ -126,7 +127,7 @@ class LaafiMonitorPage extends React.Component {
                                 {Array.from({ length: 6 }, _ => (
                                     <div className="flex bg-[#C4C4C4] h-[26px] rounded">
                                         <div className="grow"></div>
-                                        <div className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><img src="icons/super_admin_users/delete_white.svg" alt="" /></div>
+                                        <div className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
                                     </div>
                                 ))}
                             </div>

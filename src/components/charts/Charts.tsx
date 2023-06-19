@@ -8,6 +8,7 @@ import {
     PointElement,
     LineElement,
     DoughnutController,
+    BarController,
     Filler
   } from 'chart.js';
 import React from 'react';
@@ -23,6 +24,7 @@ ChartJS.register(
     LineElement,
     ChartDataLabels,
     DoughnutController,
+    BarController,
     Filler
 );
 
@@ -294,6 +296,7 @@ class TemperatureLineChart extends React.Component {
             <div className='h-full'>
                 <Chart ref={this.chartRef} type='line' data={this.data} options={{
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             ticks: {
@@ -593,6 +596,85 @@ class GroupedBarChart2 extends React.Component {
     }
 }
 
+class DeviceUsageChart4 extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        labels: ['Active', 'Unassigned', 'Disabled'],
+        datasets: [
+            {
+              data: [8, 6, 1],
+              backgroundColor: ['#69ADA7', '#D80303', '#999999'],
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                    responsive: true,
+                    // maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            maxWidth: 180,
+                            labels: { boxWidth: 10 }
+                        },
+                        datalabels: { display: false }
+                    }
+                }} />
+            </div>
+        );
+    }
+}
+
+class DeviceUsageChart5 extends React.Component {
+
+    private chartRef = React.createRef<ChartJS>()
+
+    private data = {
+        labels: ['Active', 'Disabled'],
+        datasets: [
+            {
+              data: [8, 7],
+              backgroundColor: ['#69ADA7', '#F2994A'],
+            }
+        ]
+    }
+
+    constructor(props: any) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className='h-full'>
+                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                    responsive: true,
+                    // maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            maxWidth: 180,
+                            labels: { boxWidth: 10 }
+                        },
+                        datalabels: { display: false }
+                    }
+                }} />
+            </div>
+        );
+    }
+}
+
+
 export {
     DeviceUsageChart,
     DeviceUsageChart2,
@@ -604,5 +686,7 @@ export {
     ConnectionStatusChart,
     TemperatureCurveChart,
     GroupedBarChart,
-    GroupedBarChart2
+    GroupedBarChart2,
+    DeviceUsageChart4,
+    DeviceUsageChart5
 };

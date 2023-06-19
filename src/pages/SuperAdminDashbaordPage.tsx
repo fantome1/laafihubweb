@@ -67,10 +67,9 @@ class SuperAdminDashboardPage extends React.Component {
                 <div className="flex mt-4">
                     <div className="flex flex-col space-y-2 w-[50%] pr-4">
                         <EntityCountCard
-                            iconUrl="/icons/super_admin/user.svg"
+                            icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">notifications</span>}
                             label="Users"
                             count="012"
-                            iconSize={36}
                             elevation={0}
                             items={[
                                 { label: 'Supervisors', count: '020' },
@@ -80,10 +79,9 @@ class SuperAdminDashboardPage extends React.Component {
                         />
 
                         <EntityCountCard
-                            iconUrl="/icons/super_admin/device.svg"
+                            icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices</span>}
                             label="Devices"
                             count="060"
-                            iconSize={36}
                             elevation={0}
                             items={[
                                 { label: 'Gateways', count: '020' },
