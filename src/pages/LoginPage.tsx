@@ -1,14 +1,20 @@
-import { AccountCircle, EmailOutlined, LockOutlined } from "@mui/icons-material";
-import { TextField } from "@mui/material";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import React from "react";
+import { AccountCircle, EmailOutlined, LockOutlined } from "@mui/icons-material";
+import { TextField, Box, Snackbar, Alert } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { FormValidator, FormValidatorData } from "../packages/form_validator/form_validator";
 import { getLoginFormValidator } from "../form_validator/login_form_validator";
 import { Api } from "../services/api";
-import { LoadingButton } from "@mui/lab";
+import { WithRouter } from "../components/WithRouterHook";
+import { AuthService } from "../services/auth_service";
+import { routes } from "../constants/routes";
 
-// FIXME put in constant
+// Laafi_DataBase
+// user@example.com
+// W!lly2023
+
+
+// FIXME make as constant everywhere
 const textFieldStyle = {
     "& label.Mui-focused": {
         color: 'var(--primary)'
@@ -19,15 +25,17 @@ const textFieldStyle = {
     },
 };
 
-type Props = {};
+type Props = {
+    navigate: Function;
+};
 
 type State = {
-    error: any,
-    formState: FormValidatorData
+    formState: FormValidatorData;
+    snackbarErrorMessage: string|null;
 }
 
 class LoginPage extends React.Component<Props, State> {
-    
+
     private readonly validator: FormValidator;
 
     constructor(props: any) {
@@ -36,13 +44,14 @@ class LoginPage extends React.Component<Props, State> {
         this.validator = getLoginFormValidator();
 
         this.state = {
-            error: null,
-            formState: this.validator.getData
+            formState: this.validator.getData,
+            snackbarErrorMessage: null
         };
 
         this.listen = this.listen.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.validator.listen(this.listen);
+        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     }
 
     listen(value: FormValidatorData) {
@@ -59,18 +68,30 @@ class LoginPage extends React.Component<Props, State> {
         Api.login(values.organizationId, values.email, values.password)
             .then(response => {
                 this.validator.setLoadingStatus(false);
-                // alert('success' + JSON.stringify(values));
-                console.log('succcess', response);
+                AuthService.saveData(response);
+                this.props.navigate(routes.HOME, { replace: true });
             }).catch(err => {
                 console.log('error', err);
-                
                 this.validator.setLoadingStatus(false);
-                this.setState({ error: err });
-                // alert('echec');
+
+                let message = 'Addresse email ou mot de passe incorrect !'
+
+                if (err instanceof TypeError) {
+                    message = 'Veuillez verifier votre connexion internet et reesayer' // FIXME typo
+                }
+
+                this.setState({ snackbarErrorMessage: message });
             });
     }
 
+    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
+        if (reason === 'clickaway')
+            return;
+        this.setState({ snackbarErrorMessage: null });
+    }
+
     render() {
+
         const formState = this.state.formState;
         const organizationErrorMessage = formState.fields['organizationId'].errorMessage;
         const emailErrorMessage = formState.fields['email'].errorMessage;
@@ -154,10 +175,20 @@ class LoginPage extends React.Component<Props, State> {
                     </div>
 
                 </div>
+
+                <Snackbar
+                    open={Boolean(this.state.snackbarErrorMessage)}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                    <Alert onClose={this.handleCloseSnackbar} severity="error" variant="filled" sx={{ width: '100%' }}>{this.state.snackbarErrorMessage}</Alert>
+                </Snackbar>
+
             </div>
         );
     }
 
 }
 
-export { LoginPage };
+export default WithRouter(LoginPage);

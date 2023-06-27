@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { routes } from "./constants/routes";
 import { LayoutBase } from "./layouts/LayoutBase";
 import { DashboardPage } from "./pages/DashboardPage";
-import { LoginPage } from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { EditProfilPage } from "./pages/EditProfilPage";
 import { OrganizationPage } from "./pages/OrganizationPage";

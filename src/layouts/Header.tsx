@@ -1,5 +1,7 @@
 import React from "react";
 import { Menu, MenuItem, Typography } from "@mui/material";
+import { AuthService } from "../services/auth_service";
+import { Utils } from "../services/utils";
 
 const actions = [
     'View Profile',
@@ -27,24 +29,34 @@ function Header() {
 
 function OrganizationProfile() {
 
+    const user = AuthService.getUser();
+
     const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchor(event.currentTarget);
     };
 
-    const handleCloseUserMenu = () => {
-        setAnchor(null);        
+    const handleCloseUserMenu = (action: string|null) => {
+        setAnchor(null);   
+        
+        switch(action) {
+            case 'logged_out':
+                AuthService.disconnect();
+            break;
+        }
     };
 
-    const open = Boolean(anchor)
+
+
+    const open = Boolean(anchor);
 
     return (
         <>
             <div className="flex cursor-pointer" onClick={handleOpenUserMenu} id="demo-positioned-button">
                 <div className="flex flex-col items-end text-white">
-                    <p>Organization</p>
-                    <p className="text-xs">Admin Name</p>
+                    <p>{user?.organizationId}</p>
+                    <p className="text-xs">{Utils.getUserFullname(user!)}</p>
                 </div>
                 <div className="w-[44px] h-[44px] ml-2.5 flex justify-center items-center bg-white rounded-full">
                     <img src="/icons/dashboard/organization_profile.svg" alt="" width='22px' />
@@ -64,7 +76,7 @@ function OrganizationProfile() {
                 }}
                 keepMounted
                 open={open}
-                onClose={handleCloseUserMenu}
+                onClose={() => handleCloseUserMenu(null)}
                 PaperProps={{
                     style: {
                         width: '244px',
@@ -76,15 +88,15 @@ function OrganizationProfile() {
                     sx: { py: 0 }
                 }}
             >
-                <div onClick={handleCloseUserMenu} className="flex justify-center items-center h-[48px] bg-[var(--primary)] text-white cursor-pointer">
-                    <Typography textAlign="center">Signed in as: Admin Name</Typography>
+                <div onClick={() => handleCloseUserMenu(null)} className="flex justify-center items-center h-[48px] bg-[var(--primary)] text-white cursor-pointer">
+                    <Typography textAlign="center">Signed in as: {Utils.getUserFullname(user!)}</Typography>
                 </div>
                 {actions.map((action) => (
-                    <MenuItem key={action} component="div" onClick={handleCloseUserMenu} className="h-[40px]">
+                    <MenuItem key={action} component="div" onClick={() => handleCloseUserMenu(action)} className="h-[40px]">
                         <Typography textAlign="center" className="text-neutral-500">{action}</Typography>
                     </MenuItem>
                 ))}
-                <div onClick={handleCloseUserMenu} className="flex justify-center items-center h-[48px] bg-[var(--primary)] text-white cursor-pointer">
+                <div onClick={() => handleCloseUserMenu('logged_out')} className="flex justify-center items-center h-[48px] bg-[var(--primary)] text-white cursor-pointer">
                     <Typography textAlign="center">Sign out</Typography>
                 </div>
             </Menu>

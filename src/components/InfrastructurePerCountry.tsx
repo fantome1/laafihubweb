@@ -16,7 +16,7 @@ function InfrastructurePerCountry(props: Props) {
             <Paper className="p-4 pt-0 h-full">
 
                 <div className="absolute top-[-16px] left-4 bg-[var(--primary)] flex justify-center items-center w-[48px] h-[48px] rounded">
-                    <img src="/icons/infrastructure_per_country/infrastructure.svg" width={24} alt="" />
+                    <span className="material-symbols-outlined text-white text-[28px]">domain</span>
                 </div>
 
                 {/* Pour compenser l'espace inocuupe par la div au dessus d'elle */}

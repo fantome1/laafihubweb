@@ -33,7 +33,7 @@ class DashboardPage extends React.Component {
 
                     <EntityCountCard
                         width={280}
-                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices</span>}
+                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices_other</span>}
                         label="Devices"
                         count="005"
                         items={[
@@ -58,7 +58,7 @@ class DashboardPage extends React.Component {
 
                     <EntityCountCard
                         width={280}
-                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">apartment</span>}
+                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">domain</span>}
                         label="Assets"
                         count="003"
                         items={[
