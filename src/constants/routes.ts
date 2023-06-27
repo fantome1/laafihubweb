@@ -1,6 +1,7 @@
 
 const routes = {
-    LOGIN: '/connexion',
+    NOT_FOUND: '*',
+    LOGIN: '/login',
     SIGN_UP: '/inscription',
     EDIT_PROFIL: '/edit-profil',
     HOME: '/',
