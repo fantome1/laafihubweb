@@ -20,19 +20,19 @@ const middle = [
         icon: 'devices_other'
     }, {
         route: '/a',
-        icon: '/icons/sidebar/icon1.svg'
+        icon: 'backpack'
     }, {
-        route: '/finance',
+        route: routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA,
         icon: 'finance'
     }, {
-        route: '/notifications',
+        route: routes.NOTIFICATIONS,
         icon: 'notifications'
     }
 ];
 
 const bottom = [
     {
-        route: '/account',
+        route: routes.SUPER_ADMIN_USERS,
         icon: 'account_circle'
     }, {
         route: '/forum',
