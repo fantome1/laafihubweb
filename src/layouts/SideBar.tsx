@@ -6,7 +6,7 @@ const top = [
         route: '/search',
         icon: 'search'
     }, {
-        route: '/',
+        route: routes.HOME,
         icon: 'dashboard'
     },
 ];
@@ -16,7 +16,7 @@ const middle = [
         route: routes.ORGANIZATION,
         icon: 'domain'
     }, {
-        route: '/devices',
+        route: routes.LAAFI_MONITOR, // routes.LAAFI_MONITOR_DEVICE_DATA
         icon: 'devices_other'
     }, {
         route: '/a',

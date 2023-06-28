@@ -1,0 +1,18 @@
+{
+    "matricule": "10118201",
+    "role": "Agent",
+    "firstName": "Kinda",
+    "lastName": "wilfried",
+    "phone": "73226469",
+    "gender": 1,
+    "address": {
+      "street": "Dassassgoh",
+      "city": "Ouagadougou",
+      "state": "Burkina Faso",
+      "zipCode": "000"
+    },
+    "email": "user@exemple.com",
+    "password": "12345678",
+  "infrastructureId": "",
+    "activityId": ""
+  }

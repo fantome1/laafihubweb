@@ -63,7 +63,7 @@ class LoginPage extends React.Component<Props, State> {
             return;
 
         const values = this.validator.getValues();
-        this.validator.setLoadingStatus(true);        
+        this.validator.setLoadingStatus(true);
 
         Api.login(values.organizationId, values.email, values.password)
             .then(response => {
@@ -74,7 +74,7 @@ class LoginPage extends React.Component<Props, State> {
                 console.log('error', err);
                 this.validator.setLoadingStatus(false);
 
-                let message = 'Addresse email ou mot de passe incorrect !'
+                let message = 'Adresse email ou mot de passe incorrect !'
 
                 if (err instanceof TypeError) {
                     message = 'Veuillez verifier votre connexion internet et reesayer' // FIXME typo

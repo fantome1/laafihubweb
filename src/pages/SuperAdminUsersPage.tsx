@@ -1,5 +1,11 @@
-import { Paper, TextField } from "@mui/material";
+import { Alert, AlertColor, CircularProgress, Paper, Snackbar, TextField } from "@mui/material";
 import React from "react";
+import { Completer } from "../services/completer";
+import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
+import { Api } from "../services/api";
+import { PromiseBuilder } from "../components/PromiseBuilder";
+import { IUser } from "../models/user_model";
+import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 
 const textFieldStyle = {
     "& label": {
@@ -15,9 +21,86 @@ const textFieldStyle = {
     },
 };
 
-class SuperAdminUsersPage extends React.Component {
+
+type Props = {
+
+};
+
+type State = {
+    addUserDialogCompleter: Completer<boolean>|null;
+    deleteConfirmationCompleter: Completer<boolean>|null;
+    snackbarData: {  severity: AlertColor, message: string }|null;
+    usersPromise?: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }[]>|null
+}
+
+class SuperAdminUsersPage extends React.Component<Props, State> {
+
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            addUserDialogCompleter: null,
+            deleteConfirmationCompleter: null,
+            snackbarData: null,
+            usersPromise: null
+        };
+
+        this.showAddUserDialog = this.showAddUserDialog.bind(this);
+        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+    }
+
+    componentDidMount(): void {
+        this.setState({ usersPromise: Api.getUsers() });
+    }
+
+    async showAddUserDialog() {
+        const completer = new Completer<boolean>();
+        this.setState({ addUserDialogCompleter: completer });
+
+        const result = await completer.promise;
+        this.setState({ addUserDialogCompleter: null });
+
+        if (result == true) {
+            this.setState({
+                snackbarData: { severity: 'success', message: 'Utilisateur ajouté avec succès' },
+                usersPromise: Api.getUsers()
+            });
+        }
+    }
+
+    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
+        if (reason === 'clickaway')
+            return;
+        this.setState({ snackbarData: null });
+    }
+
+    async onDeleteUser(user: IUser) {
+
+        const completer = new Completer<boolean>();
+        this.setState({ deleteConfirmationCompleter: completer });
+
+        const result = await completer.promise;
+        this.setState({ deleteConfirmationCompleter: null });
+
+        if (result != true)
+            return;
+
+        Api.deleteUser(user.id)
+            .then(() => {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Utilisateur supprimé avec succès' },
+                    usersPromise: Api.getUsers()
+                });
+            }).catch(err => {
+                console.log('err', err);
+                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur' } });
+            });
+    }
 
     render() {
+
+        const state = this.state;        
+
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
 
@@ -55,7 +138,7 @@ class SuperAdminUsersPage extends React.Component {
                         </div>
                     </div>
 
-                    <div className="flex justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                    <div onClick={this.showAddUserDialog} className="flex justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                         <span className="material-symbols-outlined text-[36px] text-white">add</span>
                         <p className="text-xl text-white">Create</p>
                     </div>
@@ -66,23 +149,30 @@ class SuperAdminUsersPage extends React.Component {
 
                     {/* user card */}
                     <div className="w-[70%]">
-                        <table className="styled-table">
-                                <thead>
-                                    <tr>{['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                                </thead>
-                                <tbody>
-                                    {Array.from({ length: 17 }, (_, index) => (
-                                        <tr key={index}>
-                                            <td></td>
-                                            <td></td>
-                                            <td>MS Burkina Faso</td>
-                                            <td>LM0077</td>
-                                            <td></td>
-                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span className="material-symbols-rounded text-[#999999]">delete_forever</span></div></div></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                        </table>
+                        <PromiseBuilder
+                            promise={state.usersPromise}
+                            dataBuilder={(data) => (
+                                <table className="styled-table">
+                                    <thead>
+                                        <tr>{['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                    </thead>
+                                    <tbody>
+                                        {data[0].documents.map(user => (
+                                            <tr key={user.id}>
+                                                <td>{user.id}</td>
+                                                <td>{user.userName}</td>
+                                                <td>{user.role}</td>
+                                                <td>{user.infrastructureId}</td>
+                                                <td>{user.activities}</td>
+                                                <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span onClick={() => this.onDeleteUser(user)} className="material-symbols-rounded text-[#999999] cursor-pointer">delete_forever</span></div></div></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                            loadingBuilder={() => (<div className="flex justify-center"><CircularProgress color="primary" /></div>)}
+                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
+                        />
                     </div>
 
                     <div className="w-[30%]">
@@ -129,8 +219,8 @@ class SuperAdminUsersPage extends React.Component {
                                 <p className="font-medium text-[#3C4858]">Activities enrolled</p>
 
                                 <div className="grid grid-cols-2 gap-2 border-2 rounded-md my-4 py-3 px-2">
-                                    {Array.from({ length: 6 }, _ => (
-                                        <div className="flex bg-[var(--primary)] h-[26px] rounded">
+                                    {Array.from({ length: 6 }, (_, index) => (
+                                        <div key={index} className="flex bg-[var(--primary)] h-[26px] rounded">
                                             <div className="grow"></div>
                                             <div className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
                                         </div>
@@ -142,6 +232,37 @@ class SuperAdminUsersPage extends React.Component {
                     </div>
 
                 </div>
+
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                {/* #################################### MODAL AND OTHER ############################################ */}
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                
+                {/* La condition ne sert pas a afficher/cacher le component mais a le re-builder  */}
+                {Boolean(state.addUserDialogCompleter) && <CreateUserDialog completer={state.addUserDialogCompleter} />}
+
+                <Snackbar
+                    open={Boolean(state.snackbarData)}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
+                </Snackbar>
+
+
+                <ConfirmSuppressionDialog
+                    completer={state.deleteConfirmationCompleter}
+                    title="Cette action est irréversible"
+                    description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam"
+                />
+
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                {/* #################################### MODAL AND OTHER ############################################ */}
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
             </div>
         );
     }

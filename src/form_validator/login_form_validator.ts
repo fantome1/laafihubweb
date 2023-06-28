@@ -9,12 +9,12 @@ function getLoginFormValidator() {
                 requiredMessage: 'Veuillez renseigner l\'ID de votre organisation'
             }),
             'email': new FormValidatorField('', {
-                requiredMessage: 'Veuillez renseigner votre addresse email',
+                requiredMessage: 'Veuillez renseigner votre adresse email',
                 validator: (value, _) => {
                     // Si c'est une chaine de caractere vide on laisse [requiredMessage] se charge de la validation
                     if (value.trim() == '')
                         return null;
-                    return Utils.isEmail(value) ?  null : 'Veuillez renseigner une addresse email valide';
+                    return Utils.isEmail(value) ?  null : 'Veuillez renseigner une adresse email valide';
                 },
             }),
             'password': new FormValidatorField('', {
