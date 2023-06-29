@@ -58,7 +58,9 @@ class LoginPage extends React.Component<Props, State> {
         this.setState({ formState: value });
     }
 
-    onSubmit()  {
+    onSubmit(e?: React.FormEvent)  {
+        e?.preventDefault();
+
         if (!this.validator.validate() || this.validator.getData.isLoading)
             return;
 
@@ -100,7 +102,7 @@ class LoginPage extends React.Component<Props, State> {
         return (
             <div className='flex justify-center items-center fixed top-0 left-0 right-0 bottom-0' style={{ background: 'url(/images/login_bg.svg) no-repeat center center fixed', backgroundSize: 'cover' }}>
 
-                <div className="relative flex flex-col items-center w-[352px] bg-white rounded-md">
+                <form onSubmit={this.onSubmit} className="relative flex flex-col items-center w-[352px] bg-white rounded-md">
 
                     <div className="absolute top-[-63px] flex justify-center items-center w-[280px] h-[126px] bg-[var(--primary)] rounded-md">
                         <img src="/icons/login/fingerprint.svg" alt="" />
@@ -162,11 +164,12 @@ class LoginPage extends React.Component<Props, State> {
 
                     <div className="my-8">
                         <LoadingButton
+                            type="submit"
                             loading={formState.isLoading}
                             loadingPosition="end"
                             endIcon={<span></span>}
                             variant="contained"
-                            onClick={this.onSubmit}
+                            // onClick={this.onSubmit}
                             disabled={!this.state.formState.isValid}
                             sx={{ bgcolor: 'var(--primary)' }}
                         >
@@ -174,7 +177,7 @@ class LoginPage extends React.Component<Props, State> {
                         </LoadingButton>
                     </div>
 
-                </div>
+                </form>
 
                 <Snackbar
                     open={Boolean(this.state.snackbarErrorMessage)}

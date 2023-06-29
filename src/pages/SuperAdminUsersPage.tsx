@@ -127,7 +127,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                             <PromiseBuilder
                                 promise={state.usersPromise}
                                 dataBuilder={data => data.roles.map((role, index) => (
-                                    <div className={`${index == 0 ? '' : 'pl-4'}`}>
+                                    <div key={index} className={`${index == 0 ? '' : 'pl-4'}`}>
                                         <p className="text-sm text-[#999999]">{role.name}</p>
                                         <p className="text-4xl text-[#3C4858]">{Utils.addTwoTrailingZero(role.total)}</p>
                                     </div>
@@ -135,19 +135,6 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                 loadingBuilder={() => (<p className="text-lg font-medium text-[#999999]">Chargement...</p>)}
                                 errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                             />
-
-                            {/* <div>
-                                <p className="text-sm text-[#999999]">Supervisors</p>
-                                <p className="text-4xl text-[#3C4858]">020</p>
-                            </div>
-                            <div className="pl-4">
-                                <p className="text-sm text-[#999999]">Agents</p>
-                                <p className="text-4xl text-[#3C4858]">020</p>
-                            </div>
-                            <div className="pl-4">
-                                <p className="text-sm text-[#999999]">Guests</p>
-                                <p className="text-4xl text-[#3C4858]">020</p>
-                            </div> */}
                         </div>
                     </div>
 
