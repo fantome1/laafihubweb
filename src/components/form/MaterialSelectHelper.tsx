@@ -1,11 +1,12 @@
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
-import { SelectInputProps } from "@mui/material/Select/SelectInput";
+// import { SelectInputProps } from "@mui/material";
 
 type Props = {
     label: string;
     labelId: string;
     value?: any;
-    onChange?: SelectInputProps<any>['onChange'];
+    // onChange?: SelectInputProps<any>['onChange'];
+    onChange?: any;
     otpions: { value: any, label: any }[];
     error?: boolean;
     helperText?: string|null;

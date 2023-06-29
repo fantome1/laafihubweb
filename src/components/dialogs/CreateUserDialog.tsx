@@ -1,15 +1,18 @@
 import React from "react";
 import { LoadingButton } from "@mui/lab";
-import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { MaterialSelectHelper } from "../form/MaterialSelectHelper";
-import PhoneInput from "react-phone-input-2";
+import ReactPhoneInput2 from "react-phone-input-2";
+
 import { CountrySelector } from "../../packages/country_selector/CountrySelector";
 import { FormValidator, FormValidatorData } from "../../packages/form_validator/form_validator";
 import { getRegisterUserValidator } from "../../form_validator/register_user_validator";
 import { Api } from "../../services/api";
 
 import "react-phone-input-2/lib/material.css";
+
+const PhoneInput = (ReactPhoneInput2 as any).default || ReactPhoneInput2;
 
 type Props = {
     completer: Completer<boolean>|null;
@@ -176,7 +179,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                             label='Role'
                             labelId='userRole'
                             value={roleField.value}
-                            onChange={e => this.onChanged('role', e.target.value)}
+                            onChange={(e: any) => this.onChanged('role', e.target.value)}
                             otpions={[
                                 { value: 'Administrator', label: 'Administrator' },
                                 { value: 'Supervisor', label: 'Supervisor' },
@@ -217,7 +220,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                                 preferredCountries={['bf', 'ci']}
                                 enableSearch={true}
                                 value={phoneField.value}
-                                onChange={(value) => this.onChanged('phone', value)}
+                                onChange={(value: any) => this.onChanged('phone', value)}
                                 // isValid={(value, country) => {
                                 //     if (value.match(/12345/)) {
                                 //       return 'Invalid value: '+value+', '+country.name;
@@ -236,7 +239,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                             label="Gender"
                             labelId="userGender"
                             value={genderField.value}
-                            onChange={e => this.onChanged('gender', e.target.value)}
+                            onChange={(e: any) => this.onChanged('gender', e.target.value)}
                             otpions={[
                                 { value: 1, label: 'Male' },
                                 { value: 2, label: 'Female' }

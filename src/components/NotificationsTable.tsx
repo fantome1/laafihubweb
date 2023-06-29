@@ -1,20 +1,7 @@
 import * as React from 'react';
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { alpha, Box, Table, TableHead, TableBody, TableCell, TableContainer, TablePagination, TableRow, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip  } from '@mui/material';
+// import { alpha } from '@mui/material/styles';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 
 const rows = [
   { id: '1', agent: 'Ethan Noah', date: '10 March, 2023', alertType: 'success', activity: '00 000 00000', infrastructure: 'abc@abc.com', deviceOrTag: '132, My Street, Kingston, New York 12401' },

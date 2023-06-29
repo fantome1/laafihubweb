@@ -14,7 +14,7 @@ function CountrySelector(props: Props) {
             label="Country"
             labelId="countrySelector"
             value={props.value ?? ''}
-            onChange={e => props.onChange(COUNTRIES.find(c => e.target.value == c.value) ?? null)}
+            onChange={(e: any) => props.onChange(COUNTRIES.find(c => e.target.value == c.value) ?? null)}
             otpions={COUNTRIES.map((country, index) => ({
                 value: country.value,
                 label: <div className="flex items-center">
