@@ -6,6 +6,7 @@ import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
+import { Utils } from "../services/utils";
 
 const textFieldStyle = {
     "& label": {
@@ -30,7 +31,7 @@ type State = {
     addUserDialogCompleter: Completer<boolean>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
-    usersPromise?: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }[]>|null
+    usersPromise?: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null
 }
 
 class SuperAdminUsersPage extends React.Component<Props, State> {
@@ -123,7 +124,19 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                             </div>
                         </div>
                         <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">
-                            <div>
+                            <PromiseBuilder
+                                promise={state.usersPromise}
+                                dataBuilder={data => data.roles.map((role, index) => (
+                                    <div className={`${index == 0 ? '' : 'pl-4'}`}>
+                                        <p className="text-sm text-[#999999]">{role.name}</p>
+                                        <p className="text-4xl text-[#3C4858]">{Utils.addTwoTrailingZero(role.total)}</p>
+                                    </div>
+                                ))}
+                                loadingBuilder={() => (<p className="text-lg font-medium text-[#999999]">Chargement...</p>)}
+                                errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
+                            />
+
+                            {/* <div>
                                 <p className="text-sm text-[#999999]">Supervisors</p>
                                 <p className="text-4xl text-[#3C4858]">020</p>
                             </div>
@@ -134,7 +147,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                             <div className="pl-4">
                                 <p className="text-sm text-[#999999]">Guests</p>
                                 <p className="text-4xl text-[#3C4858]">020</p>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -157,7 +170,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                         <tr>{['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data[0].documents.map(user => (
+                                        {data.documents.map(user => (
                                             <tr key={user.id}>
                                                 <td>{user.id}</td>
                                                 <td>{user.userName}</td>

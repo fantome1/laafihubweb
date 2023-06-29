@@ -46,7 +46,7 @@ class Api {
         return response.json();
     }
 
-    static async getUsers(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }[]> {
+    static async getUsers(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
         const response = await fetch(`${this.BASE_URL}/users`, {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -55,7 +55,8 @@ class Api {
 
         if (!response.ok)
             throw new ApiError(response.status, await response.json());
-        return response.json();
+        const data = await response.json();
+        return data[0];
     }
 
     static async deleteUser(userId: string): Promise<void> {
