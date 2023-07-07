@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select, SxProps, Theme } from "@mui/material";
 // import { SelectInputProps } from "@mui/material";
 
 type Props = {
@@ -10,11 +10,14 @@ type Props = {
     otpions: { value: any, label: any }[];
     error?: boolean;
     helperText?: string|null;
+    variant?: 'standard' | 'outlined' | 'filled';
+    sx?: SxProps<Theme>;
+    disabled?: boolean;
 };
 
 function MaterialSelectHelper(props: Props) {
     return (
-        <FormControl fullWidth>
+        <FormControl fullWidth variant={props.variant} sx={props.sx} disabled={props.disabled}>
             <InputLabel id={props.labelId}>{props.label}</InputLabel>
             <Select
                 labelId={props.labelId}

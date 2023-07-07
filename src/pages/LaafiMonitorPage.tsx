@@ -1,10 +1,36 @@
 import React from "react";
-import { Paper } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
 import { DeviceStatusChart, DeviceUsageChart2 } from "../components/charts/Charts";
+import { Api } from "../services/api";
+import { PromiseBuilder } from "../components/PromiseBuilder";
+import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 
-class LaafiMonitorPage extends React.Component {
+type Props = {
+
+};
+
+type State = {
+    devicesPromise: Promise<any>|null;
+};
+
+class LaafiMonitorPage extends React.Component<Props, State> {
+
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            devicesPromise: null
+        };
+    }
+
+    componentDidMount(): void {
+        this.setState({ devicesPromise: Api.getDevices() });
+    }
 
     render() {
+
+        const state = this.state;
+
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
 
@@ -84,24 +110,31 @@ class LaafiMonitorPage extends React.Component {
                 <div className="flex space-x-4 mt-4">
                     {/* table */}
                     <div className="grow">
-                        <table className="styled-table">
-                            <thead>
-                                <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Mode', 'Infrastructure name', 'Groups',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                            </thead>
-                            <tbody>
-                                {Array.from({ length: 13 }, (e, index) => (
-                                    <tr key={index}>
-                                        <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#69ADA7', '#D80303', '#999999'][index % 3] }}></div></div></td>
-                                        <td></td>
-                                        <td>LM0077</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>MS Burkina Faso</td>
-                                        <td>Bob Bobar</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <PromiseBuilder
+                            promise={state.devicesPromise}
+                            dataBuilder={data => (
+                                <table className="styled-table">
+                                    <thead>
+                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Mode', 'Infrastructure name', 'Groups',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                    </thead>
+                                    <tbody>
+                                        {Array.from({ length: 13 }, (e, index) => (
+                                            <tr key={index}>
+                                                <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#69ADA7', '#D80303', '#999999'][index % 3] }}></div></div></td>
+                                                <td></td>
+                                                <td>LM0077</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>MS Burkina Faso</td>
+                                                <td>Bob Bobar</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
+                            errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
+                        />
                     </div>
 
                     {/* Pie charts and group */}
@@ -124,8 +157,8 @@ class LaafiMonitorPage extends React.Component {
                             <p className="text-lg text-[#3C4858]">Groups</p>
 
                             <div className="grid grid-cols-2 gap-2 rounded-md my-4 py-3">
-                                {Array.from({ length: 6 }, _ => (
-                                    <div className="flex bg-[#C4C4C4] h-[26px] rounded">
+                                {Array.from({ length: 6 }, (_, index) => (
+                                    <div key={index} className="flex bg-[#C4C4C4] h-[26px] rounded">
                                         <div className="grow"></div>
                                         <div className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
                                     </div>

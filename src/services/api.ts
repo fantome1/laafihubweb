@@ -46,6 +46,33 @@ class Api {
         return response.json();
     }
 
+    static async updateUser(userId: string, data: Record<string, any>) {
+        const response = await fetch(`${this.BASE_URL}/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw new ApiError(response.status, await response.json());
+        return response.json();
+    }
+
+    static async getUser(userId: string): Promise<IUser> {
+        const response = await fetch(`${this.BASE_URL}/users/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw new ApiError(response.status, await response.json());
+        return response.json();
+    }
+
     static async getUsers(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
         const response = await fetch(`${this.BASE_URL}/users`, {
             headers: {
@@ -70,6 +97,51 @@ class Api {
         if (!response.ok)
             throw new ApiError(response.status, await response.json());
         return response.json();
+    }
+
+    // ###################################################################################################
+    // ###################################################################################################
+    // ########################################### DEVICES  ##############################################
+    // ###################################################################################################
+    // ###################################################################################################
+
+    static async getDevices(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
+        const response = await fetch(`${this.BASE_URL}/devices`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw new ApiError(response.status, await response.json());
+        const data = await response.json();
+
+        console.log('data', data);
+        
+        return data[0];
+    }
+
+
+    // ###################################################################################################
+    // ###################################################################################################
+    // #################################### INFRASTRUCTURE  ##############################################
+    // ###################################################################################################
+    // ###################################################################################################
+
+    static async getInfrastructures(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
+        const response = await fetch(`${this.BASE_URL}/infrastructures`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw new ApiError(response.status, await response.json());
+        const data = await response.json();
+
+        console.log('data', data);
+        
+        return data[0];
     }
 
 }

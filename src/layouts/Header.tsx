@@ -11,7 +11,7 @@ const actions = [
 
 function Header() {
     return (
-        <div className="sticky top-0 left-0 right-0 h-[56px] flex justify-between items-center bg-[var(--primary)] px-[60px] z-50">
+        <div className="sticky top-0 left-0 right-0 h-[56px] flex justify-between items-center bg-[var(--primary)] px-[60px]" style={{ zIndex: 100 }}>
             <div>
                 <p className="text-lg text-white">Laafi Hub</p>
             </div>

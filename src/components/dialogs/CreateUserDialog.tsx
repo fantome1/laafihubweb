@@ -92,7 +92,6 @@ class CreateUserDialog extends React.Component<Props, State> {
     }
 
     onSubmit() {
-
         const validator = this.state.validator!;
 
         if (!validator.validate() || validator!.getData.isLoading)
@@ -111,7 +110,7 @@ class CreateUserDialog extends React.Component<Props, State> {
             address: {
                 street: values.street,
                 city: values.city,
-                state: values.sate,
+                state: values.state.title,
                 zipCode: '000'
             },
             email: values.email,
@@ -212,9 +211,10 @@ class CreateUserDialog extends React.Component<Props, State> {
                     </div>
 
                     <div className="flex space-x-4 pt-4 items-end">
-                        <div>
+                        <div className="w-full">
                             <PhoneInput
                                 specialLabel="Phone Number"
+                                
                                 inputStyle={{ width: '100%' }}
                                 country={'bf'}
                                 preferredCountries={['bf', 'ci']}

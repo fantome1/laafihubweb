@@ -1,4 +1,4 @@
-import Paper from "@mui/material/Paper";
+import { Paper } from "@mui/material";
 
 type Props = {
     data: {

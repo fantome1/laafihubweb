@@ -1,4 +1,3 @@
-import Paper from "@mui/material/Paper";
 import { Utils } from "../services/utils";
 
 type ActivityCardModel = {

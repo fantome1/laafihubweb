@@ -1,6 +1,7 @@
 
 interface IUser {
     id: string;
+    matricule?: string;
     firstName: string;
     lastName: string;
     userName: string;
@@ -8,6 +9,11 @@ interface IUser {
     organizationId: string;
     role: string;
     activities: number;
+
+    phone?: string;
+    gender?: string;
+    adress?: { city: string, state: string, street: string, zipCode: string };
+    email?: string;
 };
 
 export type { IUser };

@@ -1,5 +1,5 @@
-import { Alert, AlertColor, CircularProgress, Paper, Snackbar, TextField } from "@mui/material";
 import React from "react";
+import { Alert, AlertColor, CircularProgress, Paper, Snackbar, TextField } from "@mui/material";
 import { Completer } from "../services/completer";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { Api } from "../services/api";
@@ -7,21 +7,7 @@ import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Utils } from "../services/utils";
-
-const textFieldStyle = {
-    "& label": {
-        color: '#3C4858',
-        fontWeight: 600
-    },
-    "& label.Mui-focused": {
-        color: 'var(--primary)'
-    },
-    // focused color for input with variant='standard'
-    "& .MuiInput-underline:after": {
-        borderBottomColor: 'var(--primary)'
-    },
-};
-
+import { EditUserComponent } from "../components/EditUser";
 
 type Props = {
 
@@ -31,7 +17,8 @@ type State = {
     addUserDialogCompleter: Completer<boolean>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
-    usersPromise?: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null
+    usersPromise?: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null;
+    selectedUser: IUser|null; // for edit user
 }
 
 class SuperAdminUsersPage extends React.Component<Props, State> {
@@ -43,7 +30,8 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
             addUserDialogCompleter: null,
             deleteConfirmationCompleter: null,
             snackbarData: null,
-            usersPromise: null
+            usersPromise: null,
+            selectedUser: null
         };
 
         this.showAddUserDialog = this.showAddUserDialog.bind(this);
@@ -100,7 +88,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
 
     render() {
 
-        const state = this.state;        
+        const state = this.state;    
 
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
@@ -158,7 +146,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                     </thead>
                                     <tbody>
                                         {data.documents.map(user => (
-                                            <tr key={user.id}>
+                                            <tr key={user.id} className="cursor-pointer" onClick={() => this.setState({ selectedUser: user })}>
                                                 <td>{user.id}</td>
                                                 <td>{user.userName}</td>
                                                 <td>{user.role}</td>
@@ -175,61 +163,8 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                         />
                     </div>
 
-                    <div className="w-[30%]">
-                        <Paper className="p-3" elevation={0}>
-                            {/* header */}
-                            <div className="flex justify-between">
-                                <div>
-                                    <img src="/icons/super_admin_users/user_image.svg" alt="" />
-                                </div>
-
-                                <div className="flex flex-col justify-center">
-                                    <p className="text-3xl font-bold text-[#3C4858] pb-2">Role</p>
-                                    <p className="text-sm font-medium text-[#3C4858]">Infrastructure</p>
-                                </div>
-
-                                <div>
-                                    <div className="flex flex-col justify-center items-center w-[64px] h-[64px] border border-[var(--primary)] cursor-pointer">
-                                        <img src="/icons/super_admin_users/pen.svg" alt="" />
-                                        <p className="text-sm text-[var(--primary)] pt-2">Edit</p>
-                                    </div>
-
-                                    <div className="flex justify-center items-center w-[64px] h-[34px] bg-[var(--primary)] mt-2 cursor-pointer">
-                                        <p className="text-white">Enroll</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* form fields */}
-                            <div className="flex flex-col space-y-4 mt-4">
-                                <TextField label="First Name" variant="standard" sx={textFieldStyle} fullWidth />
-
-                                <TextField label="Last Name" variant="standard" sx={textFieldStyle} fullWidth />
-
-                                <TextField label="Phone number" type="number" variant="standard" sx={textFieldStyle} fullWidth />
-
-                                <TextField label="Address" variant="standard" sx={textFieldStyle} fullWidth />
-
-                                <TextField label="City" variant="standard" sx={textFieldStyle} fullWidth />
-
-                                <TextField label="Country" variant="standard" sx={textFieldStyle} fullWidth />
-                            </div>
-
-                            <div className="mt-8">
-                                <p className="font-medium text-[#3C4858]">Activities enrolled</p>
-
-                                <div className="grid grid-cols-2 gap-2 border-2 rounded-md my-4 py-3 px-2">
-                                    {Array.from({ length: 6 }, (_, index) => (
-                                        <div key={index} className="flex bg-[var(--primary)] h-[26px] rounded">
-                                            <div className="grow"></div>
-                                            <div className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                        </Paper>
-                    </div>
+                    {/* Edit user */}
+                    <div className="w-[30%]"><EditUserComponent user={state.selectedUser} /></div>
 
                 </div>
 

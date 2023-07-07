@@ -1,4 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { routes } from "./constants/routes";
 import { LayoutBase } from "./layouts/LayoutBase";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -16,9 +17,21 @@ import { NotificationsPage } from "./pages/NotificationsPage";
 import { NotificationsPage2 } from "./pages/NotificationsPage2";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
+function ScrollToTop() {
+  const location = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  return null;
+}
+
+
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path={routes.LOGIN} element={<LoginPage />} />
         <Route path={routes.SIGN_UP} element={<SignUpPage />} />
@@ -41,4 +54,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
