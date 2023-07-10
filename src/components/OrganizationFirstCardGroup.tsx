@@ -3,10 +3,13 @@ import { Paper } from "@mui/material";
 import { DeviceUsageChart } from "./charts/Charts";
 import { ActivityChart } from "./charts/ActivityChart";
 
+type Props = {
+    showCreateInfrastructureDialog: () => void;
+}
 
-class OrganizationFirstCardGroup extends React.Component {
+class OrganizationFirstCardGroup extends React.Component<Props> {
 
-    constructor(props: any) {
+    constructor(props: Props) {
         super(props);
     }
 
@@ -40,8 +43,8 @@ class OrganizationFirstCardGroup extends React.Component {
                             <p className="text-3xl text-[#3C4858]">003</p>
                        </div>
                     </div>
-                            
-                    <div className="w-[80px] h-[80px] flex justify-center items-center bg-[var(--primary)] rounded-md cursor-pointer"><img src="/icons/organization/add.svg" /></div>
+
+                    <div onClick={this.props.showCreateInfrastructureDialog} className="w-[80px] h-[80px] flex justify-center items-center bg-[var(--primary)] rounded-md cursor-pointer"><img src="/icons/organization/add.svg" /></div>
                 </div>
 
                 {/* all remaining card  */}

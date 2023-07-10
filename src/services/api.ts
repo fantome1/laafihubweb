@@ -1,3 +1,4 @@
+import { IInfrastructure } from "../models/infrastructure_model";
 import { IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
 import { AuthService } from "./auth_service";
@@ -128,7 +129,23 @@ class Api {
     // ###################################################################################################
     // ###################################################################################################
 
-    static async getInfrastructures(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
+
+    static async registerInsfrastructure(data: Record<string, any>) {
+        const response = await fetch(`${this.BASE_URL}/infrastructures`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw new ApiError(response.status, await response.json());
+        return response.json();
+    }
+
+    static async getInfrastructures(): Promise<{ total: number, infrastructures: IInfrastructure[] }> {
         const response = await fetch(`${this.BASE_URL}/infrastructures`, {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -140,8 +157,19 @@ class Api {
         const data = await response.json();
 
         console.log('data', data);
-        
         return data[0];
+    }
+
+    static async deleteInfrastructure(id: string): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/infrastructures/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw new ApiError(response.status, await response.text());
     }
 
 }

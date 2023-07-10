@@ -1,0 +1,6 @@
+{
+    "code": "INVALID_TOKEN",
+    "description": "Invalid Token",
+    "type": 2,
+    "numericType": 2
+}

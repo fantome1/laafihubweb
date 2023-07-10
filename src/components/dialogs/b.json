@@ -1,0 +1,10 @@
+{
+    "type": "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+    "title": "Invalid credentials this phone number already exist",
+    "status": 409,
+    "traceId": "00-b264d42323acceac4e3c779a987922d8-720302decd9f8069-00",
+    "error-code": [
+        "USER.DUPLICATE_PHONE_NUMBER",
+        "USER.DUPLICATE_EMAIL"
+    ]
+}

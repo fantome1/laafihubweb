@@ -1,0 +1,3 @@
+- Change les button editer, voir et supprimer une insfrastructure
+- Modifier une infrastruture
+- Choisir les corrdonnees sur la carte

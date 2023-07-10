@@ -16,6 +16,9 @@ import { AnotherLaafiMonitorDeviceDataPage } from "./pages/AnotherLaafMonitorDev
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { NotificationsPage2 } from "./pages/NotificationsPage2";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { RealtimeTestPage } from "./pages/RealtimeTestPage";
+import { ThemeProvider } from "@mui/material";
+import { theme } from "./mui_theme";
 
 function ScrollToTop() {
   const location = useLocation();
@@ -27,30 +30,32 @@ function ScrollToTop() {
   return null;
 }
 
-
 function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Routes>
-        <Route path={routes.LOGIN} element={<LoginPage />} />
-        <Route path={routes.SIGN_UP} element={<SignUpPage />} />
-        <Route path={routes.EDIT_PROFIL} element={<EditProfilPage />} />
-        <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
-        <Route path={routes.HOME} element={<LayoutBase />}>
-          <Route index element={<DashboardPage />} />
-          <Route path={routes.ORGANIZATION} element={<OrganizationPage />} />
-          <Route path={routes.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboardPage />} />
-          <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />
-          <Route path={routes.LAAFI_MONITOR} element={<LaafiMonitorPage />} />
-          <Route path={routes.LAAFI_MONITOR_DEVICE_DATA} element={<LaafiMonitorDeviceDataPage />} />
-          <Route path={routes.ANOTHER_LAAFI_MONITOR} element={<AnotherLaafiMonitorPage />} />
-          <Route path={routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA} element={<AnotherLaafiMonitorDeviceDataPage />} />
-          <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />
-          <Route path={routes.NOTIFICATIONS_2} element={<NotificationsPage2 />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <ScrollToTop />
+        <Routes>
+          <Route path={routes.LOGIN} element={<LoginPage />} />
+          <Route path={routes.SIGN_UP} element={<SignUpPage />} />
+          <Route path={routes.EDIT_PROFIL} element={<EditProfilPage />} />
+          <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
+          <Route path={routes.HOME} element={<LayoutBase />}>
+            <Route index element={<DashboardPage />} />
+            <Route path={'/reatime-test'} element={<RealtimeTestPage />} />
+            <Route path={routes.ORGANIZATION} element={<OrganizationPage />} />
+            <Route path={routes.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboardPage />} />
+            <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />
+            <Route path={routes.LAAFI_MONITOR} element={<LaafiMonitorPage />} />
+            <Route path={routes.LAAFI_MONITOR_DEVICE_DATA} element={<LaafiMonitorDeviceDataPage />} />
+            <Route path={routes.ANOTHER_LAAFI_MONITOR} element={<AnotherLaafiMonitorPage />} />
+            <Route path={routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA} element={<AnotherLaafiMonitorDeviceDataPage />} />
+            <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />
+            <Route path={routes.NOTIFICATIONS_2} element={<NotificationsPage2 />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

@@ -4,13 +4,13 @@ import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, Dialo
 import { Completer } from "../../services/completer";
 import { MaterialSelectHelper } from "../form/MaterialSelectHelper";
 import ReactPhoneInput2 from "react-phone-input-2";
-
 import { CountrySelector } from "../../packages/country_selector/CountrySelector";
 import { FormValidator, FormValidatorData } from "../../packages/form_validator/form_validator";
 import { getRegisterUserValidator } from "../../form_validator/register_user_validator";
 import { Api } from "../../services/api";
 
 import "react-phone-input-2/lib/material.css";
+import { getCreateInfrastrutureValidator } from "../../form_validator/create_infrastructure_validator";
 
 const PhoneInput = (ReactPhoneInput2 as any).default || ReactPhoneInput2;
 
@@ -30,7 +30,7 @@ type State = {
 
 // FIXME validate password
 // FIXME more detailed error message
-class CreateUserDialog extends React.Component<Props, State> {
+class CreateInfrastructureDialog extends React.Component<Props, State> {
 
     private readonly isModify: boolean;
 
@@ -38,7 +38,8 @@ class CreateUserDialog extends React.Component<Props, State> {
         super(props);
 
         this.isModify = !!props.userId;
-        const validator = this.isModify ? null : getRegisterUserValidator();
+        const validator = this.isModify ? null : getCreateInfrastrutureValidator();
+        // const validator = this.isModify ? null : getRegisterUserValidator();
 
         this.state = {
             validator: validator,
@@ -82,25 +83,24 @@ class CreateUserDialog extends React.Component<Props, State> {
         validator.setLoadingStatus(true);
 
         const data = {
-            matricule: values.matricule,
-            role: values.role,
-            firstName: values.firstName,
-            lastName: values.lastName,
-            phone: values.phone,
-            gender: values.gender,
-            address: {
+            name: values.name,
+            type: values.type,
+            adress: {
                 street: values.street,
                 city: values.city,
                 state: values.state.title,
                 zipCode: '000'
             },
-            email: values.email,
-            password: values.password,
-            infrastructureId: '',
-            activityId: ''
+            coordonnates: {
+                latitude: values.latitude,
+                longitude: values.longitude
+            },
+            description: values.description
         };
 
-        Api.registerUser(data)
+        console.log('send', data);
+
+        Api.registerInsfrastructure(data)
             .then(result => {
                 validator.setLoadingStatus(false);
                 console.log('result', result);
@@ -121,18 +121,16 @@ class CreateUserDialog extends React.Component<Props, State> {
 
         const formState = this.state.formState!;
 
-        const matriculeField = formState.fields['matricule'];
-        const roleField = formState.fields['role'];
+        const nameField = formState.fields['name'];
+        const typeField = formState.fields['type'];
 
-        const firstNameField = formState.fields['firstName'];
-        const lastNameField = formState.fields['lastName'];
-        const phoneField = formState.fields['phone'];
-        const genderField = formState.fields['gender'];
         const countryField = formState.fields['state'];
         const cityField = formState.fields['city'];
         const addressField = formState.fields['street'];
-        const emailField = formState.fields['email'];
-        const passwordField = formState.fields['password'];
+
+        const latitudeField = formState.fields['latitude'];
+        const longitudeField = formState.fields['longitude'];
+        const descriptionField = formState.fields['description'];
 
         return (
             <Dialog
@@ -140,93 +138,33 @@ class CreateUserDialog extends React.Component<Props, State> {
                 maxWidth="md"
                 fullWidth
             >
-                <DialogTitle>Add a new user</DialogTitle>
+                <DialogTitle>Create a new infrastructure</DialogTitle>
                 <DialogContent>
 
                     {this.state.error && (<div className="mb-4"><Alert severity="error">Une erreur s'est produite</Alert></div>)}
 
                     <div className='flex space-x-4 pt-2'> {/* pt-2 permet au label de s'afficher correctement */}
                         <TextField
-                            value={matriculeField.value}
-                            label='Matricule'
+                            value={nameField.value}
+                            label='Infrastrucutre Name'
                             fullWidth
-                            onChange={e => this.onChanged('matricule', e.target.value)}
-                            error={Boolean(matriculeField.errorMessage)}
-                            helperText={matriculeField.errorMessage}
+                            onChange={e => this.onChanged('name', e.target.value)}
+                            error={Boolean(nameField.errorMessage)}
+                            helperText={nameField.errorMessage}
                         />
 
                         <MaterialSelectHelper
-                            label='Role'
-                            labelId='userRole'
-                            value={roleField.value}
-                            onChange={(e: any) => this.onChanged('role', e.target.value)}
+                            label='Type'
+                            labelId='infrastructureType'
+                            value={typeField.value}
+                            onChange={(e: any) => this.onChanged('type', e.target.value)}
                             otpions={[
-                                { value: 'Administrator', label: 'Administrator' },
-                                { value: 'Supervisor', label: 'Supervisor' },
-                                { value: 'Agent', label: 'Agent' },
-                                { value: 'Guest', label: 'Guest' }
+                                { value: 'Hospital', label: 'Hospital' },
+                                { value: 'CSPS', label: 'CSPS' },
+                                { value: 'Pharmacy', label: 'Pharmacy' }
                             ]}
-                            error={Boolean(roleField.errorMessage)}
-                            helperText={roleField.errorMessage}
-                        />
-                    </div>
-
-                    <div className='flex space-x-4 pt-4'>
-                        <TextField
-                            value={firstNameField.value}
-                            label='First Name'
-                            fullWidth
-                            onChange={e => this.onChanged('firstName', e.target.value)}
-                            error={Boolean(firstNameField.errorMessage)}
-                            helperText={firstNameField.errorMessage}
-                        />
-
-                        <TextField
-                            value={lastNameField.value}
-                            label="Last Name"
-                            fullWidth
-                            onChange={e => this.onChanged('lastName', e.target.value)}
-                            error={Boolean(lastNameField.errorMessage)}
-                            helperText={lastNameField.errorMessage}
-                        />
-                    </div>
-
-                    <div className="flex space-x-4 pt-4 items-end">
-                        <div className="w-full">
-                            <PhoneInput
-                                specialLabel="Phone Number"
-                                
-                                inputStyle={{ width: '100%' }}
-                                country={'bf'}
-                                preferredCountries={['bf', 'ci']}
-                                enableSearch={true}
-                                value={phoneField.value}
-                                onChange={(value: any) => this.onChanged('phone', value)}
-                                // isValid={(value, country) => {
-                                //     if (value.match(/12345/)) {
-                                //       return 'Invalid value: '+value+', '+country.name;
-                                //     } else if (value.match(/1234/)) {
-                                //       return false;
-                                //     } else {
-                                //       return true;
-                                //     }
-                                // }}
-                            />
-
-                            {phoneField.errorMessage && (<FormHelperText error>{phoneField.errorMessage}</FormHelperText>)}
-                        </div>
-
-                        <MaterialSelectHelper
-                            label="Gender"
-                            labelId="userGender"
-                            value={genderField.value}
-                            onChange={(e: any) => this.onChanged('gender', e.target.value)}
-                            otpions={[
-                                { value: 1, label: 'Male' },
-                                { value: 2, label: 'Female' }
-                            ]}
-                            error={Boolean(genderField.errorMessage)}
-                            helperText={genderField.errorMessage}
+                            error={Boolean(typeField.errorMessage)}
+                            helperText={typeField.errorMessage}
                         />
                     </div>
 
@@ -259,31 +197,49 @@ class CreateUserDialog extends React.Component<Props, State> {
                         />
                     </div>
 
-                    <div className="flex space-x-4 pt-4"> {/* pt-2 permet au label de s'afficher correctement */}
-                        <TextField
-                            value={emailField.value}
-                            label="Email"
-                            type="email"
-                            fullWidth
-                            onChange={e => this.onChanged('email', e.target.value)}
-                            error={Boolean(emailField.errorMessage)}
-                            helperText={emailField.errorMessage}
-                        />
+                    <div className='flex space-x-4 pt-4'>
+                        <div className="flex space-x-4 grow">
+                            <TextField
+                                value={latitudeField.value}
+                                label='Latitude'
+                                type='number'
+                                fullWidth
+                                onChange={e => this.onChanged('latitude', e.target.value)}
+                                error={Boolean(latitudeField.errorMessage)}
+                                helperText={latitudeField.errorMessage}
+                            />
 
-                        <TextField
-                            label="Password"
-                            type="password"
-                            fullWidth
-                            onChange={e => this.onChanged('password', e.target.value)}
-                            disabled={this.isModify}
-                            error={Boolean(passwordField.errorMessage)}
-                            helperText={passwordField.errorMessage}
-                        />
+                            <TextField
+                                value={longitudeField.value}
+                                label="Longitude"
+                                type='number'
+                                fullWidth
+                                onChange={e => this.onChanged('longitude', e.target.value)}
+                                error={Boolean(longitudeField.errorMessage)}
+                                helperText={longitudeField.errorMessage}
+                            />
+                        </div>
+                        <div className="h-full">
+                            <Button variant="outlined"  sx={{ height: '56px' }}><span className="material-symbols-outlined">pin_drop</span></Button>
+                        </div>
                     </div>
 
+                    <div className="flex space-x-4 pt-4"> {/* pt-2 permet au label de s'afficher correctement */}
+                        <TextField
+                            value={descriptionField.value}
+                            label="Descrption"
+                            fullWidth
+                            multiline
+                            minRows={4}
+                            maxRows={8}
+                            onChange={e => this.onChanged('description', e.target.value)}
+                            error={Boolean(descriptionField.errorMessage)}
+                            helperText={descriptionField.errorMessage}
+                        />
+                    </div>
                 </DialogContent>
                 <DialogActions className="mb-2 mr-4">
-                    <Button onClick={() => this.props.completer?.complete(false)}  variant="outlined" color="laafi" sx={{ width: 128 }}>Cancel</Button>
+                    <Button onClick={() => this.props.completer?.complete(false)}  variant="outlined"  sx={{ width: 128 }}>Cancel</Button>
                     <LoadingButton
                         onClick={this.onSubmit}
                         loading={formState.isLoading}
@@ -291,7 +247,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                         endIcon={<span></span>}
                         sx={{ width: 128, color: "#fff" }}
                         variant="contained"
-                        color="laafi"
+                        // color="laafi"
                         disabled={!formState.isValid}
                     >Save</LoadingButton>
                 </DialogActions>
@@ -301,4 +257,4 @@ class CreateUserDialog extends React.Component<Props, State> {
 
 }
 
-export { CreateUserDialog };
+export { CreateInfrastructureDialog };
