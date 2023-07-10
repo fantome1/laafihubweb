@@ -9,20 +9,6 @@ import ReactPhoneInput2 from "react-phone-input-2";
 
 const PhoneInput = (ReactPhoneInput2 as any).default || ReactPhoneInput2;
 
-const textFieldStyle = {
-    "& label": {
-        color: '#3C4858',
-        fontWeight: 600
-    },
-    "& label.Mui-focused": {
-        color: 'var(--primary)'
-    },
-    // focused color for input with variant='standard'
-    "& .MuiInput-underline:after": {
-        borderBottomColor: 'var(--primary)'
-    },
-};
-
 type Props = {
     user: IUser|null
 };
@@ -219,7 +205,6 @@ class EditUserComponent extends React.Component<Props, State> {
                         value={firstNameField?.value}
                         label="First Name"
                         // variant="standard"
-                        sx={textFieldStyle}
                         fullWidth
                         onChange={e => this.onChanged('firstName', e.target.value)}
                         error={Boolean(firstNameField?.errorMessage)}
@@ -231,7 +216,6 @@ class EditUserComponent extends React.Component<Props, State> {
                         value={lastNameField?.value}
                         label="Last Name"
                         // variant="standard"
-                        sx={textFieldStyle}
                         fullWidth
                         onChange={e => this.onChanged('lastName', e.target.value)}
                         error={Boolean(lastNameField?.errorMessage)}
@@ -267,7 +251,6 @@ class EditUserComponent extends React.Component<Props, State> {
                         value={addressField?.value}
                         label="Address"
                         // variant="standard"
-                        sx={textFieldStyle}
                         fullWidth
                         onChange={e => this.onChanged('street', e.target.value)}
                         error={Boolean(addressField?.errorMessage)}
@@ -279,7 +262,6 @@ class EditUserComponent extends React.Component<Props, State> {
                         value={cityField?.value}
                         label="City"
                         // variant="standard"
-                        sx={textFieldStyle}
                         fullWidth
                         onChange={e => this.onChanged('city', e.target.value)}
                         error={Boolean(cityField?.errorMessage)}
@@ -289,7 +271,6 @@ class EditUserComponent extends React.Component<Props, State> {
 
                     <CountrySelector
                         // variant="standard"
-                        sx={textFieldStyle}
                         value={countryField?.value?.value}
                         onChange={value => this.onChanged('state', value)}
                         error={Boolean(countryField?.errorMessage)}

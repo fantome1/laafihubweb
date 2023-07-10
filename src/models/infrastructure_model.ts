@@ -7,7 +7,7 @@ interface IInfrastructure {
     adress?: { city: string, state: string, street: string, zipCode: string };
     coordonnates: { longitude: number, latitude: number },
     creationDate?: Date;
-    status?: 'NotActived';
+    status?: 'NotActived'|'Actived';
 }
 
 export type { IInfrastructure };

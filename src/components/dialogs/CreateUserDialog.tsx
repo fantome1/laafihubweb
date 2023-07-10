@@ -283,7 +283,7 @@ class CreateUserDialog extends React.Component<Props, State> {
 
                 </DialogContent>
                 <DialogActions className="mb-2 mr-4">
-                    <Button onClick={() => this.props.completer?.complete(false)}  variant="outlined" color="laafi" sx={{ width: 128 }}>Cancel</Button>
+                    <Button onClick={() => this.props.completer?.complete(false)}  variant="outlined" sx={{ width: 128 }}>Cancel</Button>
                     <LoadingButton
                         onClick={this.onSubmit}
                         loading={formState.isLoading}
@@ -291,7 +291,6 @@ class CreateUserDialog extends React.Component<Props, State> {
                         endIcon={<span></span>}
                         sx={{ width: 128, color: "#fff" }}
                         variant="contained"
-                        color="laafi"
                         disabled={!formState.isValid}
                     >Save</LoadingButton>
                 </DialogActions>

@@ -1,10 +1,13 @@
 import React from "react";
-import { Paper } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
 import { DeviceUsageChart } from "./charts/Charts";
 import { ActivityChart } from "./charts/ActivityChart";
+import { PromiseBuilder } from "./PromiseBuilder";
+import { IInfrastructure } from "../models/infrastructure_model";
 
 type Props = {
     showCreateInfrastructureDialog: () => void;
+    infrastructuresPromise: Promise<{ total: number, infrastructures: IInfrastructure[] }>|null
 }
 
 class OrganizationFirstCardGroup extends React.Component<Props> {
@@ -40,7 +43,12 @@ class OrganizationFirstCardGroup extends React.Component<Props> {
                             </div>
                        </div>
                        <div className="flex items-end py-4">
-                            <p className="text-3xl text-[#3C4858]">003</p>
+                            <PromiseBuilder
+                                promise={this.props.infrastructuresPromise}
+                                dataBuilder={data => (<p className="text-3xl text-[#3C4858]">{data.total.toString().padStart(3, '0')}</p>)}
+                                loadingBuilder={() => (<Skeleton className="text-3xl w-[56px]" />)}
+                                errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
+                            />
                        </div>
                     </div>
 

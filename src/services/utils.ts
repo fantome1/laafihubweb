@@ -20,14 +20,6 @@ class Utils {
         return n < 10 ? `0${n}` : n.toString();
     }
 
-    static addTwoTrailingZero(n: number): string {
-        if (n < 10)
-            return `00${n}`;
-        if (n < 100)
-            return `0${n}`;
-        return n.toString()
-    }
-
 }
 
 export { Utils };

@@ -112,6 +112,7 @@ class OrganizationPage extends React.Component<Props, State> {
                     <div style={{ flex: '1 1 0' }}>
                         <OrganizationFirstCardGroup
                             showCreateInfrastructureDialog={this.showCreateInfrastructureDialog}
+                            infrastructuresPromise={state.infrastructuresPromise}
                         />
                     </div>
 
@@ -131,7 +132,7 @@ class OrganizationPage extends React.Component<Props, State> {
                                 <tbody>
                                     {data.infrastructures.map(value => (
                                         <tr key={value.id}>
-                                            <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: '#D80303' }}></div></div></td>
+                                            <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: getInfrastructuresStatusColor(value) }}></div></div></td>
                                             <td>{value.name}</td>
                                             <td>{value.type}</td>
                                             <td>{/*e.deviceCount*/}</td>
@@ -140,10 +141,10 @@ class OrganizationPage extends React.Component<Props, State> {
                                             <td></td>
                                             <td>{Utils.formatDate(new Date(value.creationDate!))} GMT</td>
                                             <td>
-                                                <div className="flex h-full justify-evenly items-center">
-                                                    <div className="cursor-pointer"><img src="/icons/table/editor.svg" alt="" /></div>
-                                                    <div className="cursor-pointer"><img src={`/icons/table/${Math.random() > 0.5 ? 'visibility' : 'visibility_off'}.svg`} alt="" /></div>
-                                                    <div className="cursor-pointer" onClick={() => this.onDeleteInfrastructure({ id: "-1" } as any)}><img src="/icons/table/delete.svg" alt="" /></div>
+                                                <div className="flex h-full justify-evenly items-center text-[#999999]">
+                                                    <div className="cursor-pointer"><span className="material-symbols-rounded">edit</span></div>
+                                                    <div className="cursor-pointer"><span className="material-symbols-rounded">{Math.random() > 0.5 ? 'visibility' : 'visibility_off'}</span></div>
+                                                    <div className="cursor-pointer" onClick={() => this.onDeleteInfrastructure(value)}><span className="material-symbols-rounded">delete</span></div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -171,7 +172,7 @@ class OrganizationPage extends React.Component<Props, State> {
                                 </tbody>
                             </table>
                         )}
-                        loadingBuilder={() => (<TableSkeletonComponent count={12} columnCount={5} />)}
+                        loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
                         errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                     />
                 </div>
@@ -210,6 +211,13 @@ class OrganizationPage extends React.Component<Props, State> {
         );
     }
 
+}
+
+
+function getInfrastructuresStatusColor(value: IInfrastructure) {
+    if (value.status == 'Actived')
+        return '#69ADA7'
+    return '#999999';
 }
 
 export { OrganizationPage }

@@ -29,8 +29,8 @@ class BubleMap extends React.Component {
           {this.coordinates.map((c, index) => <CircleMarker key={index}
             center={c.coords}
             pathOptions={{ color: c.color }}
-            radius={4}>
-          </CircleMarker>)}
+            radius={4} />
+          )}
         </MapContainer>
       </Paper>
     );

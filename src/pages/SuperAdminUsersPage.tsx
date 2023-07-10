@@ -8,6 +8,8 @@ import { IUser } from "../models/user_model";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Utils } from "../services/utils";
 import { EditUserComponent } from "../components/EditUser";
+import { UserCountSkeleton } from "../components/Skeletons";
+import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 
 type Props = {
 
@@ -117,10 +119,10 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                 dataBuilder={data => data.roles.map((role, index) => (
                                     <div key={index} className={`${index == 0 ? '' : 'pl-4'}`}>
                                         <p className="text-sm text-[#999999]">{role.name}</p>
-                                        <p className="text-4xl text-[#3C4858]">{Utils.addTwoTrailingZero(role.total)}</p>
+                                        <p className="text-4xl text-[#3C4858]">{role.total.toString().padStart(3, "0")}</p>
                                     </div>
                                 ))}
-                                loadingBuilder={() => (<p className="text-lg font-medium text-[#999999]">Chargement...</p>)}
+                                loadingBuilder={() => (<UserCountSkeleton count={3} />)}
                                 errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                             />
                         </div>
@@ -158,7 +160,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                     </tbody>
                                 </table>
                             )}
-                            loadingBuilder={() => (<div className="flex justify-center"><CircularProgress color="primary" /></div>)}
+                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
                             errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
