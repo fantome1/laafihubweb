@@ -1,11 +1,12 @@
+// @ts-nocheck
 import React from "react";
-import { BubleMap } from "../components/BubleMap";
+import { Alert, AlertColor, Paper, Snackbar } from "@mui/material";
+import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import { OrganizationFirstCardGroup } from "../components/OrganizationFirstCardGroup";
 import { Utils } from "../services/utils";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Api } from "../services/api";
-import { Alert, AlertColor, Snackbar } from "@mui/material";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Completer } from "../services/completer";
 import { IInfrastructure } from "../models/infrastructure_model";
@@ -19,10 +20,38 @@ type State = {
     createOrganizationDialogCompleter: Completer<boolean>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
+    infrastructureId: string|null;
     infrastructuresPromise: Promise<{ total: number, infrastructures: IInfrastructure[] }>|null;
 };
 
-// #D80303
+type MapProps = {
+    promise: Promise<{ total: number, infrastructures: IInfrastructure[] }>|null;
+}
+
+const Map = React.memo(function Map(props: MapProps) {
+    return (
+        <Paper sx={{ height: '100%' }}>
+            <MapContainer center={{ lat: 12.35, lng: -1.516667 }} zoom={1} scrollWheelZoom={false} style={{ width: '100%', height: '100%' }}>
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {<PromiseBuilder
+                promise={props.promise}
+                dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
+                    center={[value.coordonnates.latitude, value.coordonnates.longitude]}
+                    pathOptions={{ color: getInfrastructuresStatusColor(value) }}
+                    radius={4}>
+                        <Popup>Infrastruture</Popup>
+                    </CircleMarker>
+                ))}
+                loadingBuilder={() => null}
+                errorBuilder={(_) => null}
+            />}
+            </MapContainer>
+        </Paper>
+    );
+});
 
 class OrganizationPage extends React.Component<Props, State> {
 
@@ -46,6 +75,7 @@ class OrganizationPage extends React.Component<Props, State> {
             createOrganizationDialogCompleter: null,
             deleteConfirmationCompleter: null,
             snackbarData: null,
+            infrastructureId: null,
             infrastructuresPromise: null
         };
 
@@ -57,17 +87,25 @@ class OrganizationPage extends React.Component<Props, State> {
         this.setState({ infrastructuresPromise: Api.getInfrastructures() });
     }
 
-    async showCreateInfrastructureDialog() {
+    async showCreateInfrastructureDialog(infrastructureId: string|null = null) {
         const completer = new Completer<boolean>();
-        this.setState({ createOrganizationDialogCompleter: completer });
+        this.setState({ createOrganizationDialogCompleter: completer, infrastructureId });
 
-        const result = await completer.promise;
-        this.setState({ createOrganizationDialogCompleter: null });
+        try {
+            const result = await completer.promise;
+            this.setState({ createOrganizationDialogCompleter: null, infrastructureId: null });
 
-        if (result == true) {
+            if (result == true) {
+                this.setState({
+                    snackbarData: { severity: 'success', message: infrastructureId ? 'Les informations de l\'infrastructure ont été modifié avec succès' : 'Infrastructure ajouté avec succès' },
+                    infrastructuresPromise: Api.getInfrastructures()
+                });
+            }
+        } catch(err) {
             this.setState({
-                snackbarData: { severity: 'success', message: 'Infrastructure ajouté avec succès' },
-                infrastructuresPromise: Api.getInfrastructures()
+                createOrganizationDialogCompleter: null,
+                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
+                infrastructureId: null
             });
         }
     }
@@ -111,14 +149,12 @@ class OrganizationPage extends React.Component<Props, State> {
                 <div className="flex space-x-4 mt-12">
                     <div style={{ flex: '1 1 0' }}>
                         <OrganizationFirstCardGroup
-                            showCreateInfrastructureDialog={this.showCreateInfrastructureDialog}
+                            showCreateInfrastructureDialog={() => this.showCreateInfrastructureDialog()}
                             infrastructuresPromise={state.infrastructuresPromise}
                         />
                     </div>
 
-                    <div style={{ flex: '1 1 0' }}>
-                        <BubleMap />
-                    </div>
+                    <div style={{ flex: '1 1 0' }}><Map promise={state.infrastructuresPromise} /></div>
                 </div>
 
                 <div className="mt-4">
@@ -142,7 +178,7 @@ class OrganizationPage extends React.Component<Props, State> {
                                             <td>{Utils.formatDate(new Date(value.creationDate!))} GMT</td>
                                             <td>
                                                 <div className="flex h-full justify-evenly items-center text-[#999999]">
-                                                    <div className="cursor-pointer"><span className="material-symbols-rounded">edit</span></div>
+                                                    <div className="cursor-pointer" onClick={() => this.showCreateInfrastructureDialog(value.id)}><span className="material-symbols-rounded">edit</span></div>
                                                     <div className="cursor-pointer"><span className="material-symbols-rounded">{Math.random() > 0.5 ? 'visibility' : 'visibility_off'}</span></div>
                                                     <div className="cursor-pointer" onClick={() => this.onDeleteInfrastructure(value)}><span className="material-symbols-rounded">delete</span></div>
                                                 </div>
@@ -183,7 +219,7 @@ class OrganizationPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
 
-                {Boolean(state.createOrganizationDialogCompleter) && <CreateInfrastructureDialog completer={state.createOrganizationDialogCompleter} />}
+                {Boolean(state.createOrganizationDialogCompleter) && <CreateInfrastructureDialog completer={state.createOrganizationDialogCompleter} infrastructureId={state.infrastructureId} />}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}
@@ -193,7 +229,6 @@ class OrganizationPage extends React.Component<Props, State> {
                 >
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
-
 
                 <ConfirmSuppressionDialog
                     completer={state.deleteConfirmationCompleter}
@@ -212,7 +247,6 @@ class OrganizationPage extends React.Component<Props, State> {
     }
 
 }
-
 
 function getInfrastructuresStatusColor(value: IInfrastructure) {
     if (value.status == 'Actived')

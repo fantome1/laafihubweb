@@ -12,21 +12,19 @@ import { ChooseLocationDialog } from "./ChooseLocationDialog";
 
 type Props = {
     completer: Completer<boolean>|null;
-    userId?: string;
+    infrastructureId: string|null;
 };
 
 type State = {
     validator: FormValidator|null; // Not [null] juste late
-    user: any|null; // For update user
+    infrastructure: any|null; // For update user
     error: any,
     formState: FormValidatorData|null;
-    chooseLocationCompleter: Completer<{ latitude: number, longitude: number }|null>|null
+    chooseLocationCompleter: Completer<{ latitude: number, longitude: number }|null>|null;
 };
 
 // https://hub.laafi-concepts.com/home/dashboard
 
-// FIXME validate password
-// FIXME more detailed error message
 class CreateInfrastructureDialog extends React.Component<Props, State> {
 
     private readonly isModify: boolean;
@@ -34,13 +32,12 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.isModify = !!props.userId;
-        const validator = this.isModify ? null : getCreateInfrastrutureValidator();
-        // const validator = this.isModify ? null : getRegisterUserValidator();
+        this.isModify = !!props.infrastructureId;
+        const validator = this.isModify ? null : getCreateInfrastrutureValidator();        
 
         this.state = {
             validator: validator,
-            user: null,
+            infrastructure: null,
             error: null,
             formState: validator?.getData ?? null,
             chooseLocationCompleter: null
@@ -52,15 +49,16 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        // if (this.isModify) {
-        //     Api.getUser(this.props.userId!).then(user => {
-        //         const validator = getRegisterUserValidator(user);
-        //         validator.listen(this.listen);
-        //         this.setState({ user, validator, formState: validator.getData });
-        //     }).catch(err => {
-        //         this.setState({ error: err });
-        //     })
-        // }
+        if (this.isModify) {
+            Api.getInfrastructure(this.props.infrastructureId!).then(value => {
+                const validator = getCreateInfrastrutureValidator(value);
+                validator.listen(this.listen);
+                this.setState({ infrastructure: value, validator, formState: validator.getData });
+            }).catch(err => {
+                // this.setState({ error: err });
+                this.props.completer?.completeError(err);
+            })
+        }
     }
 
     listen(data: FormValidatorData) {
@@ -79,7 +77,6 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
         this.setState({ chooseLocationCompleter: null });
 
         if (result != null) {
-
            this.state.validator?.changeValue('latitude', result.latitude);
            this.state.validator?.changeValue('longitude', result.longitude);
         }
@@ -104,18 +101,16 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
                 zipCode: '000'
             },
             coordonnates: {
-                latitude: values.latitude,
-                longitude: values.longitude
+                latitude: parseFloat(values.latitude),
+                longitude: parseFloat(values.longitude)
             },
             description: values.description
         };
 
-        console.log('send', data);
+        const promise = this.isModify ? Api.updateInsfrastructure(this.props.infrastructureId!, data) : Api.registerInsfrastructure(data)
 
-        Api.registerInsfrastructure(data)
-            .then(result => {
+        promise.then(result => {
                 validator.setLoadingStatus(false);
-                console.log('result', result);
                 this.props.completer?.complete(true);
             }).catch(err => {
                 validator.setLoadingStatus(false);
@@ -125,9 +120,12 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
     }
 
     render() {
+
+        const state = this.state;
+
         const open = Boolean(this.props.completer);
 
-        if (open && this.isModify) {
+        if (open && this.isModify && state.validator == null) {
             return (<Backdrop open={open} sx={{ color: '#fff' }}><CircularProgress color="inherit" /></Backdrop>);
         }
 
@@ -147,10 +145,10 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
         return (
             <>
                 <Dialog open={open} maxWidth="md" fullWidth>
-                    <DialogTitle>Create a new infrastructure</DialogTitle>
+                    <DialogTitle>{ this.isModify ? 'Edit an infrastructure' : 'Create a new infrastructure'}</DialogTitle>
                     <DialogContent>
 
-                        {this.state.error && (<div className="mb-4"><Alert severity="error">Une erreur s'est produite</Alert></div>)}
+                        {state.error && (<div className="mb-4"><Alert severity="error">Une erreur s'est produite</Alert></div>)}
 
                         <div className='flex space-x-4 pt-2'> {/* pt-2 permet au label de s'afficher correctement */}
                             <TextField

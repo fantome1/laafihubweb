@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from "react";
 import { Paper } from "@mui/material";
-import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 
 class BubleMap extends React.Component {
 
@@ -29,7 +29,9 @@ class BubleMap extends React.Component {
           {this.coordinates.map((c, index) => <CircleMarker key={index}
             center={c.coords}
             pathOptions={{ color: c.color }}
-            radius={4} />
+            radius={4}>
+              <Popup>Infrastruture</Popup>
+            </CircleMarker>
           )}
         </MapContainer>
       </Paper>

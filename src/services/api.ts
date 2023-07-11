@@ -22,7 +22,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -43,7 +43,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -58,7 +58,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -70,7 +70,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -82,7 +82,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         const data = await response.json();
         return data[0];
     }
@@ -96,7 +96,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -114,11 +114,8 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
-        const data = await response.json();
-
-        console.log('data', data);
-        
+            throw ApiError.parse(response.status, await response.text());
+        const data = await response.json();        
         return data[0];
     }
 
@@ -141,7 +138,22 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());;
+        return response.json();
+    }
+
+    static async updateInsfrastructure(id: string, data: Record<string, any>) {
+        const response = await fetch(`${this.BASE_URL}/infrastructures/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());;
         return response.json();
     }
 
@@ -153,11 +165,21 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.json());
+            throw ApiError.parse(response.status, await response.text());
         const data = await response.json();
-
-        console.log('data', data);
         return data[0];
+    }
+
+    static async getInfrastructure(id: string): Promise<IInfrastructure> {
+        const response = await fetch(`${this.BASE_URL}/infrastructures/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
     }
 
     static async deleteInfrastructure(id: string): Promise<void> {
@@ -169,7 +191,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw new ApiError(response.status, await response.text());
+            throw ApiError.parse(response.status, await response.text());
     }
 
 }
