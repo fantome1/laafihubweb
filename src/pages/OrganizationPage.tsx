@@ -39,10 +39,10 @@ const Map = React.memo(function Map(props: MapProps) {
             {<PromiseBuilder
                 promise={props.promise}
                 dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
-                    center={[value.coordonnates.latitude, value.coordonnates.longitude]}
+                    center={[value.coordinates.latitude, value.coordinates.longitude]}
                     pathOptions={{ color: getInfrastructuresStatusColor(value) }}
                     radius={4}>
-                        <Popup>Infrastruture</Popup>
+                        <Popup>{value.name}</Popup>
                     </CircleMarker>
                 ))}
                 loadingBuilder={() => null}

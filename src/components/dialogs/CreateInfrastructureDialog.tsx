@@ -94,13 +94,13 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
         const data = {
             name: values.name,
             type: values.type,
-            adress: {
+            address: {
                 street: values.street,
                 city: values.city,
                 state: values.state.title,
                 zipCode: '000'
             },
-            coordonnates: {
+            coordinates: {
                 latitude: parseFloat(values.latitude),
                 longitude: parseFloat(values.longitude)
             },

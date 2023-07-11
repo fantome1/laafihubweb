@@ -35,7 +35,7 @@ function getCreateInfrastrutureValidator(value?: IInfrastructure) {
             'street': new FormValidatorField(value?.adress?.street ?? '', {
                 requiredMessage: 'Veuillez renseigner une adresse'
             }),
-            'latitude': new FormValidatorField(value?.coordonnates.latitude.toString() ?? '', {
+            'latitude': new FormValidatorField(value?.coordinates.latitude.toString() ?? '', {
                 requiredMessage: 'Veuillez renseigner une valeur',
                 validator: (value, _) => {
                     if (value == '')
@@ -43,7 +43,7 @@ function getCreateInfrastrutureValidator(value?: IInfrastructure) {
                     return isValidCoordinatesComponent(value, -90, 90);
                 }
             }),
-            'longitude': new FormValidatorField(value?.coordonnates.longitude.toString() ?? '', {
+            'longitude': new FormValidatorField(value?.coordinates.longitude.toString() ?? '', {
                 requiredMessage: 'Veuillez renseigner une valeur',
                 validator: (value, _) => {
                     if (value == '')

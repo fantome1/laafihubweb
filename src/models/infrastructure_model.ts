@@ -5,7 +5,7 @@ interface IInfrastructure {
     type: string;
     description: string;
     adress?: { city: string, state: string, street: string, zipCode: string };
-    coordonnates: { longitude: number, latitude: number },
+    coordinates: { longitude: number, latitude: number },
     creationDate?: Date;
     status?: 'NotActived'|'Actived';
 }
