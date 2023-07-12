@@ -7,6 +7,7 @@ import {
     Tooltip,
     PointElement,
     LineElement,
+    PieController,
     DoughnutController,
     BarController,
     Filler
@@ -25,6 +26,7 @@ ChartJS.register(
     ChartDataLabels,
     DoughnutController,
     BarController,
+    PieController,
     Filler
 );
 

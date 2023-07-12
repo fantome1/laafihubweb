@@ -6,7 +6,10 @@ const routes = {
     EDIT_PROFIL: '/edit-profil',
     HOME: '/',
     ORGANIZATION: '/organization',
-    SUPER_ADMIN_DASHBOARD: '/super-admin-dashboard',
+    SUPER_ADMIN_DASHBOARD: {
+        url: '/super-admin-dashboard/:id',
+        build: (id: string) => `/super-admin-dashboard/${id}`
+    },
     SUPER_ADMIN_USERS: '/super-admin-users',
     LAAFI_MONITOR: '/laafi-monitor',
     LAAFI_MONITOR_DEVICE_DATA: '/laafi-monitor-device-data',

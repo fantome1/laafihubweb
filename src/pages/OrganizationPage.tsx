@@ -11,9 +11,11 @@ import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressi
 import { Completer } from "../services/completer";
 import { IInfrastructure } from "../models/infrastructure_model";
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
+import { WithRouter } from "../components/WithRouterHook";
+import { routes } from "../constants/routes";
 
 type Props = {
-
+    navigate: (url: string) => void;
 };
 
 type State = {
@@ -26,7 +28,7 @@ type State = {
 
 type MapProps = {
     promise: Promise<{ total: number, infrastructures: IInfrastructure[] }>|null;
-}
+};
 
 const Map = React.memo(function Map(props: MapProps) {
     return (
@@ -139,6 +141,10 @@ class OrganizationPage extends React.Component<Props, State> {
             });
     }
 
+    onTapInfrastructure(value: IInfrastructure) {
+        this.props.navigate(routes.SUPER_ADMIN_DASHBOARD.build(value.id));
+    }
+
     render() {
 
         const state = this.state;
@@ -167,7 +173,7 @@ class OrganizationPage extends React.Component<Props, State> {
                                 </thead>
                                 <tbody>
                                     {data.infrastructures.map(value => (
-                                        <tr key={value.id}>
+                                        <tr key={value.id} onClick={() => this.onTapInfrastructure(value)} className="cursor-pointer">
                                             <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: getInfrastructuresStatusColor(value) }}></div></div></td>
                                             <td>{value.name}</td>
                                             <td>{value.type}</td>
@@ -254,4 +260,4 @@ function getInfrastructuresStatusColor(value: IInfrastructure) {
     return '#999999';
 }
 
-export { OrganizationPage }
+export default WithRouter(OrganizationPage);

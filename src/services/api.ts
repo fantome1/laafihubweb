@@ -2,6 +2,7 @@ import { IInfrastructure } from "../models/infrastructure_model";
 import { IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
 import { AuthService } from "./auth_service";
+import { Utils } from "./utils";
 
 class Api {
 
@@ -74,8 +75,12 @@ class Api {
         return response.json();
     }
 
-    static async getUsers(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
-        const response = await fetch(`${this.BASE_URL}/users`, {
+    // Pour les éléments users qui apparaisse tu peux uiliser https://hub-api-test.laafi-concepts.com/users?infrastrureid=""
+    static async getUsers(options: { infrastructure?: string } = {}): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
+        const response = await fetch(
+            Utils.buildUrl(this.BASE_URL, '/users', {
+                query: { infrastructureid: options.infrastructure  }
+            }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
             }

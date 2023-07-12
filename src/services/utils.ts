@@ -20,6 +20,30 @@ class Utils {
         return n < 10 ? `0${n}` : n.toString();
     }
 
+    static getQueryParams(params: Record<string, any>): string {
+        const parts: string[] = [];
+
+        const values = Object.entries(params);
+        const len = values.length;
+
+        for (let i=0; i<len; ++i) {
+          const e = values[i];
+          const v = e[1];
+          if (v == null)
+            continue;
+          parts.push(`${e[0]}=${encodeURIComponent(Array.isArray(v) ? v.join(',') : v.toString())}`);
+        }
+
+        return parts.join('&');
+    }
+
+    static buildUrl(url: string, path: string, options: { query?: Record<string, any> } = {}): string {
+        const q = !options.query || Object.keys(options.query).length == 0
+          ? ''
+          : `?${this.getQueryParams(options.query)}`;
+        return `${url}${path}${q}'`;
+    }
+
 }
 
 export { Utils };
