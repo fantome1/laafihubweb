@@ -1,6 +1,6 @@
-import { Paper } from "@mui/material";
 import React from "react";
-import { ConnectionStatusChart, DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2 } from "../components/charts/Charts";
+import { Paper } from "@mui/material";
+import { ConnectionStatusChart } from "../components/charts/Charts";
 import { AnotherActivityList } from "../components/AnotherActivityList";
 
 class AnotherLaafiMonitorPage extends React.Component {

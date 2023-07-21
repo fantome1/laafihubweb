@@ -126,7 +126,7 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
-    static async getDevices(options: { infrastructureId?: string } = {}): Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }> {
+    static async getDevices(options: { infrastructureId?: string } = {}): Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/devices', {
                 query: { infrastructureid: options.infrastructureId  }

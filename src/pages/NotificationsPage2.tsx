@@ -3,8 +3,8 @@ import React from "react";
 import { BubleMap } from "../components/BubleMap";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { NotificationsTable } from "../components/NotificationsTable";
-import { ActivityChart, ActivityChart2 } from "../components/charts/ActivityChart";
-import { DeviceUsageChart, DeviceUsageChart2, DeviceUsageChart3 } from "../components/charts/Charts";
+import { ActivityChart2 } from "../components/charts/ActivityChart";
+import { DeviceUsageChart3 } from "../components/charts/Charts";
 
 class NotificationsPage2 extends React.Component {
 

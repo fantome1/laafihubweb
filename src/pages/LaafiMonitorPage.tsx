@@ -17,7 +17,7 @@ type Props = {
 type State = {
     addDeviceCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
-    devicesPromise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    devicesPromise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
 };
 
 class LaafiMonitorPage extends React.Component<Props, State> {
@@ -111,17 +111,28 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                     {/* Second card */}
                     <div className="h-[120px] grow flex bg-white px-4 rounded-md">
                         {/* Activites */}
-                        <div className="w-[35%] flex flex-col justify-between h-full py-2 pr-2" style={{ borderRight: '1px solid #999999' }}>
+                        <div className="w-[40%] flex flex-col justify-between h-full py-2 pr-2" style={{ borderRight: '1px solid #999999' }}>
                             <div>
-                                <p className="text-lg text-[#3C4858]">Activities:</p>
-                                <p className="text-sm text-[#999999] mt-1">Active activies</p>
+                                <p className="text-lg text-[#3C4858]">Connection status:</p>
+                                {/* <p className="text-sm text-[#999999] mt-1">Active activies</p> */}
                             </div>
 
-                            <p className="text-4xl text-[#3C4858] text-right">020</p>
+                            {/* <p className="text-4xl text-[#3C4858] text-right">020</p> */}
+                            <PromiseBuilder
+                                promise={state.devicesPromise}
+                                dataBuilder={data => data.totalConnected.map((value, index) => (
+                                    <div key={index} className={`${index == 0 ? '' : 'pl-4'}`}>
+                                        <p className="text-sm text-[#999999]">{value.id}</p>
+                                        <p className="text-4xl text-[#3C4858]">{value.total.toString().padStart(3, '0')}</p>
+                                    </div>
+                                ))}
+                                loadingBuilder={() => (<UserCountSkeleton count={2} />)}
+                                errorBuilder={() => (<div className="text-red-500">Une erreur s'est produite</div>)}
+                            />
                         </div>
 
                         {/* Connection type */}
-                        <div className="w-[65%] px-4 py-2">
+                        <div className="w-[60%] px-4 py-2">
                             <p className="text-lg text-[#3C4858]">Connection types:</p>
 
                             <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">

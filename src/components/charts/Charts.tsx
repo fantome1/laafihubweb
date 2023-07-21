@@ -71,7 +71,7 @@ class DeviceUsageChart extends React.Component {
 
 
 type LaafiMonitorDeviceUsageChartProps = {
-    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
 };
 
 type LaafiMonitorDeviceUsageChartState = {
@@ -198,7 +198,7 @@ class DeviceUsageChart3 extends React.Component {
 }
 
 type LaafiMonitorDeviceStatusChartProps = {
-    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
 };
 
 type LaafiMonitorDeviceStatusChartState = {
