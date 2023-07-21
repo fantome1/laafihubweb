@@ -36,7 +36,7 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
         const validator = this.isModify ? null : getCreateInfrastrutureValidator();        
 
         this.state = {
-            validator: validator,
+            validator,
             infrastructure: null,
             error: null,
             formState: validator?.getData ?? null,

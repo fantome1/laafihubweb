@@ -9,8 +9,8 @@ import { EditProfilPage } from "./pages/EditProfilPage";
 import OrganizationPage from "./pages/OrganizationPage";
 import SuperAdminDashboardPage from "./pages/SuperAdminDashbaordPage";
 import { SuperAdminUsersPage } from "./pages/SuperAdminUsersPage";
-import { LaafiMonitorPage } from "./pages/LaafiMonitorPage";
-import { LaafiMonitorDeviceDataPage } from "./pages/LaafMonitorDeviceDataPage";
+import LaafiMonitorPage from "./pages/LaafiMonitorPage";
+import LaafiMonitorDeviceDataPage from "./pages/LaafMonitorDeviceDataPage";
 import { AnotherLaafiMonitorPage } from "./pages/AnotherLaafiMonitorPage";
 import { AnotherLaafiMonitorDeviceDataPage } from "./pages/AnotherLaafMonitorDeviceDataPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
@@ -47,7 +47,7 @@ function App() {
             <Route path={routes.SUPER_ADMIN_DASHBOARD.url} element={<SuperAdminDashboardPage />} />
             <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />
             <Route path={routes.LAAFI_MONITOR} element={<LaafiMonitorPage />} />
-            <Route path={routes.LAAFI_MONITOR_DEVICE_DATA} element={<LaafiMonitorDeviceDataPage />} />
+            <Route path={routes.LAAFI_MONITOR_DEVICE_DATA.url} element={<LaafiMonitorDeviceDataPage />} />
             <Route path={routes.ANOTHER_LAAFI_MONITOR} element={<AnotherLaafiMonitorPage />} />
             <Route path={routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA} element={<AnotherLaafiMonitorDeviceDataPage />} />
             <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />

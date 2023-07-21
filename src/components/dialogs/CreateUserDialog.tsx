@@ -41,7 +41,7 @@ class CreateUserDialog extends React.Component<Props, State> {
         const validator = this.isModify ? null : getRegisterUserValidator();
 
         this.state = {
-            validator: validator,
+            validator,
             user: null,
             error: null,
             formState: validator?.getData ?? null

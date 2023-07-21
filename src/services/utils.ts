@@ -1,5 +1,8 @@
 import { IUser } from "../models/user_model";
 
+var emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+var macAddressRegex = /^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$/
+
 class Utils {
 
     static formatDate(date: Date) {
@@ -9,7 +12,11 @@ class Utils {
     static isEmail(value: string): boolean {
         return !!(value
             .toLowerCase()
-            .match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/));
+            .match(emailRegex));
+    }
+
+    static isMacAddress(value: string): boolean {
+        return !!value.match(macAddressRegex);
     }
 
     static getUserFullname(user: IUser) {
@@ -26,6 +33,8 @@ class Utils {
         const values = Object.entries(params);
         const len = values.length;
 
+        
+        
         for (let i=0; i<len; ++i) {
           const e = values[i];
           const v = e[1];
@@ -41,7 +50,8 @@ class Utils {
         const q = !options.query || Object.keys(options.query).length == 0
           ? ''
           : `?${this.getQueryParams(options.query)}`;
-        return `${url}${path}${q}'`;
+
+        return `${url}${path}${q}`;
     }
 
 }

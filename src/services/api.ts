@@ -76,10 +76,10 @@ class Api {
     }
 
     // Pour les éléments users qui apparaisse tu peux uiliser https://hub-api-test.laafi-concepts.com/users?infrastrureid=""
-    static async getUsers(options: { infrastructure?: string } = {}): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
+    static async getUsers(options: { infrastructureId?: string } = {}): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/users', {
-                query: { infrastructureid: options.infrastructure  }
+                query: { infrastructureid: options.infrastructureId  }
             }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -111,8 +111,26 @@ class Api {
     // ###################################################################################################
     // ###################################################################################################
 
-    static async getDevices(): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
-        const response = await fetch(`${this.BASE_URL}/devices`, {
+    static async addDevice(macAddress: string): Promise<void> {
+        const response = await fetch(
+            Utils.buildUrl(this.BASE_URL, '/devices', {
+                query: { DeviceMac: macAddress  }
+            }), {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+                }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async getDevices(options: { infrastructureId?: string } = {}): Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }> {
+        const response = await fetch(
+            Utils.buildUrl(this.BASE_URL, '/devices', {
+                query: { infrastructureid: options.infrastructureId  }
+            }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
             }
@@ -120,8 +138,8 @@ class Api {
 
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
-        const data = await response.json();        
-        return data[0];
+        const data = await response.json();  
+        return data;
     }
 
 

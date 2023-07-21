@@ -69,28 +69,75 @@ class DeviceUsageChart extends React.Component {
     }
 }
 
-class DeviceUsageChart2 extends React.Component {
 
-    private chartRef = React.createRef<ChartJS>()
+type LaafiMonitorDeviceUsageChartProps = {
+    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+};
 
-    private data = {
-        labels: ['Enrolled', 'Disabled'],
-        datasets: [
-            {
-              data: [3.5, 3],
-              backgroundColor: ['#69ADA7', '#F2994A'],
+type LaafiMonitorDeviceUsageChartState = {
+    data: {
+        labels: string[],
+        datasets: {
+            data: number[],
+            backgroundColor: string[]
+        }[]
+    }
+};
+
+class LaafiMonitorDeviceUsageChart extends React.Component<LaafiMonitorDeviceUsageChartProps, LaafiMonitorDeviceUsageChartState> {
+
+    private chartRef = React.createRef<ChartJS>();
+
+    private static colors = { 'NotEnrolled': '#F2994A', /* 'x': '#69ADA7' */ }
+
+    constructor(props: LaafiMonitorDeviceUsageChartProps) {
+        super(props);
+
+        this.state = {
+            data: {
+                labels: ['UnAssigned'],
+                datasets: [
+                    {
+                      data: [1],
+                      backgroundColor: ['#A2A2A2'],
+                    }
+                ]
             }
-        ]
+        };
     }
 
-    constructor(props: any) {
-        super(props);
+    componentDidMount(): void {
+        this.update(this.props.promise);
+    }
+
+    componentDidUpdate(prevProps: Readonly<LaafiMonitorDeviceUsageChartProps>, prevState: Readonly<LaafiMonitorDeviceUsageChartState>, snapshot?: any): void {
+        if (prevProps.promise != this.props.promise) {
+            this.update(this.props.promise);
+        }
+    }
+
+    update(promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null) {
+        if (promise == null)
+            return;            
+        promise.then(value => {
+            const data = {
+                labels: value.totalEnrolled.map(v => v.id),
+                datasets: [
+                    {
+                        data: value.totalEnrolled.map(v => v.total),
+                        backgroundColor: value.totalEnrolled.map(v => LaafiMonitorDeviceUsageChart.colors[v.id])
+                    }
+                ]
+            };
+
+            this.setState({ data });
+        });
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                <Chart ref={this.chartRef} type='doughnut' data={this.state.data} options={{
                     responsive: true,
                     plugins: {
                         legend: {
@@ -150,28 +197,73 @@ class DeviceUsageChart3 extends React.Component {
     }
 }
 
-class DeviceStatusChart extends React.Component {
+type LaafiMonitorDeviceStatusChartProps = {
+    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+};
 
-    private chartRef = React.createRef<ChartJS>()
+type LaafiMonitorDeviceStatusChartState = {
+    data: {
+        labels: string[],
+        datasets: {
+            data: number[],
+            backgroundColor: string[]
+        }[]
+    }
+};
 
-    private data = {
-        labels: ['Enrolled', 'Unsassigned', 'Disabled'],
-        datasets: [
-            {
-              data: [9, 8, 1],
-              backgroundColor: ['#69ADA7', '#999999', '#D80303'],
+class LaafiMonitorDeviceStatusChart extends React.Component<LaafiMonitorDeviceStatusChartProps, LaafiMonitorDeviceStatusChartState>  {
+
+    private chartRef = React.createRef<ChartJS>();
+    private static colors = { 'Enrolled': '#69ADA7', 'UnAssigned': '#999999', 'Disabled': '#D80303' };
+
+    constructor(props: LaafiMonitorDeviceUsageChartProps) {
+        super(props);
+
+        this.state = {
+            data: {
+                labels: ['UnAssigned'],
+                datasets: [
+                    {
+                      data: [1],
+                      backgroundColor: ['#A2A2A2'],
+                    }
+                ]
             }
-        ]
+        };
     }
 
-    constructor(props: any) {
-        super(props);
+    componentDidMount(): void {
+        this.update(this.props.promise);
+    }
+
+    componentDidUpdate(prevProps: Readonly<LaafiMonitorDeviceUsageChartProps>, prevState: Readonly<LaafiMonitorDeviceUsageChartState>, snapshot?: any): void {
+        if (prevProps.promise != this.props.promise) {
+            this.update(this.props.promise);
+        }
+    }
+
+    update(promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null) {
+        if (promise == null)
+            return;            
+        promise.then(value => {
+            const data = {
+                labels: value.totalEnrolled.map(v => v.id),
+                datasets: [
+                    {
+                        data: value.totalEnrolled.map(v => v.total),
+                        backgroundColor: value.totalEnrolled.map(v => LaafiMonitorDeviceStatusChart.colors[v.id])
+                    }
+                ]
+            };
+
+            this.setState({ data });
+        });
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                <Chart ref={this.chartRef} type='doughnut' data={this.state.data} options={{
                     // responsive: true,
                     plugins: {
                         legend: {
@@ -676,12 +768,11 @@ class DeviceUsageChart5 extends React.Component {
     }
 }
 
-
 export {
     DeviceUsageChart,
-    DeviceUsageChart2,
+    LaafiMonitorDeviceUsageChart,
+    LaafiMonitorDeviceStatusChart,
     DeviceUsageChart3,
-    DeviceStatusChart,
     TemperatureChart,
     TemperatureChart2,
     TemperatureLineChart,

@@ -1,9 +1,18 @@
-import { Button, Checkbox, FormControlLabel, Paper } from "@mui/material";
 import React from "react";
+import { Button, Checkbox, FormControlLabel, Paper } from "@mui/material";
 import { TemperatureChart, TemperatureLineChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
+import { WithRouter } from "../components/WithRouterHook";
 
-class LaafiMonitorDeviceDataPage extends React.Component {
+type Props = {
+    params: Record<string, string>;
+}
+
+class LaafiMonitorDeviceDataPage extends React.Component<Props> {
+
+    constructor(props: Props) {
+        super(props);
+    }
 
     render() {
         return (
@@ -47,15 +56,15 @@ class LaafiMonitorDeviceDataPage extends React.Component {
                             <div className="flex flex-col justify-around h-full">
                                 {/* item 1 */}
                                 <div className="flex items-center space-x-2">
-                                    <div><img src="icons/laafi_monitor/wlan_repeater.svg" alt="" /></div>
+                                    <div><img src="/icons/laafi_monitor/wlan_repeater.svg" alt="" /></div>
 
                                     <div className="flex justify-between w-[160px] border border-[#999999] rounded-md px-2 py-[2px]">
                                         <div className="flex">
-                                            <div><img src="icons/laafi_monitor/wifi.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/wifi.svg" alt="" /></div>
                                         </div>
 
                                         <div className="flex items-center">
-                                            <div><img src="icons/laafi_monitor/battery.svg" alt="" /></div>
+                                            <div><img src='/icons/laafi_monitor/battery.svg' alt="" /></div>
                                             <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
                                         </div>
                                     </div>
@@ -63,16 +72,16 @@ class LaafiMonitorDeviceDataPage extends React.Component {
                                 {/* End item */}
                                 {/* item 2 */}
                                 <div className="flex items-center space-x-2">
-                                    <div><img src="icons/laafi_monitor/wifi_router.svg" alt="" /></div>
+                                    <div><img src="/icons/laafi_monitor/wifi_router.svg" alt="" /></div>
 
                                     <div className="flex justify-between w-[160px] border border-[#999999] rounded-md px-2 py-[2px]">
                                         <div className="flex">
-                                            <div><img src="icons/laafi_monitor/wifi.svg" alt="" /></div>
-                                            <div><img src="icons/laafi_monitor/wired_network_connection.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/wifi.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/wired_network_connection.svg" alt="" /></div>
                                         </div>
 
                                         <div className="flex items-center">
-                                            <div><img src="icons/laafi_monitor/battery.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/battery.svg" alt="" /></div>
                                             <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
                                         </div>
                                     </div>
@@ -80,16 +89,16 @@ class LaafiMonitorDeviceDataPage extends React.Component {
                                 {/* End item */}
                                 {/* item 2 */}
                                 <div className="flex items-center space-x-2">
-                                    <div><img src="icons/laafi_monitor/android.svg" alt="" /></div>
+                                    <div><img src="/icons/laafi_monitor/android.svg" alt="" /></div>
 
                                     <div className="flex justify-between w-[160px] border border-[#999999] rounded-md px-2 py-[2px]">
                                         <div className="flex">
-                                            <div><img src="icons/laafi_monitor/signal_cellular.svg" alt="" /></div>
-                                            <div><img src="icons/laafi_monitor/wifi.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/signal_cellular.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/wifi.svg" alt="" /></div>
                                         </div>
 
                                         <div className="flex items-center">
-                                            <div><img src="icons/laafi_monitor/battery.svg" alt="" /></div>
+                                            <div><img src="/icons/laafi_monitor/battery.svg" alt="" /></div>
                                             <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
                                         </div>
                                     </div>
@@ -119,11 +128,11 @@ class LaafiMonitorDeviceDataPage extends React.Component {
                     {/* Buttons */}
                     <div className="flex flex-col justify-between w-[140px]">
                         <div className="">
-                            <Button variant="contained" sx={{ bgcolor: '#E93975', fontSize: 12, width: '100%', padding: '12px 12px' }}>Generate<br /> Report</Button>
+                            <Button variant="contained" sx={{ bgcolor: '#E93975', fontSize: 12, color: '#FFFFFF', width: '100%', padding: '12px 12px' }}>Generate<br /> Report</Button>
                         </div>
 
                         <div className="">
-                            <Button variant="contained" sx={{ bgcolor: 'var(--primary)', fontSize: 12, width: '100%', padding: '12px 12px' }} startIcon={<span className="material-symbols-outlined text-[28px]">upload</span>}>Push Update</Button>
+                            <Button variant="contained" sx={{ bgcolor: 'var(--primary)', fontSize: 12, color: '#FFFFFF', width: '100%', padding: '12px 12px' }} startIcon={<span className="material-symbols-outlined text-[28px]">upload</span>}>Push Update</Button>
                         </div>
                     </div>
                 </div>
@@ -139,7 +148,7 @@ class LaafiMonitorDeviceDataPage extends React.Component {
                                     <p className="text-6xl text-[#3C4858]">4.55</p>
                                     <p className="text-3xl text-[#3C4858]">° C</p>
                                     <div className="flex space-x-2">
-                                        <img src="icons/laafi_monitor/humidity.svg" alt="" />
+                                        <img src="/icons/laafi_monitor/humidity.svg" alt="" />
                                         <p className="text-lg text-[#3C4858]">32% RH</p>
                                     </div>
 
@@ -158,14 +167,14 @@ class LaafiMonitorDeviceDataPage extends React.Component {
                             <div className="flex flex-col items-center">
                                 <p className="text-[#999999]">Battery status</p>
                                 <div className="flex items-center">
-                                    <div><img src="icons/laafi_monitor/battery_per.svg" alt="" /></div>
+                                    <div><img src="/icons/laafi_monitor/battery_per.svg" alt="" /></div>
                                     <p className="text-2xl text-[#3C4858] font-medium">55%</p>
                                 </div>
                                 <p className="text-sm text-[#999999] pb-2">18 heures restantes</p>
                             </div>
 
                             <div>
-                                <div className="w-[90%] border-y border-[#AAAAAA] py-2" style={{ margin: '0 auto' }}><img src="icons/laafi_monitor/opening_status.svg" alt="" /></div>
+                                <div className="w-[90%] border-y border-[#AAAAAA] py-2" style={{ margin: '0 auto' }}><img src="/icons/laafi_monitor/opening_status.svg" alt="" /></div>
                                 <p className="text-lg text-[#3C4858] text-center">Opening status</p>
                             </div>
                         </Paper>
@@ -206,4 +215,4 @@ class LaafiMonitorDeviceDataPage extends React.Component {
 
 }
 
-export { LaafiMonitorDeviceDataPage };
+export default WithRouter(LaafiMonitorDeviceDataPage);

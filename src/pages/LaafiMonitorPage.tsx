@@ -1,16 +1,23 @@
 import React from "react";
-import { Paper, Skeleton } from "@mui/material";
-import { DeviceStatusChart, DeviceUsageChart2 } from "../components/charts/Charts";
+import { Alert, AlertColor, Paper, Skeleton, Snackbar } from "@mui/material";
+import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
+import { Completer } from "../services/completer";
+import { AddDeviceDialog } from "../components/dialogs/AddDeviceDialog";
+import { UserCountSkeleton } from "../components/Skeletons";
+import { WithRouter } from "../components/WithRouterHook";
+import { routes } from "../constants/routes";
 
 type Props = {
-
+    navigate: (url: string) => void
 };
 
 type State = {
-    devicesPromise: Promise<any>|null;
+    addDeviceCompleter: Completer<boolean>|null;
+    snackbarData: {  severity: AlertColor, message: string }|null;
+    devicesPromise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
 };
 
 class LaafiMonitorPage extends React.Component<Props, State> {
@@ -19,12 +26,49 @@ class LaafiMonitorPage extends React.Component<Props, State> {
         super(props);
 
         this.state = {
-            devicesPromise: null
+            addDeviceCompleter: null,
+            snackbarData: null,
+            devicesPromise: null,
         };
+
+        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+        this.showAddDeviceDialog = this.showAddDeviceDialog.bind(this);
     }
 
     componentDidMount(): void {
         this.setState({ devicesPromise: Api.getDevices() });
+    }
+
+    async showAddDeviceDialog() {
+        const completer = new Completer<boolean>();
+        this.setState({ addDeviceCompleter: completer });
+
+        try {
+            const result = await completer.promise;
+            this.setState({ addDeviceCompleter: null });
+
+            if (result == true) {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Appareil ajouté avec succès' },
+                    devicesPromise: Api.getDevices()
+                });
+            }
+        } catch(err) {
+            this.setState({
+                addDeviceCompleter: null,
+                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
+            });
+        }
+    }
+
+    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
+        if (reason === 'clickaway')
+            return;
+        this.setState({ snackbarData: null });
+    }
+
+    onTapRow(device: { id: string }) {
+        this.props.navigate(routes.LAAFI_MONITOR_DEVICE_DATA.build(device.id));
     }
 
     render() {
@@ -55,7 +99,12 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                                 </div>
                         </div>
                         <div className="flex items-end py-4">
-                            <p className="text-4xl text-[#3C4858]">003</p>
+                            <PromiseBuilder
+                                promise={state.devicesPromise}
+                                dataBuilder={data => (<p className="text-4xl text-[#3C4858]">{data.count.toString().padStart(3, '0')}</p>)}
+                                loadingBuilder={() => (<Skeleton className="text-4xl" width={72} />)}
+                                errorBuilder={() => (<div className="text-red-500">Une erreur s'est produite</div>)}
+                            />
                         </div>
                     </div>
 
@@ -76,25 +125,24 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             <p className="text-lg text-[#3C4858]">Connection types:</p>
 
                             <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">
-                                <div className="grow">
-                                    <p className="text-sm text-[#999999]">Monitor App</p>
-                                    <p className="text-4xl text-[#3C4858]">020</p>
-                                </div>
-                                <div className="pl-4 grow">
-                                    <p className="text-sm text-[#999999]">Central</p>
-                                    <p className="text-4xl text-[#3C4858]">020</p>
-                                </div>
-                                <div className="pl-4 grow">
-                                    <p className="text-sm text-[#999999]">Gateway</p>
-                                    <p className="text-4xl text-[#3C4858]">020</p>
-                                </div>
+                                <PromiseBuilder
+                                    promise={state.devicesPromise}
+                                    dataBuilder={data => data.totalConnexionType.map((value, index) => (
+                                        <div key={index} className={`grow ${index == 0 ? '' : 'pl-4'}`}>
+                                            <p className="text-sm text-[#999999]">{value.id}</p>
+                                            <p className="text-4xl text-[#3C4858]">{value.total.toString().padStart(3, '0')}</p>
+                                        </div>
+                                    ))}
+                                    loadingBuilder={() => (<UserCountSkeleton count={3} />)}
+                                    errorBuilder={() => (<div className="text-red-500">Une erreur s'est produite</div>)}
+                                />
                             </div>
                         </div>
                     </div>
 
                     {/* Button add monitor and add group */}
                     <div className="flex flex-col justify-between">
-                        <div className="flex items-center w-[120px] h-[68px] px-2 cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                        <div onClick={this.showAddDeviceDialog} className="flex items-center w-[120px] h-[68px] px-2 cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                             <span className="material-symbols-rounded text-[28px] text-white">add</span>
                             <p className="text-xl text-white">Monitor</p>
                         </div>
@@ -115,24 +163,24 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
-                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Mode', 'Infrastructure name', 'Groups',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Last connexion date',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {Array.from({ length: 13 }, (e, index) => (
-                                            <tr key={index}>
+                                        {data.devicies.map((value, index) => (
+                                            <tr onClick={() => this.onTapRow(value)} key={value.id} className="cursor-pointer">
                                                 <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#69ADA7', '#D80303', '#999999'][index % 3] }}></div></div></td>
-                                                <td></td>
-                                                <td>LM0077</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td>MS Burkina Faso</td>
-                                                <td>Bob Bobar</td>
+                                                <td>{value.id}</td>
+                                                <td>{value.name}</td>
+                                                <td>{value.parentModel}</td>
+                                                <td>{value.model}</td>
+                                                <td>{value.infrastructureName}</td>
+                                                <td>{value.lastConnexion}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             )}
-                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
+                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={6} />)}
                             errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                         />
                     </div>
@@ -143,12 +191,12 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                         <div className="bg-white rounded-lg">
                             <div className="p-2">
                                 <p className="text-lg text-[#999999] mb-2">Devices usage</p>
-                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><DeviceUsageChart2 /></div>
+                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceUsageChart promise={state.devicesPromise} /></div>
                             </div>
 
                             <div className="p-2 border-t">
                                 <p className="text-lg text-[#999999] mb-2">Devices status</p>
-                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><DeviceStatusChart /></div>
+                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
                             </div>
                         </div>
 
@@ -168,9 +216,32 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                     </div>
                 </div>
 
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                {/* #################################### MODAL AND OTHER ############################################ */}
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+
+                {Boolean(state.addDeviceCompleter) && <AddDeviceDialog completer={state.addDeviceCompleter} />}
+
+                <Snackbar
+                    open={Boolean(state.snackbarData)}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
+                </Snackbar>
+                
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                {/* #################################### MODAL AND OTHER ############################################ */}
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+
             </div>
         );
     }
 }
 
-export { LaafiMonitorPage };
+export default WithRouter(LaafiMonitorPage);

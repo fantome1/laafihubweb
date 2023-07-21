@@ -1,9 +1,18 @@
-import { Paper } from "@mui/material";
 import React from "react";
-import { DeviceStatusChart, DeviceUsageChart, DeviceUsageChart2, GroupedBarChart, GroupedBarChart2, TemperatureChart, TemperatureChart2, TemperatureCurveChart } from "../components/charts/Charts";
+import { Paper } from "@mui/material";
+import { GroupedBarChart, GroupedBarChart2, TemperatureChart2, TemperatureCurveChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
+import { WithRouter } from "../components/WithRouterHook";
 
-class AnotherLaafiMonitorDeviceDataPage extends React.Component {
+
+type Props = {
+}
+
+class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props> {
+
+    constructor(props: Props) {
+        super(props);
+    }
 
     render() {
         return (

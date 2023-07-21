@@ -1,0 +1,47 @@
+{
+    "count": 2,
+    "totalEnrolled": [
+        {
+            "id": "NotEnrolled",
+            "total": 2
+        }
+    ],
+    "totalConnexionType": [
+        {
+            "id": "Monitor",
+            "total": 2
+        }
+    ],
+    "totalConnected": [
+        {
+            "id": "Offline",
+            "total": 2
+        }
+    ],
+    "totalSatus": [
+        {
+            "id": "UnAssigned",
+            "total": 2
+        }
+    ],
+    "devicies": [
+        {
+            "id": "LF-D-IVSJ1870",
+            "name": "",
+            "infrastructureId": "LF-I-B1310",
+            "infrastructureName": "",
+            "model": "Monitor",
+            "parentModel": "AppMobile",
+            "lastConnexion": "never"
+        },
+        {
+            "id": "LF-D-DXVF1478",
+            "name": "",
+            "infrastructureId": "",
+            "infrastructureName": "",
+            "model": "Monitor",
+            "parentModel": "AppMobile",
+            "lastConnexion": "never"
+        }
+    ]
+}

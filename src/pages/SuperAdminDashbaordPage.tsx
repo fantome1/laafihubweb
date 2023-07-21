@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Skeleton } from "@mui/material";
+import { Paper, Skeleton, Tooltip } from "@mui/material";
 import { NearMap } from "../components/NearMap";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { IInfrastructure } from "../models/infrastructure_model";
@@ -8,7 +8,6 @@ import { WithRouter } from "../components/WithRouterHook";
 import { Api } from "../services/api";
 import { IUser } from "../models/user_model";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
-import { Utils } from "../services/utils";
 
 type Props = {
     params: any
@@ -17,6 +16,7 @@ type Props = {
 type State = {
     promise: Promise<IInfrastructure>|null;
     usersPromise: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null;
+    devicesPromise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
 };
 
 class SuperAdminDashboardPage extends React.Component<Props, State> {
@@ -26,14 +26,16 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         this.state = {
             promise: null,
-            usersPromise: null
+            usersPromise: null,
+            devicesPromise: null
         };
     }
 
     componentDidMount(): void {
         this.setState({
             promise: Api.getInfrastructure(this.props.params.id),
-            usersPromise: Api.getUsers({ infrastructure: this.props.params.id })
+            usersPromise: Api.getUsers({ infrastructureId: this.props.params.id }),
+            devicesPromise: Api.getDevices(/*{ infrastructureId: this.props.params.id }*/)
         });
     }
 
@@ -125,16 +127,17 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                             errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                         />
 
-                        <EntityCountCard
-                            icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices</span>}
-                            label="Devices"
-                            count="060"
-                            elevation={0}
-                            items={[
-                                { label: 'Gateways', count: '020' },
-                                { label: 'Centrals', count: '020' },
-                                { label: 'Monitors', count: '020' },
-                            ]}
+                        <PromiseBuilder
+                            promise={this.state.devicesPromise}
+                            dataBuilder={data => (<EntityCountCard
+                                icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices</span>}
+                                label="Devices"
+                                count={data.count.toString().padStart(3, '0')}
+                                elevation={0}
+                                items={data.totalConnexionType.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0') }))}
+                            />)}
+                            loadingBuilder={() => (<Skeleton variant="rounded" height={128} />)}
+                            errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                         />
                     </div>
 
@@ -166,22 +169,41 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                     </div>
 
                     <div className="w-[70%]">
-                        <table className="styled-table">
-                                <thead>
-                                    <tr>{['Device ID', 'Device Name', 'Type', 'Registration status', 'Status'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                                </thead>
-                                <tbody>
-                                    {Array.from({ length: 14 }, (_, index) => (
-                                        <tr key={index}>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: randomRegistrationStatus(index + 1).color }}>{randomRegistrationStatus(index + 1).label}</div></div></td>
-                                            <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[80px] h-[20px] rounded text-white text-xs font-medium`} style={{ backgroundColor: randomStatus(index + 1).color }}>{randomStatus(index + 1).label}</div></div></td>
+                        <PromiseBuilder
+                            promise={this.state.devicesPromise}
+                            dataBuilder={data => (
+                                <table className="styled-table">
+                                    <thead>
+                                        <tr>{['Device ID', 'Device Name', 'Model', 'Registration status', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.devicies.map((value, index/* remove index later */) => (
+                                            <tr key={value.id}>
+                                            <td>{value.id}</td>
+                                            <td>{value.name}</td>
+                                            <td>{value.model}</td>
+                                            <td>
+                                                <div className="flex justify-center">
+                                                    <div className={`flex justify-center items-center bg-[#3C4858] w-[80px] h-[20px] rounded text-white text-xs font-medium`}>
+                                                        {value.lastConnexion}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="flex justify-center">
+                                                    <Tooltip title={'Supprimer l\'appareil de l\'infrastructure'}>
+                                                        <span className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
+                                                    </Tooltip>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    ))}
-                                </tbody>
-                        </table>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
+                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
+                        />
                     </div>
                 </div>     
 
@@ -191,23 +213,23 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
 }
 
-function randomRegistrationStatus(index: number) {
-    if (index % 4 == 0)
-        return { label: 'Not enrolled', color: '#999999' };
-    return { label: 'Enrolled', color: '#3C4858' }
-}
+// function randomRegistrationStatus(index: number) {
+//     if (index % 4 == 0)
+//         return { label: 'Not enrolled', color: '#999999' };
+//     return { label: 'Enrolled', color: '#3C4858' }
+// }
 
-function randomStatus(index: number) {
-    const r = index % 3;
+// function randomStatus(index: number) {
+//     const r = index % 3;
 
-    switch(r) {
-        case 1:
-            return { label: 'Connected', color: '#309E3A' };
-        case 2:
-            return { label: 'Disconnected', color: '#D80303' };
-        default:
-            return { label: 'Inactive', color: '#FE9B15' };
-    }
-}
+//     switch(r) {
+//         case 1:
+//             return { label: 'Connected', color: '#309E3A' };
+//         case 2:
+//             return { label: 'Disconnected', color: '#D80303' };
+//         default:
+//             return { label: 'Inactive', color: '#FE9B15' };
+//     }
+// }
 
 export default WithRouter(SuperAdminDashboardPage);
