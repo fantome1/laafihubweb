@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Skeleton, Tooltip } from "@mui/material";
+import { Alert, AlertColor, Paper, Skeleton, Snackbar, Tooltip } from "@mui/material";
 import { NearMap } from "../components/NearMap";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { IInfrastructure } from "../models/infrastructure_model";
@@ -8,6 +8,9 @@ import { WithRouter } from "../components/WithRouterHook";
 import { Api } from "../services/api";
 import { IUser } from "../models/user_model";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
+import { IGetDeviceResult } from "../models/device_mdoel";
+import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
+import { Completer } from "../services/completer";
 
 type Props = {
     params: any
@@ -16,7 +19,9 @@ type Props = {
 type State = {
     promise: Promise<IInfrastructure>|null;
     usersPromise: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null;
-    devicesPromise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    devicesPromise: Promise<IGetDeviceResult>|null;
+    deleteConfirmationCompleter: Completer<boolean>|null;
+    snackbarData: {  severity: AlertColor, message: string }|null;
 };
 
 class SuperAdminDashboardPage extends React.Component<Props, State> {
@@ -27,8 +32,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.state = {
             promise: null,
             usersPromise: null,
-            devicesPromise: null
+            devicesPromise: null,
+            deleteConfirmationCompleter: null,
+            snackbarData: null
         };
+
+        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     }
 
     componentDidMount(): void {
@@ -39,7 +48,38 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         });
     }
 
+    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
+        if (reason === 'clickaway')
+            return;
+        this.setState({ snackbarData: null });
+    }
+
+    async onDeleteUser(user: IUser) {
+
+        const completer = new Completer<boolean>();
+        this.setState({ deleteConfirmationCompleter: completer });
+
+        const result = await completer.promise;
+        this.setState({ deleteConfirmationCompleter: null });
+
+        if (result != true)
+            return;
+
+        Api.deleteUserFromInfrastructure(user.id)
+            .then(() => {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' },
+                    usersPromise: Api.getUsers()
+                });
+            }).catch(err => {
+                console.log('err', err);
+                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' } });
+            });
+    }
+
     render() {
+        const state = this.state;
+
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
 
@@ -47,7 +87,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                     {/* Infrastruture name */}
                     <div className="grow">
                         <PromiseBuilder
-                            promise={this.state.promise}
+                            promise={state.promise}
                             dataBuilder={data => (
                                 <div className="h-[120px] grow flex flex-col justify-between bg-white px-4 rounded-md">
                                     <div className="relative">
@@ -77,7 +117,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                     {/* details canrd and edit, enroll buttons */}
                     <div className="flex grow space-x-2">
                         <PromiseBuilder
-                            promise={this.state.promise}
+                            promise={state.promise}
                             dataBuilder={data => (
                                 <div className="grow h-[120px] flex flex-col bg-white px-4 rounded-md">
                                     <p className="text-[#3C4858] mt-2">Details</p>
@@ -128,7 +168,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         />
 
                         <PromiseBuilder
-                            promise={this.state.devicesPromise}
+                            promise={state.devicesPromise}
                             dataBuilder={data => (<EntityCountCard
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices</span>}
                                 label="Devices"
@@ -147,56 +187,65 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 <div className="flex space-x-2 mt-4">
                     <div className="w-[30%]">
                         <PromiseBuilder
-                            promise={this.state.usersPromise}
+                            promise={state.usersPromise}
                             dataBuilder={data => (
                                 <table className="styled-table">
                                         <thead>
-                                            <tr>{['User Name', 'Role'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                            <tr>{['', 'User Name', 'Role', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                         </thead>
                                         <tbody>
                                             {data.documents.map(user => (
                                                 <tr key={user.id}>
+                                                    <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: false ? '#69ADA7' : '#D80303' }}></div></div></td>
                                                     <td>{user.userName}</td>
                                                     <td>{user.role}</td>
+                                                    <td>
+                                                        <div className="flex justify-center">
+                                                            <Tooltip title={'Supprimer l\'utilisateur de l\'infrastructure'}>
+                                                                <span onClick={() => this.onDeleteUser(user)} className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
+                                                            </Tooltip>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                 </table>
                             )}
-                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={2} />)}
+                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={3} />)}
                             errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
 
                     <div className="w-[70%]">
                         <PromiseBuilder
-                            promise={this.state.devicesPromise}
+                            promise={state.devicesPromise}
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
-                                        <tr>{['Device ID', 'Device Name', 'Model', 'Registration status', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                        <tr>{['', 'Device ID', 'Device Name', 'Model', 'Last connexion date', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.devicies.map((value, index/* remove index later */) => (
+                                        {data.devicies.map(value => (
                                             <tr key={value.id}>
-                                            <td>{value.id}</td>
-                                            <td>{value.name}</td>
-                                            <td>{value.model}</td>
-                                            <td>
-                                                <div className="flex justify-center">
-                                                    <div className={`flex justify-center items-center bg-[#3C4858] w-[80px] h-[20px] rounded text-white text-xs font-medium`}>
-                                                        {value.lastConnexion}
+                                                <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
+                                                <td>{value.id}</td>
+                                                <td>{value.name}</td>
+                                                <td>{value.model}</td>
+                                                <td>
+                                                    <div className="flex justify-center">
+                                                        <div className={`flex justify-center items-center bg-[#3C4858] w-[80px] h-[20px] rounded text-white text-xs font-medium`}>
+                                                            {value.lastConnexion}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="flex justify-center">
-                                                    <Tooltip title={'Supprimer l\'appareil de l\'infrastructure'}>
-                                                        <span className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
-                                                    </Tooltip>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td>
+                                                    <div className="flex justify-center">
+                                                        <Tooltip title={'Supprimer l\'appareil de l\'infrastructure'}>
+                                                            <span className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
+                                                        </Tooltip>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -205,7 +254,34 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                             errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
-                </div>     
+                </div>
+                
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                {/* #################################### MODAL AND OTHER ############################################ */}
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+
+                <ConfirmSuppressionDialog
+                    completer={state.deleteConfirmationCompleter}
+                    title="Cette action est irréversible"
+                    description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam"
+                />
+
+                <Snackbar
+                    open={Boolean(state.snackbarData)}
+                    autoHideDuration={6000}
+                    onClose={this.handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
+                </Snackbar>
+
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}
+                {/* #################################### MODAL AND OTHER ############################################ */}
+                {/* ################################################################################################# */}
+                {/* ################################################################################################# */}   
 
             </div>
         );

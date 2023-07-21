@@ -15,6 +15,7 @@ import {
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { IGetDeviceResult } from '../../models/device_mdoel';
 
 ChartJS.register(
     ArcElement,
@@ -69,9 +70,8 @@ class DeviceUsageChart extends React.Component {
     }
 }
 
-
 type LaafiMonitorDeviceUsageChartProps = {
-    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    promise: Promise<IGetDeviceResult>|null;
 };
 
 type LaafiMonitorDeviceUsageChartState = {
@@ -198,7 +198,7 @@ class DeviceUsageChart3 extends React.Component {
 }
 
 type LaafiMonitorDeviceStatusChartProps = {
-    promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    promise: Promise<IGetDeviceResult>|null;
 };
 
 type LaafiMonitorDeviceStatusChartState = {

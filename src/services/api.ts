@@ -1,3 +1,4 @@
+import { IGetDeviceResult } from "../models/device_mdoel";
 import { IInfrastructure } from "../models/infrastructure_model";
 import { IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
@@ -126,7 +127,7 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
-    static async getDevices(options: { infrastructureId?: string } = {}): Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }> {
+    static async getDevices(options: { infrastructureId?: string } = {}): Promise<IGetDeviceResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/devices', {
                 query: { infrastructureid: options.infrastructureId  }
@@ -141,7 +142,6 @@ class Api {
         const data = await response.json();  
         return data;
     }
-
 
     // ###################################################################################################
     // ###################################################################################################
@@ -215,6 +215,21 @@ class Api {
 
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async deleteUserFromInfrastructure(userId: string): Promise<void> {
+        await new Promise((r) => setTimeout(r, 1000));
+        throw new Error('');
+        // const response = await fetch(`${this.BASE_URL}/users/${userId}`, {
+        //     method: 'DELETE',
+        //     headers: {
+        //         'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+        //     }
+        // });
+
+        // if (!response.ok)
+        //     throw ApiError.parse(response.status, await response.text());
+        // return response.json();
     }
 
 }

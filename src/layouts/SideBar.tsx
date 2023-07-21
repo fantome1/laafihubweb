@@ -22,7 +22,7 @@ const middle = [
         route: '/a',
         icon: 'backpack'
     }, {
-        route: routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA,
+        route: routes.ANOTHER_LAAFI_MONITOR,
         icon: 'finance'
     }, {
         route: routes.NOTIFICATIONS,

@@ -188,7 +188,6 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
 
-
                 <ConfirmSuppressionDialog
                     completer={state.deleteConfirmationCompleter}
                     title="Cette action est irréversible"

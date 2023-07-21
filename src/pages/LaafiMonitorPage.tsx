@@ -9,6 +9,7 @@ import { AddDeviceDialog } from "../components/dialogs/AddDeviceDialog";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
+import { IGetDeviceResult } from "../models/device_mdoel";
 
 type Props = {
     navigate: (url: string) => void
@@ -17,7 +18,7 @@ type Props = {
 type State = {
     addDeviceCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
-    devicesPromise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { id: string, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null;
+    devicesPromise: Promise<IGetDeviceResult>|null;
 };
 
 class LaafiMonitorPage extends React.Component<Props, State> {
@@ -174,17 +175,18 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
-                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Last connexion date',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Activity ID', 'Last connexion date',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.devicies.map((value, index) => (
+                                        {data.devicies.map(value => (
                                             <tr onClick={() => this.onTapRow(value)} key={value.id} className="cursor-pointer">
-                                                <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#69ADA7', '#D80303', '#999999'][index % 3] }}></div></div></td>
+                                                <td><div className="flex justify-center"><div className='w-[12px] h-[12px]' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
                                                 <td>{value.id}</td>
                                                 <td>{value.name}</td>
                                                 <td>{value.parentModel}</td>
                                                 <td>{value.model}</td>
                                                 <td>{value.infrastructureName}</td>
+                                                <td>{value.activityId}</td>
                                                 <td>{value.lastConnexion}</td>
                                             </tr>
                                         ))}
