@@ -6,7 +6,7 @@ var macAddressRegex = /^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$/
 class Utils {
 
     static formatDate(date: Date) {
-        return `${this.addTrailingZero(date.getDate())}/${this.addTrailingZero(date.getMonth() + 1)}/${date.getFullYear()} ${this.addTrailingZero(date.getHours())}h${this.addTrailingZero(date.getMinutes())}`;
+        return `${this.addTrailingZero(date.getDate())}/${this.addTrailingZero(date.getMonth() + 1)}/${date.getFullYear()} ${this.addTrailingZero(date.getHours())}:${this.addTrailingZero(date.getMinutes())}`;
     }
 
     static isEmail(value: string): boolean {

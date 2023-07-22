@@ -7,17 +7,20 @@ const routes = {
     HOME: '/',
     ORGANIZATION: '/organization',
     SUPER_ADMIN_DASHBOARD: {
-        url: '/super-admin-dashboard/:id',
+        route: '/super-admin-dashboard/:id',
         build: (id: string) => `/super-admin-dashboard/${id}`
     },
     SUPER_ADMIN_USERS: '/super-admin-users',
     LAAFI_MONITOR: '/laafi-monitor',
     LAAFI_MONITOR_DEVICE_DATA: {
-        url: '/laafi-monitor-device-data/:id',
+        route: '/laafi-monitor-device-data/:id',
         build: (id: string) => `/laafi-monitor-device-data/${id}`
     },
     ANOTHER_LAAFI_MONITOR: '/another-laafi-monitor',
-    ANOTHER_LAAFI_MONITOR_DEVICE_DATA: '/another-laafi-monitor-device-data',
+    ANOTHER_LAAFI_MONITOR_DEVICE_DATA: {
+        route: '/another-laafi-monitor-device-data/:id',
+        build: (id: string) => `/another-laafi-monitor-device-data/${id}`
+    },
     NOTIFICATIONS: '/notifications',
     NOTIFICATIONS_2: '/notifications-2'
 };

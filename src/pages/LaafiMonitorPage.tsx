@@ -12,7 +12,7 @@ import { routes } from "../constants/routes";
 import { IGetDeviceResult } from "../models/device_mdoel";
 
 type Props = {
-    navigate: (url: string) => void
+    navigate: (route: string) => void
 };
 
 type State = {
@@ -180,7 +180,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                                     <tbody>
                                         {data.devicies.map(value => (
                                             <tr onClick={() => this.onTapRow(value)} key={value.id} className="cursor-pointer">
-                                                <td><div className="flex justify-center"><div className='w-[12px] h-[12px]' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
+                                                <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
                                                 <td>{value.id}</td>
                                                 <td>{value.name}</td>
                                                 <td>{value.parentModel}</td>

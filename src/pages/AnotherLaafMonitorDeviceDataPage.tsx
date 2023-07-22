@@ -4,11 +4,15 @@ import { GroupedBarChart, GroupedBarChart2, TemperatureChart2, TemperatureCurveC
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
 
-
 type Props = {
+    params: { id: string }
 }
 
-class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props> {
+type State = {
+
+}
+
+class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -285,4 +289,4 @@ function BridgeStatus2() {
     );
 }
 
-export { AnotherLaafiMonitorDeviceDataPage };
+export default WithRouter(AnotherLaafiMonitorDeviceDataPage);

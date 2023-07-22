@@ -1,3 +1,4 @@
+import { IGetActivitiesResult } from "../models/activity_model";
 import { IGetDeviceResult } from "../models/device_mdoel";
 import { IInfrastructure } from "../models/infrastructure_model";
 import { IUser } from "../models/user_model";
@@ -77,7 +78,7 @@ class Api {
     }
 
     // Pour les éléments users qui apparaisse tu peux uiliser https://hub-api-test.laafi-concepts.com/users?infrastrureid=""
-    static async getUsers(options: { infrastructureId?: string } = {}): Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }> {
+    static async getUsers(options: { infrastructureId?: string } = {}): Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/users', {
                 query: { infrastructureid: options.infrastructureId  }
@@ -89,8 +90,7 @@ class Api {
 
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
-        const data = await response.json();
-        return data[0];
+        return response.json();
     }
 
     static async deleteUser(userId: string): Promise<void> {
@@ -139,8 +139,7 @@ class Api {
 
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
-        const data = await response.json();  
-        return data;
+        return response.json();  
     }
 
     // ###################################################################################################
@@ -148,7 +147,6 @@ class Api {
     // #################################### INFRASTRUCTURE  ##############################################
     // ###################################################################################################
     // ###################################################################################################
-
 
     static async registerInsfrastructure(data: Record<string, any>) {
         const response = await fetch(`${this.BASE_URL}/infrastructures`, {
@@ -189,8 +187,7 @@ class Api {
 
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
-        const data = await response.json();
-        return data[0];
+        return response.json();
     }
 
     static async getInfrastructure(id: string): Promise<IInfrastructure> {
@@ -230,6 +227,36 @@ class Api {
         // if (!response.ok)
         //     throw ApiError.parse(response.status, await response.text());
         // return response.json();
+    }
+
+    // ###################################################################################################
+    // ###################################################################################################
+    // ######################################## ACTIVITIES  ##############################################
+    // ###################################################################################################
+    // ###################################################################################################
+
+    static async getActivies(): Promise<IGetActivitiesResult> {
+        const response = await fetch(`${this.BASE_URL}/activities`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
+    static async deleteActivity(id: string): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/activities/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
     }
 
 }

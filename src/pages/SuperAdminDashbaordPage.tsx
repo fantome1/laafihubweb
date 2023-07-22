@@ -18,7 +18,7 @@ type Props = {
 
 type State = {
     promise: Promise<IInfrastructure>|null;
-    usersPromise: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null;
+    usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
@@ -194,7 +194,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                             <tr>{['', 'User Name', 'Role', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                         </thead>
                                         <tbody>
-                                            {data.documents.map(user => (
+                                            {data.users.map(user => (
                                                 <tr key={user.id}>
                                                     <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: false ? '#69ADA7' : '#D80303' }}></div></div></td>
                                                     <td>{user.userName}</td>

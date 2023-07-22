@@ -6,7 +6,6 @@ import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
-import { Utils } from "../services/utils";
 import { EditUserComponent } from "../components/EditUser";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
@@ -19,7 +18,7 @@ type State = {
     addUserDialogCompleter: Completer<boolean>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
-    usersPromise?: Promise<{ count: number, documents: IUser[], roles: { name: string, total: number }[] }>|null;
+    usersPromise?: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
     selectedUser: IUser|null; // for edit user
 }
 
@@ -147,7 +146,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                         <tr>{['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.documents.map(user => (
+                                        {data.users.map(user => (
                                             <tr key={user.id} className="cursor-pointer" onClick={() => this.setState({ selectedUser: user })}>
                                                 <td>{user.id}</td>
                                                 <td>{user.userName}</td>
