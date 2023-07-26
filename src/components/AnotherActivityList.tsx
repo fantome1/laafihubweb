@@ -1,5 +1,7 @@
 import { Utils } from "../services/utils";
 
+// NOT USER
+
 type ActivityCardModel = {
     personsCount: string;
     devicesCount: string;

@@ -1,7 +1,6 @@
 import React from "react";
-import { Alert, AlertColor, Paper, Snackbar } from "@mui/material";
-import { ConnectionStatusChart } from "../components/charts/Charts";
-import { AnotherActivityList } from "../components/AnotherActivityList";
+import { Alert, AlertColor, Paper, Skeleton, Snackbar } from "@mui/material";
+import { ActivitesConnectionStatusChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
@@ -11,6 +10,10 @@ import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressi
 import { Completer } from "../services/completer";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
+import { AnotherActivityList } from "../components/AnotherActivityList";
+import { ActivityList } from "../components/ActivityList";
+import { IGetDeviceResult } from "../models/device_mdoel";
+import { UserCountSkeleton } from "../components/Skeletons";
 
 type Props = {
     navigate: (route: string) => void;
@@ -18,6 +21,7 @@ type Props = {
 
 type State = {
     promise: Promise<IGetActivitiesResult>|null;
+    devicesPromise: Promise<IGetDeviceResult>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
 }
@@ -30,6 +34,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         this.state = {
             promise: null,
+            devicesPromise: null,
             deleteConfirmationCompleter: null,
             snackbarData: null
         };
@@ -38,7 +43,10 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ promise: Api.getActivies() });
+        this.setState({
+            promise: Api.getActivies(),
+            devicesPromise: Api.getDevices()
+        });
     }
 
     onTapRow(activity: { id: string }) {
@@ -50,7 +58,6 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
             return;
         this.setState({ snackbarData: null });
     }
-
 
     async onDelete(value: IActivity) {
 
@@ -115,7 +122,12 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                 <p className="text-sm text-[#999999] mt-1">Active activies</p>
                             </div>
 
-                            <p className="text-4xl text-[#3C4858] text-right">020/100</p>
+                            <PromiseBuilder
+                                promise={state.promise}
+                                dataBuilder={(data) => (<p className="text-4xl text-[#3C4858] text-right">{Utils.getActivedActivityCount(data).toString().padStart(3, '0')}/{data.count.toString().padStart(3, '0')}</p>)}
+                                loadingBuilder={() => (<Skeleton className="text-4xl" width={120} />)}
+                                errorBuilder={err => (<span></span>)}
+                            />
                         </div>
 
                         {/* Connection type */}
@@ -123,18 +135,17 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                             <p className="text-lg text-[#3C4858]">Connection types:</p>
 
                             <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">
-                                <div className="grow">
-                                    <p className="text-sm text-[#999999]">All Monitors</p>
-                                    <p className="text-4xl text-[#3C4858]">020</p>
-                                </div>
-                                <div className="pl-4 grow">
-                                    <p className="text-sm text-[#999999]">All centrals</p>
-                                    <p className="text-4xl text-[#3C4858]">020</p>
-                                </div>
-                                <div className="pl-4 grow">
-                                    <p className="text-sm text-[#999999]">All Gateways</p>
-                                    <p className="text-4xl text-[#3C4858]">020</p>
-                                </div>
+                                <PromiseBuilder
+                                    promise={state.devicesPromise}
+                                    dataBuilder={data => data.totalConnexionType.map((value, index) => (
+                                        <div key={index} className={`grow ${index == 0 ? '' : 'pl-4'}`}>
+                                            <p className="text-sm text-[#999999]">{value.id}</p>
+                                            <p className="text-4xl text-[#3C4858]">{value.total.toString().padStart(3, '0')}</p>
+                                        </div>
+                                    ))}
+                                    loadingBuilder={() => (<UserCountSkeleton count={3} />)}
+                                    errorBuilder={() => (<div className="text-red-500">Une erreur s'est produite</div>)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -170,7 +181,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                                 <td>{data.name}</td>
                                                 <td>{data.type}</td>
                                                 <td>{Utils.formatDate(new Date(data.startedDate))}</td>
-                                                <td>{Utils.formatDate(new Date(data.endDate))}</td>
+                                                <td>{data.endDate == null ? 'N/A' : Utils.formatDate(new Date(data.endDate))}</td>
                                                 <td>{data.infrastructureName}</td>
                                                 <td>
                                                     <div className="flex justify-center items-center space-x-1">
@@ -197,22 +208,24 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                         {/* Pie chart */}
                         <div className="bg-white rounded-lg p-2">
                             <p className="text-lg text-[#999999] mb-2">Connection status</p>
-                            <div className=" w-[70%]" style={{ margin: '0 auto' }}><ConnectionStatusChart /></div>
+                            <div className=" w-[70%]" style={{ margin: '0 auto' }}><ActivitesConnectionStatusChart promise={state.promise} /></div>
                         </div>
 
                         {/* Group */}
-                        <div className='bg-white rounded-lg mt-2 pb-4'>
-                            <AnotherActivityList
-                                data={[
-                                    { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)] },
-                                    { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25), new Date(2020, 4, 15, 15, 25)] },
-                                    { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25), new Date(2020, 4, 15, 15, 25)] },
-                                    { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)] },
-                                    { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)] },
-                                    { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)] }
-                                ]}
-                            />
-                        </div>
+                        <PromiseBuilder
+                            promise={state.promise}
+                            dataBuilder={(data) => (
+                                <div className='bg-white rounded-lg mt-2 pb-4'>
+                                    <ActivityList
+                                        label='Favorite Activities'
+                                        columnCount={1}
+                                        data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
+                                    />
+                                </div>
+                            )}
+                            loadingBuilder={() => (<Skeleton className="mt-4" variant='rounded' width='100%' height='480px' />)}
+                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
+                        />
                     </div>
                 </div>
 

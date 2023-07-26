@@ -16,6 +16,7 @@ import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { IGetDeviceResult } from '../../models/device_mdoel';
+import { IGetActivitiesResult } from '../../models/activity_model';
 
 ChartJS.register(
     ArcElement,
@@ -88,7 +89,7 @@ class LaafiMonitorDeviceUsageChart extends React.Component<LaafiMonitorDeviceUsa
 
     private chartRef = React.createRef<ChartJS>();
 
-    private static colors = { 'NotEnrolled': '#F2994A', /* 'x': '#69ADA7' */ }
+    private static colors = { 'Disable': '#F2994A', 'Assigned': '#69ADA7', 'UnAssigned': '#999999' }
 
     constructor(props: LaafiMonitorDeviceUsageChartProps) {
         super(props);
@@ -116,16 +117,16 @@ class LaafiMonitorDeviceUsageChart extends React.Component<LaafiMonitorDeviceUsa
         }
     }
 
-    update(promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null) {
+    update(promise: Promise<IGetDeviceResult>|null) {
         if (promise == null)
             return;            
         promise.then(value => {
             const data = {
-                labels: value.totalEnrolled.map(v => v.id),
+                labels: value.totalSatus.map(v => v.id),
                 datasets: [
                     {
-                        data: value.totalEnrolled.map(v => v.total),
-                        backgroundColor: value.totalEnrolled.map(v => LaafiMonitorDeviceUsageChart.colors[v.id])
+                        data: value.totalSatus.map(v => v.total),
+                        backgroundColor: value.totalSatus.map(v => LaafiMonitorDeviceUsageChart.colors[v.id])
                     }
                 ]
             };
@@ -214,7 +215,7 @@ type LaafiMonitorDeviceStatusChartState = {
 class LaafiMonitorDeviceStatusChart extends React.Component<LaafiMonitorDeviceStatusChartProps, LaafiMonitorDeviceStatusChartState>  {
 
     private chartRef = React.createRef<ChartJS>();
-    private static colors = { 'Enrolled': '#69ADA7', 'UnAssigned': '#999999', 'Disabled': '#D80303' };
+    private static colors = { /*'Enrolled': '#69ADA7',*/ 'Offline': '#D80303' };
 
     constructor(props: LaafiMonitorDeviceUsageChartProps) {
         super(props);
@@ -242,16 +243,16 @@ class LaafiMonitorDeviceStatusChart extends React.Component<LaafiMonitorDeviceSt
         }
     }
 
-    update(promise: Promise<{ count: number, devicies: { id: string, infrastructureId: string, infrastructureName: string, lastConnexion: string, model: string, name: string, parentModel: string }[], totalConnected: { _id: boolean, total: number }[], totalConnexionType: { id: string, total: number }[], totalEnrolled: { id: string, total: number }[], totalSatus: { id: string, total: number }[] }>|null) {
+    update(promise: Promise<IGetDeviceResult>|null) {
         if (promise == null)
             return;            
         promise.then(value => {
             const data = {
-                labels: value.totalEnrolled.map(v => v.id),
+                labels: value.totalConnected.map(v => v.id),
                 datasets: [
                     {
-                        data: value.totalEnrolled.map(v => v.total),
-                        backgroundColor: value.totalEnrolled.map(v => LaafiMonitorDeviceStatusChart.colors[v.id])
+                        data: value.totalConnected.map(v => v.total),
+                        backgroundColor: value.totalConnected.map(v => LaafiMonitorDeviceStatusChart.colors[v.id])
                     }
                 ]
             };
@@ -418,28 +419,75 @@ class TemperatureLineChart extends React.Component {
     }
 }
 
-class ConnectionStatusChart extends React.Component {
+type ActivitesConnectionStatusChartProps = {
+    promise: Promise<IGetActivitiesResult>|null;
+};
+
+type ActivitesConnectionStatusChartState = {
+    data: {
+        labels: string[],
+        datasets: {
+            data: number[],
+            backgroundColor: string[]
+        }[]
+    }
+};
+
+class ActivitesConnectionStatusChart extends React.Component<ActivitesConnectionStatusChartProps, ActivitesConnectionStatusChartState> {
 
     private chartRef = React.createRef<ChartJS>()
+    private static colors = { 'Actived': '#69ADA7', 'Stopped': '#D80303' /*#F2994A*/, 'Expired': '#999999' };
 
-    private data = {
-        labels: ['Connected', 'Not connected'],
-        datasets: [
-            {
-              data: [240, 120],
-              backgroundColor: ['#69ADA7', '#F2994A'],
+    constructor(props: ActivitesConnectionStatusChartProps) {
+        super(props);
+
+        this.state = {
+            data: {
+                labels: ['Expired'],
+                datasets: [
+                    {
+                      data: [1],
+                      backgroundColor: ['#A2A2A2'],
+                    }
+                ]
             }
-        ]
+        };
     }
 
-    constructor(props: any) {
-        super(props);
+    componentDidMount(): void {
+        this.update(this.props.promise);
+    }
+
+    
+
+    componentDidUpdate(prevProps: Readonly<ActivitesConnectionStatusChartProps>, prevState: Readonly<ActivitesConnectionStatusChartState>, snapshot?: any): void {
+        if (prevProps.promise != this.props.promise) {
+            this.update(this.props.promise);
+        }
+    }
+
+    update(promise: Promise<IGetActivitiesResult>|null) {
+        if (promise == null)
+            return;            
+        promise.then(value => {
+            const data = {
+                labels: value.totalStatus.map(v => v.id),
+                datasets: [
+                    {
+                        data: value.totalStatus.map(v => v.total),
+                        backgroundColor: value.totalStatus.map(v => ActivitesConnectionStatusChart.colors[v.id])
+                    }
+                ]
+            };
+
+            this.setState({ data });
+        });
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='pie' data={this.data} options={{
+                <Chart ref={this.chartRef} type='pie' data={this.state.data} options={{
                     responsive: true,
                     tooltips: {
                         enabled: true
@@ -690,83 +738,85 @@ class GroupedBarChart2 extends React.Component {
     }
 }
 
-class DeviceUsageChart4 extends React.Component {
+// Same as LaafiMonitorDeviceStatusChart
+// class DeviceUsageChart4 extends React.Component {
 
-    private chartRef = React.createRef<ChartJS>()
+//     private chartRef = React.createRef<ChartJS>()
 
-    private data = {
-        labels: ['Active', 'Unassigned', 'Disabled'],
-        datasets: [
-            {
-              data: [8, 6, 1],
-              backgroundColor: ['#69ADA7', '#D80303', '#999999'],
-            }
-        ]
-    }
+//     private data = {
+//         labels: ['Active', 'Unassigned', 'Disabled'],
+//         datasets: [
+//             {
+//               data: [8, 6, 1],
+//               backgroundColor: ['#69ADA7', '#D80303', '#999999'],
+//             }
+//         ]
+//     }
 
-    constructor(props: any) {
-        super(props);
-    }
+//     constructor(props: any) {
+//         super(props);
+//     }
 
-    render() {
-        return (
-            <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
-                    responsive: true,
-                    // maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'right',
-                            maxWidth: 180,
-                            labels: { boxWidth: 10 }
-                        },
-                        datalabels: { display: false }
-                    }
-                }} />
-            </div>
-        );
-    }
-}
+//     render() {
+//         return (
+//             <div className='h-full'>
+//                 <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+//                     responsive: true,
+//                     // maintainAspectRatio: false,
+//                     plugins: {
+//                         legend: {
+//                             display: true,
+//                             position: 'right',
+//                             maxWidth: 180,
+//                             labels: { boxWidth: 10 }
+//                         },
+//                         datalabels: { display: false }
+//                     }
+//                 }} />
+//             </div>
+//         );
+//     }
+// }
 
-class DeviceUsageChart5 extends React.Component {
+// Same as LaafiMonitorDeviceUsageChart
+// class DeviceUsageChart5 extends React.Component {
 
-    private chartRef = React.createRef<ChartJS>()
+//     private chartRef = React.createRef<ChartJS>()
 
-    private data = {
-        labels: ['Active', 'Disabled'],
-        datasets: [
-            {
-              data: [8, 7],
-              backgroundColor: ['#69ADA7', '#F2994A'],
-            }
-        ]
-    }
+//     private data = {
+//         labels: ['Active', 'Disabled'],
+//         datasets: [
+//             {
+//               data: [8, 7],
+//               backgroundColor: ['#69ADA7', '#F2994A'],
+//             }
+//         ]
+//     }
 
-    constructor(props: any) {
-        super(props);
-    }
+//     constructor(props: any) {
+//         super(props);
+//     }
 
-    render() {
-        return (
-            <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
-                    responsive: true,
-                    // maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'right',
-                            maxWidth: 180,
-                            labels: { boxWidth: 10 }
-                        },
-                        datalabels: { display: false }
-                    }
-                }} />
-            </div>
-        );
-    }
-}
+//     render() {
+//         return (
+//             <div className='h-full'>
+//                 <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+//                     responsive: true,
+//                     // maintainAspectRatio: false,
+//                     plugins: {
+//                         legend: {
+//                             display: true,
+//                             position: 'right',
+//                             maxWidth: 180,
+//                             labels: { boxWidth: 10 }
+//                         },
+//                         datalabels: { display: false }
+//                     }
+//                 }} />
+//             </div>
+//         );
+//     }
+// }
 
 export {
     DeviceUsageChart,
@@ -776,10 +826,10 @@ export {
     TemperatureChart,
     TemperatureChart2,
     TemperatureLineChart,
-    ConnectionStatusChart,
+    ActivitesConnectionStatusChart,
     TemperatureCurveChart,
     GroupedBarChart,
     GroupedBarChart2,
-    DeviceUsageChart4,
-    DeviceUsageChart5
+    // DeviceUsageChart4,
+    // DeviceUsageChart5
 };

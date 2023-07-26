@@ -10,4 +10,11 @@ interface IInfrastructure {
     status?: 'NotActived'|'Actived';
 }
 
-export type { IInfrastructure };
+
+interface IGetInfrastructureResult {
+    total: number;
+    states: { id: "NotActive", total: number }[];
+    infrastructures: IInfrastructure[];
+}
+
+export type { IInfrastructure, IGetInfrastructureResult };

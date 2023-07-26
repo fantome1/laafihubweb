@@ -1,16 +1,15 @@
 
 // Les differents valeurs de status
-// 
 
 interface IActivity {
     id: string;
     name: string;
-    type: 'Permanent';
-    characteristic: { humidityMax: number, humidityMin: number, minuteCover: number, temperatureCover: number, temperatureMax: number, temperatureMaxSeul: number, temperatureMin: number, temperatureMinSeul: number, tumidityCover: number },
+    type: 'Permanent'|'Temporary';
+    characteristic: { humidityMax: number, humidityMin: number, minuteCover: number, temperatureCover?: number, temperatureMax: number, temperatureMaxSeul?: number, temperatureMin: number, temperatureMinSeul?: number, tumidityCover?: number },
     infrastructureName: string;
-    isFavorite: string;
+    isFavorite: boolean;
     startedDate: string;
-    endDate: string;
+    endDate: string|null;
     totalDevices: number;
     totalUsers: number;
 }
@@ -18,9 +17,9 @@ interface IActivity {
 interface IGetActivitiesResult {
     count: number;
     activities: IActivity[];
-    totalByMonth: { id: string, total: 3 },
-    totalStatus: { id: string, total: 3 },
-    totalType: { id: string, total: 3 }
+    totalByMonth: { id: string, total: number }[],
+    totalStatus: { id: 'Expired'|'Actived'|'Stopped', total: number }[],
+    totalType: { id: string, total: number }[]
 }
 
 export type { IActivity, IGetActivitiesResult }

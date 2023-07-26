@@ -1,6 +1,6 @@
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IGetDeviceResult } from "../models/device_mdoel";
-import { IInfrastructure } from "../models/infrastructure_model";
+import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
 import { AuthService } from "./auth_service";
@@ -77,7 +77,6 @@ class Api {
         return response.json();
     }
 
-    // Pour les éléments users qui apparaisse tu peux uiliser https://hub-api-test.laafi-concepts.com/users?infrastrureid=""
     static async getUsers(options: { infrastructureId?: string } = {}): Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/users', {
@@ -178,7 +177,7 @@ class Api {
         return response.json();
     }
 
-    static async getInfrastructures(): Promise<{ total: number, infrastructures: IInfrastructure[] }> {
+    static async getInfrastructures(): Promise<IGetInfrastructureResult> {
         const response = await fetch(`${this.BASE_URL}/infrastructures`, {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`

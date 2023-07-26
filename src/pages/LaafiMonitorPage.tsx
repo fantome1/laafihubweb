@@ -208,7 +208,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             </div>
 
                             <div className="p-2 border-t">
-                                <p className="text-lg text-[#999999] mb-2">Devices status</p>
+                                <p className="text-lg text-[#999999] mb-2">Total Connected</p>
                                 <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
                             </div>
                         </div>

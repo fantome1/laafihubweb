@@ -1,23 +1,59 @@
 import React from "react";
-import { Paper } from "@mui/material";
+import { Skeleton } from "@mui/material";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { InfrastructurePerCountry } from "../components/InfrastructurePerCountry";
 import { BubleMap } from "../components/BubleMap";
 import { ActivityList } from "../components/ActivityList";
-import { DeviceUsageChart3, DeviceUsageChart4, DeviceUsageChart5 } from "../components/charts/Charts";
+import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
+import { IGetActivitiesResult } from "../models/activity_model";
+import { IGetDeviceResult } from "../models/device_mdoel";
+import { PromiseBuilder } from "../components/PromiseBuilder";
+import { IUser } from "../models/user_model";
+import { Api } from "../services/api";
+import { IGetInfrastructureResult } from "../models/infrastructure_model";
 
-class DashboardPage extends React.Component {
+type Props = {
 
-    constructor(props: any) {
+}
+
+type State = {
+    devicesPromise: Promise<IGetDeviceResult>|null;
+    activitiesPromise: Promise<IGetActivitiesResult>|null;
+    usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
+    infrastructurePromise: Promise<IGetInfrastructureResult>|null;
+}
+
+class DashboardPage extends React.Component<Props, State> {
+
+    constructor(props: Props) {
         super(props);
+
+        this.state = {
+            devicesPromise: null,
+            activitiesPromise: null,
+            usersPromise: null,
+            infrastructurePromise: null
+        }
+    }
+
+    componentDidMount(): void {
+        this.setState({
+            devicesPromise: Api.getDevices(),
+            activitiesPromise: Api.getActivies(),
+            usersPromise: Api.getUsers(),
+            infrastructurePromise: Api.getInfrastructures()
+        });
     }
 
     render() {
+
+        const state = this.state;
+
         return (
             <div className="bg-[#E5E5E5] p-8 h-[1440px]">
 
                 {/* FIXME scroll */}
-                <div className="flex space-x-6">
+                <div className="flex space-x-4">
 
                     <EntityCountCard
                         width={280}
@@ -31,40 +67,49 @@ class DashboardPage extends React.Component {
                         ]}
                     />
 
-                    <EntityCountCard
-                        width={280}
-                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices_other</span>}
-                        label="Devices"
-                        count="005"
-                        items={[
-                            { label: 'Monitors', count: '020' },
-                            { label: 'Centrals', count: '020' },
-                            { label: 'Gateways', count: '020' },
-                        ]}
+                    <PromiseBuilder
+                        promise={state.devicesPromise}
+                        dataBuilder={data => (
+                            <EntityCountCard
+                                width={280}
+                                icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices_other</span>}
+                                label="Devices"
+                                count={data.count.toString().padStart(3, '0')}
+                                items={data.totalConnexionType.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0')}))}
+                            />
+                        )}
+                        loadingBuilder={() => (<Skeleton variant='rounded' width={280} height={140} />)}
+                        errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                     />
 
-                    <EntityCountCard
-                        width={310}
-                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">person</span>}
-                        label="Users"
-                        count="012"
-                        items={[
-                            { label: 'Admis', count: '020' },
-                            { label: 'Supervisors', count: '020' },
-                            { label: 'Agents', count: '020' },
-                            { label: 'Guests', count: '020' },
-                        ]}
+                    <PromiseBuilder
+                        promise={state.usersPromise}
+                        dataBuilder={data => (
+                            <EntityCountCard
+                                width={320}
+                                icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">person</span>}
+                                label="Users"
+                                count={data.count.toString().padStart(3, '0')}
+                                items={data.roles.map(v => ({ label: v.name, count: v.total.toString().padStart(3, '0')}))}
+                            />
+                        )}
+                        loadingBuilder={() => (<Skeleton variant='rounded' width={320} height={140} />)}
+                        errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                     />
 
-                    <EntityCountCard
-                        width={280}
-                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">domain</span>}
-                        label="Assets"
-                        count="003"
-                        items={[
-                            { label: 'Infrastructures', count: '020' },
-                            { label: 'Types', count: '020' }
-                        ]}
+                    <PromiseBuilder
+                        promise={state.infrastructurePromise}
+                        dataBuilder={data => (
+                            <EntityCountCard
+                                width={280}
+                                icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">domain</span>}
+                                label="Assets"
+                                count={data.total.toString().padStart(3, '0')}
+                                items={data.states.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0')}))}
+                            />
+                        )}
+                        loadingBuilder={() => (<Skeleton variant='rounded' width={280} height={140} />)}
+                        errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                     />
                 </div>
 
@@ -89,13 +134,19 @@ class DashboardPage extends React.Component {
 
                 <div className="flex space-x-4 mt-12">
                     <div style={{ flex: '1 1 0' }}>
-                        <ActivityList
-                            data={[
-                                { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25), new Date(2020, 4, 15, 15, 25)], temperatures: ['-10.20', '-40.20'], himudities: [0, 100], time: '03' },
-                                { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)], temperatures: ['-10.20', '-40.20'], himudities: [0, 100], time: '03' },
-                                { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25), new Date(2020, 4, 15, 15, 25)], temperatures: ['-10.20', '-40.20'], himudities: [0, 100], time: '03' },
-                                { personsCount: '020', devicesCount: '020', dates: [new Date(2020, 4, 15, 15, 25)], temperatures: ['-10.20', '-40.20'], himudities: [0, 100], time: '03' }
-                            ]}
+                        <PromiseBuilder
+                            promise={state.activitiesPromise}
+                            dataBuilder={(data) => (
+                                <div className='bg-white rounded-lg pb-4'>
+                                    <ActivityList
+                                        label='Activities list'
+                                        columnCount={2}
+                                        data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
+                                    />
+                                </div>
+                            )}
+                            loadingBuilder={() => (<Skeleton variant='rounded' width='100%' height='400px' />)}
+                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
 
@@ -106,16 +157,16 @@ class DashboardPage extends React.Component {
 
                         <div className="flex p-4 grow">
                             <div className="w-[50%] flex flex-col justify-between">
-                                <p className="text-xl text-[#3C4858]">Devices status</p>
+                                <p className="text-xl text-[#3C4858]">Total Connected</p>
                                 <div className="flex justify-center items-center">
-                                    <div className="w-[80%] border-r"><DeviceUsageChart4 /></div>
+                                    <div className="w-[80%] border-r"> <LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
                                 </div>
                             </div>
 
                             <div className="w-[50%] w-[50%] flex flex-col justify-between">
                                 <p className="text-xl text-[]">Devices usage</p>
                                 <div className="flex justify-center items-center">
-                                    <div className="w-[80%]"><DeviceUsageChart5 /></div>
+                                    <div className="w-[80%]"><LaafiMonitorDeviceUsageChart promise={state.devicesPromise} /></div>
                                 </div>
                             </div>
                         </div>
