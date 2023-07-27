@@ -1,6 +1,8 @@
 import { Paper } from "@mui/material";
 import { Utils } from "../services/utils";
 import { IActivity } from "../models/activity_model";
+import { useNavigate } from "react-router-dom";
+import { routes } from "../constants/routes";
 
 type ActivityCardModel = {
     activity: IActivity;
@@ -10,14 +12,24 @@ type ActivityCardModel = {
 type Props = {
     label: String;
     columnCount: number;
-    data: ActivityCardModel[]
+    data: ActivityCardModel[];
+    showMoreBtn?: boolean;
 };
 
 function ActivityList(props: Props) {
+
+    const navigate = useNavigate();
+
     return (
         <Paper sx={{ borderRadius: '4px' }} elevation={0}>
-            <div className="bg-[var(--primary)] py-1 text-center" style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
-                <p className="text-lg text-white font-medium">{props.label}</p>
+            <div className={`bg-[var(--primary)] py-1 ${props.showMoreBtn ? 'flex justify-between px-2' : 'text-center'}`} style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
+                {!props.showMoreBtn && (<p className="text-lg text-white font-medium">{props.label}</p>)}
+                {props.showMoreBtn && (
+                    <>
+                        <p className="text-lg text-white font-medium">{props.label}</p>
+                        <p onClick={() => navigate(routes.ANOTHER_LAAFI_MONITOR)} className="text-sm text-white font-medium underline cursor-pointer">View more</p>
+                    </>
+                )}
             </div>
 
             <div className={`grid grid-cols-${props.columnCount} px-4 py-6 gap-4`}>
@@ -28,8 +40,11 @@ function ActivityList(props: Props) {
 }
 
 function ActivityCard({ value }: { value: ActivityCardModel }) {
+
+    const navigate = useNavigate();
+
     return (
-        <div className="border-2 border-[var(--primary)] rounded-md">
+        <div onClick={() => navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(value.activity.id))} className="border-2 border-[var(--primary)] rounded-md cursor-pointer">
             <div className="flex bg-[var(--primary)] px-1 py-1">
                 {value.activity.isFavorite
                     ? (<div className="grow flex space-x-1">

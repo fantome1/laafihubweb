@@ -215,7 +215,7 @@ type LaafiMonitorDeviceStatusChartState = {
 class LaafiMonitorDeviceStatusChart extends React.Component<LaafiMonitorDeviceStatusChartProps, LaafiMonitorDeviceStatusChartState>  {
 
     private chartRef = React.createRef<ChartJS>();
-    private static colors = { /*'Enrolled': '#69ADA7',*/ 'Offline': '#D80303' };
+    private static colors = { 'Online': '#69ADA7', 'Offline': '#D80303' };
 
     constructor(props: LaafiMonitorDeviceUsageChartProps) {
         super(props);

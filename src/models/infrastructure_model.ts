@@ -5,7 +5,9 @@ interface IInfrastructure {
     type: string;
     description: string;
     adress?: { city: string, state: string, street: string, zipCode: string };
-    coordinates: { longitude: number, latitude: number },
+    coordinates: { longitude: number, latitude: number };
+    totalDevicies: number;
+    devicies: { id: 'Central'|'Monitor'|'Gateway', total: number }[];
     creationDate?: Date;
     status?: 'NotActived'|'Actived';
 }
@@ -13,7 +15,7 @@ interface IInfrastructure {
 
 interface IGetInfrastructureResult {
     total: number;
-    states: { id: "NotActive", total: number }[];
+    activeCount: number;
     infrastructures: IInfrastructure[];
 }
 

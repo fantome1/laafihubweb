@@ -1,7 +1,7 @@
 import React from "react";
 import { Skeleton } from "@mui/material";
 import { EntityCountCard } from "../components/EntityCountCard";
-import { InfrastructurePerCountry } from "../components/InfrastructurePerCountry";
+import { InfrastructureCard } from "../components/InfrastructureCard";
 import { BubleMap } from "../components/BubleMap";
 import { ActivityList } from "../components/ActivityList";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
@@ -75,7 +75,7 @@ class DashboardPage extends React.Component<Props, State> {
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices_other</span>}
                                 label="Devices"
                                 count={data.count.toString().padStart(3, '0')}
-                                items={data.totalConnexionType.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0')}))}
+                                items={data.totalModel.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0')}))}
                             />
                         )}
                         loadingBuilder={() => (<Skeleton variant='rounded' width={280} height={140} />)}
@@ -105,7 +105,7 @@ class DashboardPage extends React.Component<Props, State> {
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">domain</span>}
                                 label="Assets"
                                 count={data.total.toString().padStart(3, '0')}
-                                items={data.states.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0')}))}
+                                items={[{ label: 'Active', count: data.activeCount.toString().padStart(3, '0') }, { label: 'Not active', count: (data.total - data.activeCount).toString().padStart(3, '0') }]}
                             />
                         )}
                         loadingBuilder={() => (<Skeleton variant='rounded' width={280} height={140} />)}
@@ -114,16 +114,12 @@ class DashboardPage extends React.Component<Props, State> {
                 </div>
 
                 <div className="flex space-x-4 mt-12">
-                    <div style={{ flex: '1 1 0' }}>
-                        <InfrastructurePerCountry
-                            data={[
-                                { countryFlagUrl: '/icons/infrastructure_per_country/usa.svg', countryName: 'USA', monitor: '2.900', central: '53.23%', gateways: '' },
-                                { countryFlagUrl: '/icons/infrastructure_per_country/germany.svg', countryName: 'Germany', monitor: '1.300', central: '20.43%', gateways: '' },
-                                { countryFlagUrl: '/icons/infrastructure_per_country/australie.svg', countryName: 'Australia', monitor: '760', central: '10.35%', gateways: '' },
-                                { countryFlagUrl: '/icons/infrastructure_per_country/united_kingdom.svg', countryName: 'United Kingdom', monitor: '', central: '7.87%', gateways: '' },
-                                { countryFlagUrl: '/icons/infrastructure_per_country/united_kingdom.svg', countryName: 'Romania', monitor: '600', central: '5.94%', gateways: '' },
-                                { countryFlagUrl: '/icons/infrastructure_per_country/brasil.svg', countryName: 'Brasil', monitor: '600', central: '5.94%', gateways: '' }
-                            ]}
+                    <div style={{ flex: '1 1 0', minHeight: '328px' }}>
+                        <PromiseBuilder
+                            promise={state.infrastructurePromise}
+                            dataBuilder={data => (<InfrastructureCard data={data.infrastructures} />)}
+                            loadingBuilder={() => (<Skeleton variant="rounded" height="328px" />)}
+                            errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                         />
                     </div>
 
@@ -141,6 +137,7 @@ class DashboardPage extends React.Component<Props, State> {
                                     <ActivityList
                                         label='Activities list'
                                         columnCount={2}
+                                        showMoreBtn={true}
                                         data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
                                     />
                                 </div>

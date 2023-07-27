@@ -17,6 +17,7 @@ interface IGetDeviceResult {
     totalConnected: { id: string, total: number }[];
     totalConnexionType: { id: string, total: number }[];
     totalEnrolled: { id: string, total: number }[];
+    totalModel: { id: 'Central'|'Gateway'|'Monitor', total: number }[];
     totalSatus: { id: 'Disable'|'UnAssigned'|'Assigned', total: number }[];
 }
 

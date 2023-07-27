@@ -5,7 +5,7 @@ import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
 
 type Props = {
-    params: { id: string }
+    params: { id: string };
 }
 
 type State = {
@@ -42,7 +42,7 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
                             </div>
                         </div>
                         <div className="flex justify-between py-4">
-                            <p className="text-xl text-[#999999]">Activies ID: <span className="text-[#3C4858]">LF-A-637</span></p>
+                            <p className="text-xl text-[#999999]">Activies ID: <span className="text-[#3C4858]">{this.props.params.id}</span></p>
                             <div className="flex">
                                 <p className="text-[#309E3A] cursor-pointer"><span className="material-symbols-rounded">play_circle</span></p>
                                 <p className="ml-4 text-[#999999] cursor-pointer"><span className="material-symbols-rounded">stop_circle</span></p>
