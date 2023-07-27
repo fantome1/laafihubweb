@@ -49,11 +49,11 @@ function ActivityCard({ value }: { value: ActivityCardModel }) {
                 {value.activity.isFavorite
                     ? (<div className="grow flex space-x-1">
                             <span className="material-symbols-rounded text-[20px] text-white">push_pin</span>
-                            <p className="text-sm font-medium text-white">Vaccination_Dandé</p>
+                            <p className="text-sm font-medium text-white">{value.activity.name}</p>
                         </div>)
-                    : (<div className="grow"><p className="text-sm font-medium text-white">Vaccination_Dandé</p></div>)}
+                    : (<div className="grow"><p className="text-sm font-medium text-white">{value.activity.name}</p></div>)}
                 <div className="flex space-x-1">
-                    <div className="bg-[#3C4858] px-2 rounded flex justify-center items-center"><p className="text-xs text-white">{value.activity.endDate == null ? 'Permanent' : 'Temporary'}</p></div>
+                    <div className="bg-[#3C4858] px-2 rounded flex justify-center items-center"><p className="text-xs text-white">{value.activity.type}</p></div>
                     <div className="w-[24px] h-[24px] flex justify-center items-center bg-[#3C4858] rounded cursor-pointer"><span className="material-symbols-rounded text-[16px] text-white">edit</span></div>
                     <div className="w-[24px] h-[24px] flex justify-center items-center bg-[#3C4858] rounded cursor-pointer"><span className="material-symbols-rounded text-[16px] text-white">delete_forever</span></div>
                 </div>
@@ -67,7 +67,7 @@ function ActivityCard({ value }: { value: ActivityCardModel }) {
                     <span className="material-symbols-outlined text-[#434343] text-[32px]">devices</span>
                     <p className="text-2xl pt-1">{value.activity.totalDevices.toString().padStart(3, '0')}</p>
                 </div>
-                {value.activity.endDate == null
+                {!value.activity.endDate
                  ? (
                     <div className="flex flex-col justify-center items-center space-y-1 grow-[2]">
                         <span className="material-symbols-rounded text-[#434343] text-[28px]">calendar_today</span>

@@ -11,6 +11,7 @@ import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
 import { Api } from "../services/api";
 import { IGetInfrastructureResult } from "../models/infrastructure_model";
+import { CircleMarker, Popup } from "react-leaflet";
 
 type Props = {
 
@@ -124,7 +125,22 @@ class DashboardPage extends React.Component<Props, State> {
                     </div>
 
                     <div style={{ flex: '1 1 0' }}>
-                        <BubleMap />
+                        <BubleMap>
+                            {<PromiseBuilder
+                                promise={state.infrastructurePromise}
+                                dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
+                                    center={[value.coordinates.latitude, value.coordinates.longitude]}
+                                    pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-ignore
+                                    radius={4}>
+                                        <Popup>{value.name}</Popup>
+                                    </CircleMarker>
+                                ))}
+                                loadingBuilder={() => null}
+                                errorBuilder={(_) => null}
+                            />}
+                        </BubleMap>
                     </div>
                 </div>
 
