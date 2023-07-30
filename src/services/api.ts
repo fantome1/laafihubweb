@@ -1,7 +1,7 @@
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IGetDeviceResult } from "../models/device_mdoel";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
-import { IUser } from "../models/user_model";
+import { IGetUsersResult, IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
 import { AuthService } from "./auth_service";
 import { Utils } from "./utils";
@@ -77,10 +77,10 @@ class Api {
         return response.json();
     }
 
-    static async getUsers(options: { infrastructureId?: string } = {}): Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }> {
+    static async getUsers(options: { infrastructureId?: string } = {}): Promise<IGetUsersResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/users', {
-                query: { infrastructureid: options.infrastructureId  }
+                query: { InfrastructureId: options.infrastructureId  }
             }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -129,7 +129,7 @@ class Api {
     static async getDevices(options: { infrastructureId?: string } = {}): Promise<IGetDeviceResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/devices', {
-                query: { infrastructureid: options.infrastructureId  }
+                query: { InfrastructureId: options.infrastructureId  }
             }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -234,11 +234,14 @@ class Api {
     // ###################################################################################################
     // ###################################################################################################
 
-    static async getActivies(): Promise<IGetActivitiesResult> {
-        const response = await fetch(`${this.BASE_URL}/activities`, {
-            headers: {
-                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
-            }
+    // L'encadrer en violet pour obtenir les activités d'une infrastructure : https://hub-api-test.laafi-concepts.com/activities?InfrastructureId=LF-I-N1710
+
+    static async getActivies(options: { infrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
+        const response = await fetch(
+            Utils.buildUrl(this.BASE_URL, '/activities', { query: { InfrastructureId: options.infrastructureId } }), {
+                headers: {
+                    'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+                }
         });
 
         if (!response.ok)

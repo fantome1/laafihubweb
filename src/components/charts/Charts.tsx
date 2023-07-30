@@ -32,45 +32,6 @@ ChartJS.register(
     Filler
 );
 
-class DeviceUsageChart extends React.Component {
-
-    private chartRef = React.createRef<ChartJS>()
-
-    private data = {
-        labels: ['Enrolled', 'Disabled'],
-        datasets: [
-            {
-              data: [3, 3],
-              backgroundColor: ['#69ADA7', '#E0F1E1'],
-            }
-        ]
-    }
-
-    constructor(props: any) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
-                    responsive: true,
-                    // maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'right',
-                            maxWidth: 180,
-                            labels: { boxWidth: 10 }
-                        },
-                        datalabels: { display: false }
-                    }
-                }} />
-            </div>
-        );
-    }
-}
-
 type LaafiMonitorDeviceUsageChartProps = {
     promise: Promise<IGetDeviceResult>|null;
 };
@@ -738,88 +699,7 @@ class GroupedBarChart2 extends React.Component {
     }
 }
 
-// Same as LaafiMonitorDeviceStatusChart
-// class DeviceUsageChart4 extends React.Component {
-
-//     private chartRef = React.createRef<ChartJS>()
-
-//     private data = {
-//         labels: ['Active', 'Unassigned', 'Disabled'],
-//         datasets: [
-//             {
-//               data: [8, 6, 1],
-//               backgroundColor: ['#69ADA7', '#D80303', '#999999'],
-//             }
-//         ]
-//     }
-
-//     constructor(props: any) {
-//         super(props);
-//     }
-
-//     render() {
-//         return (
-//             <div className='h-full'>
-//                 <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
-//                     responsive: true,
-//                     // maintainAspectRatio: false,
-//                     plugins: {
-//                         legend: {
-//                             display: true,
-//                             position: 'right',
-//                             maxWidth: 180,
-//                             labels: { boxWidth: 10 }
-//                         },
-//                         datalabels: { display: false }
-//                     }
-//                 }} />
-//             </div>
-//         );
-//     }
-// }
-
-// Same as LaafiMonitorDeviceUsageChart
-// class DeviceUsageChart5 extends React.Component {
-
-//     private chartRef = React.createRef<ChartJS>()
-
-//     private data = {
-//         labels: ['Active', 'Disabled'],
-//         datasets: [
-//             {
-//               data: [8, 7],
-//               backgroundColor: ['#69ADA7', '#F2994A'],
-//             }
-//         ]
-//     }
-
-//     constructor(props: any) {
-//         super(props);
-//     }
-
-//     render() {
-//         return (
-//             <div className='h-full'>
-//                 <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
-//                     responsive: true,
-//                     // maintainAspectRatio: false,
-//                     plugins: {
-//                         legend: {
-//                             display: true,
-//                             position: 'right',
-//                             maxWidth: 180,
-//                             labels: { boxWidth: 10 }
-//                         },
-//                         datalabels: { display: false }
-//                     }
-//                 }} />
-//             </div>
-//         );
-//     }
-// }
-
 export {
-    DeviceUsageChart,
     LaafiMonitorDeviceUsageChart,
     LaafiMonitorDeviceStatusChart,
     DeviceUsageChart3,
@@ -829,7 +709,5 @@ export {
     ActivitesConnectionStatusChart,
     TemperatureCurveChart,
     GroupedBarChart,
-    GroupedBarChart2,
-    // DeviceUsageChart4,
-    // DeviceUsageChart5
+    GroupedBarChart2
 };

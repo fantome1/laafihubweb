@@ -6,6 +6,7 @@ import {
   } from 'chart.js';
 import React from 'react';
 import { Chart } from 'react-chartjs-2';
+import { IGetActivitiesResult } from '../../models/activity_model';
 
 ChartJS.register(
     BarElement,
@@ -13,28 +14,73 @@ ChartJS.register(
     LinearScale
 );
 
-class ActivityChart extends React.Component {
+
+type Props = {
+    promise: Promise<IGetActivitiesResult>|null;
+};
+
+type State = {
+    data: {
+        labels: string[],
+        datasets: {
+            data: number[],
+            backgroundColor: string
+        }[]
+    }
+}
+
+class ActivityChart extends React.Component<Props, State> {
 
     private chartRef = React.createRef<ChartJS>()
 
-    private data = {
-        labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A'],
-        datasets: [
-            {
-              data: [16, 20, 4, 15, 13, 10, 8, 14, 2],
-              backgroundColor: '#69ADA7',
-            }
-        ]
-    }
-
     constructor(props: any) {
         super(props);
+
+        this.state = {
+            data: {
+                labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A'],
+                datasets: [
+                    {
+                      data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      backgroundColor: '#69ADA7',
+                    }
+                ]
+            }
+        }
+    }
+
+    componentDidMount(): void {
+        this.update(this.props.promise);
+    }
+
+    componentDidUpdate(prevProps: Readonly<Props>): void {
+        if (prevProps.promise != this.props.promise) {
+            this.update(this.props.promise);
+        }
+    }
+
+    update(promise: Promise<IGetActivitiesResult>|null) {
+        if (promise == null)
+            return;            
+        promise.then(value => {
+            const data = {
+                labels: value.totalByMonth.map(v => v.id),
+                datasets: [
+                    {
+                        data: value.totalByMonth.map(v => v.total),
+                        backgroundColor: '#69ADA7'
+                    }
+                ]
+            };
+
+            this.setState({ data });
+        });
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='bar' data={this.data} options={{
+                <Chart ref={this.chartRef} type='bar' data={this.state.data} options={{
                     // responsive: true,
                     plugins: {
                         legend: { display: false }

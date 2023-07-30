@@ -21,7 +21,7 @@ type State = {
     devicesPromise: Promise<IGetDeviceResult>|null;
     activitiesPromise: Promise<IGetActivitiesResult>|null;
     usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
-    infrastructurePromise: Promise<IGetInfrastructureResult>|null;
+    infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
 }
 
 class DashboardPage extends React.Component<Props, State> {
@@ -33,7 +33,7 @@ class DashboardPage extends React.Component<Props, State> {
             devicesPromise: null,
             activitiesPromise: null,
             usersPromise: null,
-            infrastructurePromise: null
+            infrastructuresPromise: null
         }
     }
 
@@ -42,7 +42,7 @@ class DashboardPage extends React.Component<Props, State> {
             devicesPromise: Api.getDevices(),
             activitiesPromise: Api.getActivies(),
             usersPromise: Api.getUsers(),
-            infrastructurePromise: Api.getInfrastructures()
+            infrastructuresPromise: Api.getInfrastructures()
         });
     }
 
@@ -99,7 +99,7 @@ class DashboardPage extends React.Component<Props, State> {
                     />
 
                     <PromiseBuilder
-                        promise={state.infrastructurePromise}
+                        promise={state.infrastructuresPromise}
                         dataBuilder={data => (
                             <EntityCountCard
                                 width={280}
@@ -117,7 +117,7 @@ class DashboardPage extends React.Component<Props, State> {
                 <div className="flex space-x-4 mt-12">
                     <div style={{ flex: '1 1 0', minHeight: '328px' }}>
                         <PromiseBuilder
-                            promise={state.infrastructurePromise}
+                            promise={state.infrastructuresPromise}
                             dataBuilder={data => (<InfrastructureCard data={data.infrastructures} />)}
                             loadingBuilder={() => (<Skeleton variant="rounded" height="328px" />)}
                             errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
@@ -127,7 +127,7 @@ class DashboardPage extends React.Component<Props, State> {
                     <div style={{ flex: '1 1 0' }}>
                         <BubleMap>
                             {<PromiseBuilder
-                                promise={state.infrastructurePromise}
+                                promise={state.infrastructuresPromise}
                                 dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
                                     center={[value.coordinates.latitude, value.coordinates.longitude]}
                                     pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}

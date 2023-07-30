@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React from "react";
-import { Alert, AlertColor, Paper, Snackbar } from "@mui/material";
-import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
+import { Alert, AlertColor, Snackbar } from "@mui/material";
+import { CircleMarker, Popup } from "react-leaflet";
 import { OrganizationFirstCardGroup } from "../components/OrganizationFirstCardGroup";
 import { Utils } from "../services/utils";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
@@ -9,10 +8,14 @@ import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Api } from "../services/api";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Completer } from "../services/completer";
-import { IInfrastructure } from "../models/infrastructure_model";
+import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
+import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetActivitiesResult } from "../models/activity_model";
+import { BubleMap } from "../components/BubleMap";
+import { IGetUsersResult } from "../models/user_model";
 
 type Props = {
     navigate: (url: string) => void;
@@ -23,37 +26,11 @@ type State = {
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
     infrastructureId: string|null;
-    infrastructuresPromise: Promise<{ total: number, infrastructures: IInfrastructure[] }>|null;
+    infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
+    usersPromise: Promise<IGetUsersResult>|null;
+    devicesPromise: Promise<IGetDeviceResult>|null;
+    activitesPromise: Promise<IGetActivitiesResult>|null;
 };
-
-type MapProps = {
-    promise: Promise<{ total: number, infrastructures: IInfrastructure[] }>|null;
-};
-
-const Map = React.memo(function Map(props: MapProps) {
-    return (
-        <Paper sx={{ height: '100%' }}>
-            <MapContainer center={{ lat: 12.35, lng: -1.516667 }} zoom={1} scrollWheelZoom={false} style={{ width: '100%', height: '100%' }}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {<PromiseBuilder
-                promise={props.promise}
-                dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
-                    center={[value.coordinates.latitude, value.coordinates.longitude]}
-                    pathOptions={{ color: getInfrastructuresStatusColor(value) }}
-                    radius={4}>
-                        <Popup>{value.name}</Popup>
-                    </CircleMarker>
-                ))}
-                loadingBuilder={() => null}
-                errorBuilder={(_) => null}
-            />}
-            </MapContainer>
-        </Paper>
-    );
-});
 
 class OrganizationPage extends React.Component<Props, State> {
 
@@ -78,7 +55,10 @@ class OrganizationPage extends React.Component<Props, State> {
             deleteConfirmationCompleter: null,
             snackbarData: null,
             infrastructureId: null,
-            infrastructuresPromise: null
+            infrastructuresPromise: null,
+            usersPromise: null,
+            devicesPromise: null,
+            activitesPromise: null
         };
 
         this.showCreateInfrastructureDialog = this.showCreateInfrastructureDialog.bind(this);
@@ -86,7 +66,12 @@ class OrganizationPage extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ infrastructuresPromise: Api.getInfrastructures() });
+        this.setState({
+            infrastructuresPromise: Api.getInfrastructures(),
+            usersPromise: Api.getUsers(),
+            devicesPromise: Api.getDevices(),
+            activitesPromise: Api.getActivies()
+        });
     }
 
     async showCreateInfrastructureDialog(infrastructureId: string|null = null) {
@@ -157,10 +142,30 @@ class OrganizationPage extends React.Component<Props, State> {
                         <OrganizationFirstCardGroup
                             showCreateInfrastructureDialog={() => this.showCreateInfrastructureDialog()}
                             infrastructuresPromise={state.infrastructuresPromise}
+                            usersPromise={state.usersPromise}
+                            devicesPromise={state.devicesPromise}
+                            activitesPromise={state.activitesPromise}
                         />
                     </div>
 
-                    <div style={{ flex: '1 1 0' }}><Map promise={state.infrastructuresPromise} /></div>
+                    <div style={{ flex: '1 1 0' }}>
+                        <BubleMap>
+                            {<PromiseBuilder
+                                promise={state.infrastructuresPromise}
+                                dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
+                                    center={[value.coordinates.latitude, value.coordinates.longitude]}
+                                    pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-ignore
+                                    radius={4}>
+                                        <Popup>{value.name}</Popup>
+                                    </CircleMarker>
+                                ))}
+                                loadingBuilder={() => null}
+                                errorBuilder={(_) => null}
+                            />}
+                        </BubleMap>
+                    </div>
                 </div>
 
                 <div className="mt-4">
@@ -191,26 +196,6 @@ class OrganizationPage extends React.Component<Props, State> {
                                             </td>
                                         </tr>
                                     ))}
-
-                                    {/* {this.tableData.map((e, index) => (
-                                        <tr key={index}>
-                                            <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: e.color }}></div></div></td>
-                                            <td></td>
-                                            <td>{e.type}</td>
-                                            <td>{e.deviceCount}</td>
-                                            <td>{e.monitorCount}</td>
-                                            <td>{e.supervisors}</td>
-                                            <td></td>
-                                            <td>{Utils.formatDate(e.createAt)} GMT</td>
-                                            <td>
-                                                <div className="flex h-full justify-evenly items-center">
-                                                    <div className="cursor-pointer"><img src="/icons/table/editor.svg" alt="" /></div>
-                                                    <div className="cursor-pointer"><img src={`/icons/table/${Math.random() > 0.5 ? 'visibility' : 'visibility_off'}.svg`} alt="" /></div>
-                                                    <div className="cursor-pointer" onClick={() => this.onDeleteInfrastructure({ id: "-1" } as any)}><img src="/icons/table/delete.svg" alt="" /></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))} */}
                                 </tbody>
                             </table>
                         )}

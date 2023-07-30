@@ -16,4 +16,10 @@ interface IUser {
     email?: string;
 };
 
-export type { IUser };
+interface IGetUsersResult {
+    count: number;
+    users: IUser[];
+    roles: { name: string, total: number }[]
+}
+
+export type { IUser, IGetUsersResult };
