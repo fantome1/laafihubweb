@@ -121,12 +121,16 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             {/* <p className="text-4xl text-[#3C4858] text-right">020</p> */}
                             <PromiseBuilder
                                 promise={state.devicesPromise}
-                                dataBuilder={data => data.totalConnected.map((value, index) => (
-                                    <div key={index} className={`${index == 0 ? '' : 'pl-4'}`}>
-                                        <p className="text-sm text-[#999999]">{value.id}</p>
-                                        <p className="text-4xl text-[#3C4858]">{value.total.toString().padStart(3, '0')}</p>
+                                dataBuilder={data => (
+                                    <div className="flex">
+                                        {data.totalConnected.map((value, index) => (
+                                            <div key={index} className={`${index == 0 ? '' : 'pl-4'}`}>
+                                                <p className="text-sm text-[#999999]">{value.id}</p>
+                                                <p className="text-4xl text-[#3C4858]">{value.total.toString().padStart(3, '0')}</p>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                )}
                                 loadingBuilder={() => (<UserCountSkeleton count={2} />)}
                                 errorBuilder={() => (<div className="text-red-500">Une erreur s'est produite</div>)}
                             />

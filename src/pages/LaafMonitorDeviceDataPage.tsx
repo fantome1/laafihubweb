@@ -45,7 +45,7 @@ class LaafiMonitorDeviceDataPage extends React.Component<Props> {
 
                                 <div className="flex items-center space-x-2">
                                     <div className="w-[14px] h-[14px] bg-[#D80303]"></div>
-                                    <p className="text-sm text-[#A2A2A2]">Offline</p>
+                                    <p className="text-sm text-[#A2A2A2]">Offline 155</p>
                                 </div>
                             </div>
                         </div>

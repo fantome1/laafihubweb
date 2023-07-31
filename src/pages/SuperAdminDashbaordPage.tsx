@@ -119,7 +119,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             .then(() => {
                 this.setState({
                     snackbarData: { severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' },
-                    usersPromise: Api.getUsers()
+                    usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id })
                 });
             }).catch(err => {
                 console.log('err', err);
@@ -328,7 +328,13 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                                 <td>
                                                     <div className="flex justify-center">
                                                         <Tooltip title={'Supprimer l\'appareil de l\'infrastructure'}>
-                                                            <span onClick={() => this.onDeleteDevice(value)} className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
+                                                            <span
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    this.onDeleteDevice(value)
+                                                                }}
+                                                                className="material-symbols-rounded text-red-500 cursor-pointer"
+                                                            >delete</span>
                                                         </Tooltip>
                                                     </div>
                                                 </td>
