@@ -186,7 +186,7 @@ class OrganizationPage extends React.Component<Props, State> {
                                             <td>{/*e.monitorCount*/}</td>
                                             <td>{/*e.supervisors*/}</td>
                                             <td></td>
-                                            <td>{Utils.formatDate(new Date(value.creationDate!))} GMT</td>
+                                            <td>{Utils.formatDate(new Date(value.creationDate!))}</td>
                                             <td>
                                                 <div className="flex h-full justify-evenly items-center text-[#999999]">
                                                     <div className="cursor-pointer" onClick={() => this.showCreateInfrastructureDialog(value.id)}><span className="material-symbols-rounded">edit</span></div>

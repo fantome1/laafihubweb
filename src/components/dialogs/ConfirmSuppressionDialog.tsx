@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Completer } from '../../services/completer';
 
@@ -12,6 +11,7 @@ function ConfirmSuppressionDialog(props: Props) {
   return (
     <Dialog
       open={Boolean(props.completer)}
+      onClose={() => props.completer?.complete(false)}
     >
       <DialogTitle>{props.title}</DialogTitle>
       <DialogContent><DialogContentText></DialogContentText>{props.description}</DialogContent>

@@ -77,10 +77,10 @@ class Api {
         return response.json();
     }
 
-    static async getUsers(options: { infrastructureId?: string } = {}): Promise<IGetUsersResult> {
+    static async getUsers(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}): Promise<IGetUsersResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/users', {
-                query: { InfrastructureId: options.infrastructureId  }
+                query: options
             }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -126,10 +126,10 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
-    static async getDevices(options: { infrastructureId?: string } = {}): Promise<IGetDeviceResult> {
+    static async getDevices(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}): Promise<IGetDeviceResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/devices', {
-                query: { InfrastructureId: options.infrastructureId  }
+                query: options
             }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
@@ -207,6 +207,19 @@ class Api {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
             }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async enrollItems(infrastructureId: string, body: { usersIds: string[], devicesIds: string[] }): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/infrastructures/enrolle-items/${infrastructureId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(body)
         });
 
         if (!response.ok)

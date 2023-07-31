@@ -14,8 +14,8 @@ type Props = {
 
 type State = {
     validator: FormValidator;
-    error: any,
-    formState: FormValidatorData
+    error: any;
+    formState: FormValidatorData;
 };
 
 // FIXME more detailed error message

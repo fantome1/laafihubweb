@@ -52,4 +52,25 @@ class PromiseBuilder<T> extends React.Component<Props<T>, State<T>> {
 
 }
 
-export { PromiseBuilder };
+
+type PromiseDataBuilderProps<T> = {
+    data: PromiseData<T>|null;
+    loadingBuilder: () => any;
+    dataBuilder: (data: T) => any;
+    errorBuilder: (error?: any) => any;
+}
+
+
+function PromiseDataBuilder<T>(props: PromiseDataBuilderProps<T>) {
+    switch(props.data?.state ?? null) {
+        case null:
+        case PromiseState.pending:
+            return props.loadingBuilder();
+        case PromiseState.resolved:
+            return props.dataBuilder(props.data!.data!);
+        default:
+            return props.errorBuilder(props.data!.error);
+    }
+}
+
+export { PromiseBuilder, PromiseDataBuilder };

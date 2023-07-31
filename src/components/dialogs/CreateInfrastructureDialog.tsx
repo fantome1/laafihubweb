@@ -18,7 +18,7 @@ type Props = {
 type State = {
     validator: FormValidator|null; // Not [null] juste late
     infrastructure: any|null; // For update user
-    error: any,
+    error: any;
     formState: FormValidatorData|null;
     chooseLocationCompleter: Completer<{ latitude: number, longitude: number }|null>|null;
 };

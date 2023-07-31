@@ -8,19 +8,24 @@ import { WithRouter } from "../components/WithRouterHook";
 import { Api } from "../services/api";
 import { IUser } from "../models/user_model";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IDevice, IGetDeviceResult } from "../models/device_mdoel";
 import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Completer } from "../services/completer";
+import { EnrollItemsDialog } from "../components/dialogs/EnrollItemsDialog";
+import { NavigateFunction } from "react-router-dom";
+import { routes } from "../constants/routes";
 
 type Props = {
-    params: any
+    params: any,
+    navigate: NavigateFunction;
 };
 
 type State = {
     promise: Promise<IInfrastructure>|null;
     usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
-    deleteConfirmationCompleter: Completer<boolean>|null;
+    enrollItemsCompleter: Completer<boolean>|null;
+    deleteConfirmation: { title: string, description: string, completer: Completer<boolean> }|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
 };
 
@@ -33,18 +38,20 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             promise: null,
             usersPromise: null,
             devicesPromise: null,
-            deleteConfirmationCompleter: null,
+            enrollItemsCompleter: null,
+            deleteConfirmation: null,
             snackbarData: null
         };
 
         this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
+        this.onRollitems = this.onRollitems.bind(this);
     }
 
     componentDidMount(): void {
         this.setState({
-            promise: Api.getInfrastructure(this.props.params.id),
-            usersPromise: Api.getUsers({ infrastructureId: this.props.params.id }),
-            devicesPromise: Api.getDevices(/*{ infrastructureId: this.props.params.id }*/)
+            // promise: Api.getInfrastructure(this.props.params.id),
+            // usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
+            // devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
         });
     }
 
@@ -54,13 +61,29 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({ snackbarData: null });
     }
 
+    async onRollitems() {
+        const completer = new Completer<boolean>();
+        this.setState({ enrollItemsCompleter: completer });
+
+        const result = await completer.promise;
+        this.setState({ enrollItemsCompleter: null });
+
+        if (result == true) {
+            this.setState({
+                snackbarData: { severity: 'success', message: 'Enrôlement effectué avec succès' },
+                usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
+                devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
+            });
+        }
+    }
+
     async onDeleteUser(user: IUser) {
 
         const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmationCompleter: completer });
+        this.setState({ deleteConfirmation: { completer, title: 'Cette action est irréversible', description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam' } });
 
         const result = await completer.promise;
-        this.setState({ deleteConfirmationCompleter: null });
+        this.setState({ deleteConfirmation: null });
 
         if (result != true)
             return;
@@ -75,6 +98,29 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 console.log('err', err);
                 this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' } });
             });
+    }
+
+    async onDeleteDevice(device: IDevice) {
+
+        const completer = new Completer<boolean>();
+        this.setState({ deleteConfirmation: { completer, title: 'Cette action est irréversible', description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam' } });
+
+        const result = await completer.promise;
+        this.setState({ deleteConfirmation: null });
+
+        if (result != true)
+            return;
+
+        // Api.deleteUserFromInfrastructure(user.id)
+        //     .then(() => {
+        //         this.setState({
+        //             snackbarData: { severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' },
+        //             usersPromise: Api.getUsers()
+        //         });
+        //     }).catch(err => {
+        //         console.log('err', err);
+        //         this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' } });
+        //     });
     }
 
     render() {
@@ -144,7 +190,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                             <p className="text-2xl text-white">Edit</p>
                         </div>
 
-                        <div className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                        <div onClick={this.onRollitems} className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                             <img src="/icons/super_admin/edit.svg" alt="" />
                             <p className="text-2xl text-white">Enroll</p>
                         </div>
@@ -174,7 +220,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                 label="Devices"
                                 count={data.count.toString().padStart(3, '0')}
                                 elevation={0}
-                                items={data.totalConnexionType.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0') }))}
+                                items={data.totalModel.map(v => ({ label: v.id, count: v.total.toString().padStart(3, '0') }))}
                             />)}
                             loadingBuilder={() => (<Skeleton variant="rounded" height={128} />)}
                             errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
@@ -226,7 +272,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                     </thead>
                                     <tbody>
                                         {data.devicies.map(value => (
-                                            <tr key={value.id}>
+                                            <tr key={value.id} onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(value.id))} className="cursor-pointer">
                                                 <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
                                                 <td>{value.id}</td>
                                                 <td>{value.name}</td>
@@ -241,7 +287,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                                 <td>
                                                     <div className="flex justify-center">
                                                         <Tooltip title={'Supprimer l\'appareil de l\'infrastructure'}>
-                                                            <span className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
+                                                            <span onClick={() => this.onDeleteDevice(value)} className="material-symbols-rounded text-red-500 cursor-pointer">delete</span>
                                                         </Tooltip>
                                                     </div>
                                                 </td>
@@ -262,11 +308,15 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
 
-                <ConfirmSuppressionDialog
-                    completer={state.deleteConfirmationCompleter}
-                    title="Cette action est irréversible"
-                    description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam"
-                />
+                {state.enrollItemsCompleter && (<EnrollItemsDialog completer={state.enrollItemsCompleter} infrastructureId={this.props.params.id} />)}
+
+                {state.deleteConfirmation && (
+                    <ConfirmSuppressionDialog
+                        completer={state.deleteConfirmation.completer}
+                        title={state.deleteConfirmation.title}
+                        description={state.deleteConfirmation.description}
+                    />
+                )}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}

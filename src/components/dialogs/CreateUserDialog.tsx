@@ -22,8 +22,8 @@ type Props = {
 type State = {
     validator: FormValidator|null; // Not [null] juste late
     user: any|null; // For update user
-    error: any,
-    formState: FormValidatorData|null
+    error: any;
+    formState: FormValidatorData|null;
 };
 
 // https://hub.laafi-concepts.com/home/dashboard
