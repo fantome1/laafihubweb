@@ -7,6 +7,7 @@ import {
 import React from 'react';
 import { Chart } from 'react-chartjs-2';
 import { IGetActivitiesResult } from '../../models/activity_model';
+import { months } from '../../constants/mouths';
 
 ChartJS.register(
     BarElement,
@@ -38,10 +39,10 @@ class ActivityChart extends React.Component<Props, State> {
 
         this.state = {
             data: {
-                labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A'],
+                labels: months,
                 datasets: [
                     {
-                      data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      data: months.map(_ => 0),
                       backgroundColor: '#69ADA7',
                     }
                 ]
@@ -63,11 +64,14 @@ class ActivityChart extends React.Component<Props, State> {
         if (promise == null)
             return;            
         promise.then(value => {
+
+            const d = months.map(m => value.totalByMonth.find(d => d.id == m)?.total ?? 0);
+
             const data = {
-                labels: value.totalByMonth.map(v => v.id),
+                labels: months,
                 datasets: [
                     {
-                        data: value.totalByMonth.map(v => v.total),
+                        data: d,
                         backgroundColor: '#69ADA7'
                     }
                 ]

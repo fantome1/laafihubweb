@@ -339,23 +339,4 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
 }
 
-// function randomRegistrationStatus(index: number) {
-//     if (index % 4 == 0)
-//         return { label: 'Not enrolled', color: '#999999' };
-//     return { label: 'Enrolled', color: '#3C4858' }
-// }
-
-// function randomStatus(index: number) {
-//     const r = index % 3;
-
-//     switch(r) {
-//         case 1:
-//             return { label: 'Connected', color: '#309E3A' };
-//         case 2:
-//             return { label: 'Disconnected', color: '#D80303' };
-//         default:
-//             return { label: 'Inactive', color: '#FE9B15' };
-//     }
-// }
-
 export default WithRouter(SuperAdminDashboardPage);

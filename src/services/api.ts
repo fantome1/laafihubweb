@@ -214,9 +214,10 @@ class Api {
     }
 
     static async enrollItems(infrastructureId: string, body: { usersIds: string[], devicesIds: string[] }): Promise<void> {
-        const response = await fetch(`${this.BASE_URL}/infrastructures/enrolle-items/${infrastructureId}`, {
-            method: 'POST',
+        const response = await fetch(`${this.BASE_URL}/infrastructures/${infrastructureId}/enrolle-items`, {
+            method: 'PUT',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
             },
             body: JSON.stringify(body)

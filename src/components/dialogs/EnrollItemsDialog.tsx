@@ -141,7 +141,7 @@ class EnrollItemsDialog extends React.Component<Props, State> {
                                                 <ListItemAvatar>
                                                     <Avatar><span className="material-symbols-rounded">person</span></Avatar>
                                                 </ListItemAvatar>
-                                                <ListItemText id={labelId} primary={Utils.getUserFullname(value)} />
+                                                <ListItemText id={labelId} primary={value.userName} />
                                             </ListItemButton>
                                         </ListItem>
                                     );
