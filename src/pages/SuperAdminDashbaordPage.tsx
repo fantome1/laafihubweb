@@ -49,9 +49,9 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
     componentDidMount(): void {
         this.setState({
-            // promise: Api.getInfrastructure(this.props.params.id),
-            // usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
-            // devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
+            promise: Api.getInfrastructure(this.props.params.id),
+            usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
+            devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
         });
     }
 
@@ -186,12 +186,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         />
 
                         <div className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
-                            <img src="/icons/super_admin/edit.svg" alt="" />
+                            <span className="material-symbols-outlined text-[64px] text-white">edit</span>
                             <p className="text-2xl text-white">Edit</p>
                         </div>
 
                         <div onClick={this.onRollitems} className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
-                            <img src="/icons/super_admin/edit.svg" alt="" />
+                            <span className="material-symbols-outlined text-[64px] text-white">edit</span>
                             <p className="text-2xl text-white">Enroll</p>
                         </div>
                     </div>
