@@ -55,7 +55,6 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
                 validator.listen(this.listen);
                 this.setState({ infrastructure: value, validator, formState: validator.getData });
             }).catch(err => {
-                // this.setState({ error: err });
                 this.props.completer?.completeError(err);
             })
         }
@@ -256,7 +255,7 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
                             variant="contained"
                             // color="laafi"
                             disabled={!formState.isValid}
-                        >Save</LoadingButton>
+                        >{this.isModify ? 'Update' : 'Save'}</LoadingButton>
                     </DialogActions>
                 </Dialog>
 

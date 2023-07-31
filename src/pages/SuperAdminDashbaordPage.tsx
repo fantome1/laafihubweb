@@ -14,9 +14,11 @@ import { Completer } from "../services/completer";
 import { EnrollItemsDialog } from "../components/dialogs/EnrollItemsDialog";
 import { NavigateFunction } from "react-router-dom";
 import { routes } from "../constants/routes";
+import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
+import { Marker, Popup } from "react-leaflet";
 
 type Props = {
-    params: any,
+    params: { id: string },
     navigate: NavigateFunction;
 };
 
@@ -25,6 +27,7 @@ type State = {
     usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
     enrollItemsCompleter: Completer<boolean>|null;
+    updateDialogCompleter: Completer<boolean>|null;
     deleteConfirmation: { title: string, description: string, completer: Completer<boolean> }|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
 };
@@ -39,12 +42,14 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             usersPromise: null,
             devicesPromise: null,
             enrollItemsCompleter: null,
+            updateDialogCompleter: null,
             deleteConfirmation: null,
             snackbarData: null
         };
 
         this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
         this.onRollitems = this.onRollitems.bind(this);
+        this.showUpdateDialog = this.showUpdateDialog.bind(this);
     }
 
     componentDidMount(): void {
@@ -77,6 +82,28 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         }
     }
 
+    async showUpdateDialog() {
+        const completer = new Completer<boolean>();
+        this.setState({ updateDialogCompleter: completer });
+
+        try {
+            const result = await completer.promise;
+            this.setState({ updateDialogCompleter: null });
+
+            if (result == true) {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Les informations de l\'infrastructure ont été modifié avec succès' },
+                    promise: Api.getInfrastructure(this.props.params.id)
+                });
+            }
+        } catch(err) {
+            this.setState({
+                updateDialogCompleter: null,
+                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
+            });
+        }
+    }
+
     async onDeleteUser(user: IUser) {
 
         const completer = new Completer<boolean>();
@@ -88,7 +115,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         if (result != true)
             return;
 
-        Api.deleteUserFromInfrastructure(user.id)
+        Api.deleteUserFromInfrastructure(this.props.params.id, user.id)
             .then(() => {
                 this.setState({
                     snackbarData: { severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' },
@@ -111,16 +138,16 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         if (result != true)
             return;
 
-        // Api.deleteUserFromInfrastructure(user.id)
-        //     .then(() => {
-        //         this.setState({
-        //             snackbarData: { severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' },
-        //             usersPromise: Api.getUsers()
-        //         });
-        //     }).catch(err => {
-        //         console.log('err', err);
-        //         this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' } });
-        //     });
+            Api.deleteDeviceFromInfrastructure(this.props.params.id, device.id)
+                .then(() => {
+                    this.setState({
+                        snackbarData: { severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' },
+                        devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
+                    });
+                }).catch(err => {
+                    console.log('err', err);
+                    this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'appareil de l\'infrastructure' } });
+                });
     }
 
     render() {
@@ -138,7 +165,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                 <div className="h-[120px] grow flex flex-col justify-between bg-white px-4 rounded-md">
                                     <div className="relative">
                                         <Paper elevation={2} sx={{ backgroundColor: 'var(--primary)' }} className="absolute top-[-24px] flex justify-center items-center w-[80px] h-[80px]">
-                                            <img src="/icons/organization/infrastructure.svg" alt="" />
+                                            <span className="material-symbols-outlined text-white text-[42px]">domain</span>
                                         </Paper>
 
                                         <div className="flex items-center h-[56px]">
@@ -185,7 +212,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                             errorBuilder={() => (<div>Une erreur s'est produite</div>)}
                         />
 
-                        <div className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                        <div onClick={this.showUpdateDialog} className="flex flex-col justify-center items-center w-[120px] h-[120px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                             <span className="material-symbols-outlined text-[64px] text-white">edit</span>
                             <p className="text-2xl text-white">Edit</p>
                         </div>
@@ -227,7 +254,21 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         />
                     </div>
 
-                    <div className="w-[50%]"><NearMap /></div>
+                    <div className="w-[50%]">
+                        <PromiseBuilder
+                            promise={this.state.promise}
+                            dataBuilder={data => {
+                                const position = { lat: data.coordinates.latitude, lng: data.coordinates.longitude };
+                                return (
+                                    <NearMap key={'infrastructure-position'} center={position}>
+                                        <Marker position={position}><Popup>{data.name}</Popup></Marker>
+                                    </NearMap>
+                                );
+                            }}
+                            loadingBuilder={() => (<NearMap />)}
+                            errorBuilder={_ => (<NearMap />)}
+                        />
+                    </div>
                 </div>
 
                 <div className="flex space-x-2 mt-4">
@@ -309,6 +350,8 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
 
                 {state.enrollItemsCompleter && (<EnrollItemsDialog completer={state.enrollItemsCompleter} infrastructureId={this.props.params.id} />)}
+                
+                {Boolean(state.updateDialogCompleter) && <CreateInfrastructureDialog completer={state.updateDialogCompleter} infrastructureId={this.props.params.id} />}
 
                 {state.deleteConfirmation && (
                     <ConfirmSuppressionDialog

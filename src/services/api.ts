@@ -227,19 +227,30 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
-    static async deleteUserFromInfrastructure(userId: string): Promise<void> {
-        await new Promise((r) => setTimeout(r, 1000));
-        throw new Error('');
-        // const response = await fetch(`${this.BASE_URL}/users/${userId}`, {
-        //     method: 'DELETE',
-        //     headers: {
-        //         'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
-        //     }
-        // });
+    static async deleteUserFromInfrastructure(infrastructureId: string, userId: string): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/infrastructures/${infrastructureId}/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
 
-        // if (!response.ok)
-        //     throw ApiError.parse(response.status, await response.text());
-        // return response.json();
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
+    static async deleteDeviceFromInfrastructure(infrastructureId: string, userId: string): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/infrastructures/${infrastructureId}/devices/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
     }
 
     // ###################################################################################################

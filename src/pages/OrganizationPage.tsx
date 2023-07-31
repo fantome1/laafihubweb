@@ -22,7 +22,7 @@ type Props = {
 };
 
 type State = {
-    createOrganizationDialogCompleter: Completer<boolean>|null;
+    createDialogCompleter: Completer<boolean>|null;
     deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
     infrastructureId: string|null;
@@ -51,7 +51,7 @@ class OrganizationPage extends React.Component<Props, State> {
         super(props);  
 
         this.state = {
-            createOrganizationDialogCompleter: null,
+            createDialogCompleter: null,
             deleteConfirmationCompleter: null,
             snackbarData: null,
             infrastructureId: null,
@@ -76,11 +76,11 @@ class OrganizationPage extends React.Component<Props, State> {
 
     async showCreateInfrastructureDialog(infrastructureId: string|null = null) {
         const completer = new Completer<boolean>();
-        this.setState({ createOrganizationDialogCompleter: completer, infrastructureId });
+        this.setState({ createDialogCompleter: completer, infrastructureId });
 
         try {
             const result = await completer.promise;
-            this.setState({ createOrganizationDialogCompleter: null, infrastructureId: null });
+            this.setState({ createDialogCompleter: null, infrastructureId: null });
 
             if (result == true) {
                 this.setState({
@@ -90,7 +90,7 @@ class OrganizationPage extends React.Component<Props, State> {
             }
         } catch(err) {
             this.setState({
-                createOrganizationDialogCompleter: null,
+                createDialogCompleter: null,
                 snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
                 infrastructureId: null
             });
@@ -210,7 +210,7 @@ class OrganizationPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
 
-                {Boolean(state.createOrganizationDialogCompleter) && <CreateInfrastructureDialog completer={state.createOrganizationDialogCompleter} infrastructureId={state.infrastructureId} />}
+                {Boolean(state.createDialogCompleter) && <CreateInfrastructureDialog completer={state.createDialogCompleter} infrastructureId={state.infrastructureId} />}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}
