@@ -6,6 +6,7 @@ import { IGetInfrastructureResult } from "../models/infrastructure_model";
 import { IGetDeviceResult } from "../models/device_mdoel";
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IGetUsersResult } from "../models/user_model";
+import { Utils } from "../services/utils";
 
 type Props = {
     showCreateInfrastructureDialog: () => void;
@@ -16,7 +17,6 @@ type Props = {
 }
 
 function OrganizationFirstCardGroup(props: Props) {
-
     return (
         <>
 
@@ -36,7 +36,12 @@ function OrganizationFirstCardGroup(props: Props) {
                                     <p className="text-xl text-[#a2a2a2]">Infrastructures</p>
                                     <div className="flex items-center">
                                         <div className="w-[14px] h-[14px] bg-[#999999] mr-2"></div>
-                                        <p className="text-sm text-[#a2a2a2]">Just updated</p>
+                                        <PromiseBuilder
+                                            promise={props.infrastructuresPromise}
+                                            dataBuilder={data => (<p className="text-sm text-[#a2a2a2]">{data.infrastructures.length > 0 ?  `Last update ${Utils.timeAgo(new Date(data.infrastructures[0].creationDate!))}` : ''}</p>)}
+                                            loadingBuilder={() => (<Skeleton className="text-sm w-[56px]" />)}
+                                            errorBuilder={(err) => (<span></span>)}
+                                        />
                                     </div>
                                 </div>
                             </div>

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IUser } from "../models/user_model";
 
@@ -59,6 +60,12 @@ class Utils {
     static getActivedActivityCount(data: IGetActivitiesResult): number {
         const result = data.totalStatus.find(v => v.id == 'Actived');
         return result?.total ?? 0
+    }
+
+    static timeAgo(date: Date) {
+        const now = moment(new Date());
+        const past = moment(date);
+        return past.from(now);
     }
 
 }

@@ -174,7 +174,7 @@ class OrganizationPage extends React.Component<Props, State> {
                         dataBuilder={data => (
                             <table className="styled-table">
                                 <thead>
-                                    <tr>{['', 'Infrastructures Name', 'Type', 'Devices Count', 'Devices Count', 'Supervisors', 'Agents Count', 'Date of creation', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                    <tr>{['', 'Infrastructures Name', 'Type', 'Activites', 'Devices', 'Agents', 'Date of creation', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                 </thead>
                                 <tbody>
                                     {data.infrastructures.map(value => (
@@ -182,16 +182,20 @@ class OrganizationPage extends React.Component<Props, State> {
                                             <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: getInfrastructuresStatusColor(value) }}></div></div></td>
                                             <td>{value.name}</td>
                                             <td>{value.type}</td>
-                                            <td>{/*e.deviceCount*/}</td>
-                                            <td>{/*e.monitorCount*/}</td>
-                                            <td>{/*e.supervisors*/}</td>
-                                            <td></td>
+                                            <td>{value.totalActivities}</td>
+                                            <td>{value.totalDevicies}</td>
+                                            <td>{value.totalAgents}</td>
                                             <td>{Utils.formatDate(new Date(value.creationDate!))}</td>
                                             <td>
                                                 <div className="flex h-full justify-evenly items-center text-[#999999]">
-                                                    <div className="cursor-pointer" onClick={() => this.showCreateInfrastructureDialog(value.id)}><span className="material-symbols-rounded">edit</span></div>
-                                                    <div className="cursor-pointer"><span className="material-symbols-rounded">{Math.random() > 0.5 ? 'visibility' : 'visibility_off'}</span></div>
-                                                    <div className="cursor-pointer" onClick={() => this.onDeleteInfrastructure(value)}><span className="material-symbols-rounded">delete</span></div>
+                                                    <div className="cursor-pointer" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        this.showCreateInfrastructureDialog(value.id)
+                                                    }}><span className="material-symbols-rounded">edit</span></div>
+                                                    <div className="cursor-pointer" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        this.onDeleteInfrastructure(value)
+                                                    }}><span className="material-symbols-rounded">delete</span></div>
                                                 </div>
                                             </td>
                                         </tr>
