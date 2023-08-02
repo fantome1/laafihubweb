@@ -174,7 +174,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                             <tr key={data.id} className="cursor-pointer" onClick={() => this.onTapRow(data)}>
                                                 <td>
                                                     <div className="flex items-center px-2">
-                                                        <div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: ['#7EC381', '#D80303', '#999999'][index % 3] }}></div>
+                                                        <div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: ['#7EC381', '#D80303', '#999999'][index % 3] }}></div>
                                                         <p className="pl-1">{data.id}</p>
                                                     </div>
                                                 </td>

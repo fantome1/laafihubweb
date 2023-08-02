@@ -21,7 +21,6 @@ type Props = {
 
 type State = {
     validator: FormValidator|null; // Not [null] juste late
-    user: any|null; // For update user
     error: any;
     formState: FormValidatorData|null;
 };
@@ -42,7 +41,6 @@ class CreateUserDialog extends React.Component<Props, State> {
 
         this.state = {
             validator,
-            user: null,
             error: null,
             formState: validator?.getData ?? null
         };
@@ -53,15 +51,15 @@ class CreateUserDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        // if (this.isModify) {
-        //     Api.getUser(this.props.userId!).then(user => {
-        //         const validator = getRegisterUserValidator(user);
-        //         validator.listen(this.listen);
-        //         this.setState({ user, validator, formState: validator.getData });
-        //     }).catch(err => {
-        //         this.setState({ error: err });
-        //     })
-        // }
+        if (this.isModify) {
+            Api.getUser(this.props.userId!).then(user => {
+                const validator = getRegisterUserValidator(user);
+                validator.listen(this.listen);
+                this.setState({ validator, formState: validator.getData });
+            }).catch(err => {
+                this.props.completer?.completeError(err);
+            })
+        }
     }
 
     listen(data: FormValidatorData) {
@@ -100,8 +98,9 @@ class CreateUserDialog extends React.Component<Props, State> {
             activityId: ''
         };
 
-        Api.registerUser(data)
-            .then(result => {
+        const promise = this.isModify ? Api.updateUser(this.props.userId!, data) : Api.registerUser(data);
+
+        promise.then(result => {
                 validator.setLoadingStatus(false);
                 console.log('result', result);
                 this.props.completer?.complete(true);
@@ -115,7 +114,7 @@ class CreateUserDialog extends React.Component<Props, State> {
     render() {
         const open = Boolean(this.props.completer);
 
-        if (open && this.isModify) {
+        if (open && this.isModify && this.state.validator == null) {
             return (<Backdrop open={open} sx={{ color: '#fff' }}><CircularProgress color="inherit" /></Backdrop>);
         }
 
@@ -140,7 +139,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                 maxWidth="md"
                 fullWidth
             >
-                <DialogTitle>Add a new user</DialogTitle>
+                <DialogTitle>{this.isModify ? 'Edit an user' : 'Add a new user'}</DialogTitle>
                 <DialogContent>
 
                     {this.state.error && (<div className="mb-4"><Alert severity="error">Une erreur s'est produite</Alert></div>)}
@@ -270,7 +269,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                             helperText={emailField.errorMessage}
                         />
 
-                        <TextField
+                        {!this.isModify && (<TextField
                             label="Password"
                             type="password"
                             fullWidth
@@ -278,7 +277,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                             disabled={this.isModify}
                             error={Boolean(passwordField.errorMessage)}
                             helperText={passwordField.errorMessage}
-                        />
+                        />)}
                     </div>
 
                 </DialogContent>
@@ -292,7 +291,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                         sx={{ width: 128, color: "#fff" }}
                         variant="contained"
                         disabled={!formState.isValid}
-                    >Save</LoadingButton>
+                    >{this.isModify ? 'Update' : 'Save'}</LoadingButton>
                 </DialogActions>
             </Dialog>
         );        

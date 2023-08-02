@@ -63,7 +63,13 @@ class Utils {
     }
 
     static timeAgo(date: Date) {
-        const now = moment(new Date());
+        const n = new Date();
+
+        if (n.getTime() - date.getTime() >= 3 * 24 * 60 * 60 * 1000) {
+            return Utils.formatDate(date);
+        }
+
+        const now = moment();
         const past = moment(date);
         return past.from(now);
     }

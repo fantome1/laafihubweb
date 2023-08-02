@@ -261,9 +261,9 @@ class Api {
 
     // L'encadrer en violet pour obtenir les activités d'une infrastructure : https://hub-api-test.laafi-concepts.com/activities?InfrastructureId=LF-I-N1710
 
-    static async getActivies(options: { infrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
+    static async getActivies(options: { InfrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
         const response = await fetch(
-            Utils.buildUrl(this.BASE_URL, '/activities', { query: { InfrastructureId: options.infrastructureId } }), {
+            Utils.buildUrl(this.BASE_URL, '/activities', { query: options }), {
                 headers: {
                     'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
                 }

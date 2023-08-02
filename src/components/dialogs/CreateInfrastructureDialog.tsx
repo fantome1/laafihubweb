@@ -17,7 +17,6 @@ type Props = {
 
 type State = {
     validator: FormValidator|null; // Not [null] juste late
-    infrastructure: any|null; // For update user
     error: any;
     formState: FormValidatorData|null;
     chooseLocationCompleter: Completer<{ latitude: number, longitude: number }|null>|null;
@@ -37,7 +36,6 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
 
         this.state = {
             validator,
-            infrastructure: null,
             error: null,
             formState: validator?.getData ?? null,
             chooseLocationCompleter: null
@@ -53,7 +51,7 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
             Api.getInfrastructure(this.props.infrastructureId!).then(value => {
                 const validator = getCreateInfrastrutureValidator(value);
                 validator.listen(this.listen);
-                this.setState({ infrastructure: value, validator, formState: validator.getData });
+                this.setState({ validator, formState: validator.getData });
             }).catch(err => {
                 this.props.completer?.completeError(err);
             })
