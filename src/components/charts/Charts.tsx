@@ -378,35 +378,78 @@ class TemperatureChart2 extends React.Component {
     }
 }
 
-class TemperatureLineChart extends React.Component {
+type TemperatureLineChartProps = {
+
+}
+
+type TemperatureLineChartState = {
+
+}
+
+class TemperatureLineChart extends React.Component<TemperatureLineChartProps, TemperatureLineChartState> {
 
     private chartRef = React.createRef<ChartJS>()
 
-    private data = {
-        labels: [1, 4, 2.3, 1.5, 1.4, 1.2, 1],
-        datasets: [
-            {
-            //   fill: true,
-              tension: 0.1,
-              borderColor: '#69ADA7',
-              data: [1, 4, 2.3, 1.5, 1.4, 1.2, 1.1, 1]
+    constructor(props: TemperatureLineChartProps) {
+        super(props);
+
+        this.state = {
+            data: {
+                labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
+                datasets: [
+                    {
+                      fill: true,
+                      // tension: 0.1,
+                      borderWidth: 2,
+                      borderColor: '#69ADA7',
+                      pointRadius: 0,
+                      //   backgroundColor: '#AA69ADA7',
+                      data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
+                    }
+                ]
             }
-        ]
+        }
     }
 
-    constructor(props: any) {
-        super(props);
+    componentDidMount(): void {
+        const ctx = document.getElementById('temperature-line-chart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+        gradient.addColorStop(0, 'rgba(84, 176, 84, 0.4)');
+        gradient.addColorStop(1, 'rgba(84, 176, 84, 0)');
+
+        this.setState({ data: {
+            labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
+            datasets: [
+                {
+                  fill: true,
+                  // tension: 0.1,
+                  borderWidth: 1,
+                  borderColor: '#54b054',
+                  pointRadius: 0,
+                //   pointColor : "#fff",
+                // pointStrokeColor : "#ff6c23",
+                // pointHighlightFill: "#fff",
+                // pointHighlightStroke: "#ff6c23",
+                  backgroundColor: gradient,
+                  data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
+                }
+            ]
+        } })
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='line' data={this.data} options={{
+                <Chart ref={this.chartRef} type='line' data={this.state.data} id='temperature-line-chart' options={{
                     responsive: true,
                     maintainAspectRatio: false,
+                    scaleShowVerticalLines: false,
                     scales: {
                         x: {
                             ticks: {
+                                display: false
+                            },
+                            grid: {
                                 display: false
                             }
                         },
@@ -414,6 +457,9 @@ class TemperatureLineChart extends React.Component {
                             beginAtZero: true,
                             ticks: {
                                 display: false
+                            },
+                            grid: {
+                                color: 'rgb(255, 255, 255, 0.08)'
                             }
                         }
                     },

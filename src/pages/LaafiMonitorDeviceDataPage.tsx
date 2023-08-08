@@ -1,6 +1,6 @@
 import React from "react";
 import * as signalR from '@microsoft/signalr';
-import { Button, Checkbox, FormControlLabel, Paper } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Paper, Tab, Tabs } from "@mui/material";
 import { TemperaturePieChart, TemperatureLineChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
@@ -8,6 +8,7 @@ import { IReceiveDeviceData } from "../models/receive_device_data";
 import { Api } from "../services/api";
 import { BatteryIcon } from "../components/BatteryIcon";
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from "../constants/temperature";
+import { Marker, Popup } from "react-leaflet";
 
 
 type Props = {
@@ -16,6 +17,10 @@ type Props = {
 
 type State = {
     data: IReceiveDeviceData|null;
+    chartTabIndex: number;
+    temperature: [];
+    humidity: [];
+    exposure: [];
 }
 
 class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
@@ -28,8 +33,14 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
         super(props);
 
         this.state = {
-            data: null
+            data: null,
+            chartTabIndex: 0,
+            temperature: [],
+            humidity: [],
+            exposure: []
         };
+
+        this.listen = this.listen.bind(this);
     }
 
     componentDidMount(): void {
@@ -40,7 +51,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
             .then(() => {
                 this.connection.invoke('SubscribeToGetDeviceData', { DeviceId: 'ID' });
 
-                this.connection.on('ReceiveDeviceData', (data) => this.setState({ data }));
+                this.connection.on('ReceiveDeviceData', this.listen);
             }).catch(err => {
                 console.log(err);
                 // this.setState({ error: true });
@@ -57,9 +68,21 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
         // this.connection.stop()
     }
 
+    listen(data: IReceiveDeviceData) {
+        this.setState((prevState) => {
+            
+
+            return {
+                data
+            };
+        })
+    }
+
     render() {
 
-        const data = this.state.data;
+        const { data, chartTabIndex } = this.state;
+        const position = null;
+        // const position = data == null ? null : { lat: data?.dataSent?.data?.coordinates?.latitude, lng: data?.dataSent?.data?.coordinates?.longitude };
 
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
@@ -235,9 +258,17 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                     </div>
 
                     {/* Map */}
-                    <div className="grow"><NearMap /></div>
+                    <div className="grow">
+                        {position == null
+                            ? (<NearMap />)
+                            : (
+                                <NearMap key='position' center={position}>
+                                    <Marker position={position}><Popup>Accuracy {data?.dataSent?.data?.coordinates?.accuracy}</Popup></Marker>
+                                </NearMap>
+                              )
+                        }
+                    </div>
                 </div>
-
 
                 {/* Last Row */}
                 <div className="mt-4">
@@ -247,18 +278,22 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                         <div className="flex justify-between items-center">
                             <p className="text-[#3C4858] font-medium">Data history</p>
                             <div>
-                                <FormControlLabel control={<Checkbox />} label="Humidity" />
-                                <FormControlLabel control={<Checkbox />} label="Temperature" />
+                                <Box>
+                                    <Tabs
+                                        value={chartTabIndex}
+                                        onChange={(_, index) => this.setState({ chartTabIndex: index })}
+                                    >
+                                        <Tab label='Humidity' />
+                                        <Tab label='Temperature' />
+                                        <Tab label='Exposure' />
+                                    </Tabs>
+                                </Box>
                             </div>
                         </div>
                         <div className="flex justify-end items-center mt-4">
-                            <Paper sx={{ width: '100%', height: '300px', padding: '20px' }}>
+                            <Paper sx={{ width: '100%', height: '300px', padding: '20px', backgroundColor: '#223046' }}>
                                 <TemperatureLineChart />
                             </Paper>
-                        </div>
-
-                        <div className="mt-4">
-                            <Paper sx={{ height: 74 }}></Paper>
                         </div>
                     </Paper>
 

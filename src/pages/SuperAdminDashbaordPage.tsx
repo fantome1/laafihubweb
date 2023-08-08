@@ -384,7 +384,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                             dataBuilder={data => {
                                 const position = { lat: data.coordinates.latitude, lng: data.coordinates.longitude };
                                 return (
-                                    <NearMap key={'infrastructure-position'} center={position}>
+                                    <NearMap key='infrastructure-position' center={position}>
                                         <Marker position={position}><Popup>{data.name}</Popup></Marker>
                                     </NearMap>
                                 );
