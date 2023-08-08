@@ -16,11 +16,11 @@ function CrudMenu(props: Props) {
             anchorPosition={props.position ? { top: props.position.top, left: props.position.left } : undefined}
         >
             {!props.hideView && (<MenuItem onClick={() => props.onSelected('view')}>
-                <ListItemIcon><span className="material-symbols-rounded">edit</span></ListItemIcon>
+                <ListItemIcon><span className="material-symbols-rounded">visibility</span></ListItemIcon>
                 <Typography>Voir</Typography>
             </MenuItem>)}
             <MenuItem onClick={() => props.onSelected('update')}>
-                <ListItemIcon><span className="material-symbols-rounded">visibility</span></ListItemIcon>
+                <ListItemIcon><span className="material-symbols-rounded">edit</span></ListItemIcon>
                 <Typography>Modifier</Typography>
             </MenuItem>
             <MenuItem onClick={() => props.onSelected('delete')}>

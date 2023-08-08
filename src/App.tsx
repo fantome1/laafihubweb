@@ -10,7 +10,7 @@ import OrganizationPage from "./pages/OrganizationPage";
 import SuperAdminDashboardPage from "./pages/SuperAdminDashbaordPage";
 import { SuperAdminUsersPage } from "./pages/SuperAdminUsersPage";
 import LaafiMonitorPage from "./pages/LaafiMonitorPage";
-import LaafiMonitorDeviceDataPage from "./pages/LaafMonitorDeviceDataPage";
+import LaafiMonitorDeviceDataPage from "./pages/LaafiMonitorDeviceDataPage";
 import AnotherLaafiMonitorPage from "./pages/AnotherLaafiMonitorPage";
 import AnotherLaafiMonitorDeviceDataPage from "./pages/AnotherLaafMonitorDeviceDataPage";
 import { NotificationsPage } from "./pages/NotificationsPage";

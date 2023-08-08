@@ -13,7 +13,7 @@ type State = {
 class RealtimeTestPage extends React.PureComponent<Props, State> {
 
     private connection = new signalR.HubConnectionBuilder()
-        .withUrl('http://192.168.99.22:5276/auth/connect', {
+        .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect', {
             // skipNegotiation: false,
             // transport: signalR.HttpTransportType.WebSockets
 
@@ -30,16 +30,16 @@ class RealtimeTestPage extends React.PureComponent<Props, State> {
     }
 
     componentDidMount(): void {
-        if (this.connection.state !=  signalR.HubConnectionState.Disconnected)
+        if (this.connection.state != signalR.HubConnectionState.Disconnected)
             return;
 
         this.connection.start()
             .then(() => {
                 this.setState({ connected: true })
-                this.connection.invoke('SendMessage', 'Willy', 'Hello');
+                this.connection.invoke('SubscribeToGetDeviceData', { DeviceId: 'ID' });
 
-                this.connection.on('a', (args) => {
-
+                this.connection.on('ReceiveDeviceData', (args) => {
+                    console.log(args);
                 });
 
             }).catch(err => {

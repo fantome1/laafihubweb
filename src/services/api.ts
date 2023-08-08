@@ -126,6 +126,18 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
+    static async getDevice(id: string): Promise<IGetDeviceResult> {
+        const response = await fetch(`${this.BASE_URL}/devices/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();  
+    }
+
     static async getDevices(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}): Promise<IGetDeviceResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/devices', {

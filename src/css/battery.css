@@ -1,0 +1,15 @@
+
+
+.battery::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    display: block;
+    width: 20px;
+    height: 8px;
+    background-color: #00a6f9;
+    border-radius: 2px;
+    transform: translateX(-50%);
+}
+

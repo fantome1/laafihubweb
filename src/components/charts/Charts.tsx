@@ -17,6 +17,8 @@ import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { IGetDeviceResult } from '../../models/device_mdoel';
 import { IGetActivitiesResult } from '../../models/activity_model';
+import { MAX_TEMPERATURE, MIN_TEMPERATURE } from '../../constants/temperature';
+import { Utils } from '../../services/utils';
 
 ChartJS.register(
     ArcElement,
@@ -245,32 +247,81 @@ class LaafiMonitorDeviceStatusChart extends React.Component<LaafiMonitorDeviceSt
     }
 }
 
-class TemperatureChart extends React.Component {
+type TemperaturePieChartProps = {
+    temperature?: number|null;
+    thresMaxTemp?: number|null;
+    thresMinTemp?: number|null;
+    maxTemp?: number|null;
+    minTemp?: number|null;
+}
+
+type TemperaturePieChartState = {
+    data: {
+        datasets: {
+            cutout: number, 
+            circumference: number,
+            rotation: number,
+            borderWidth: number[],
+            data: number[],
+            borderRadius: number,
+            backgroundColor: string[],
+        }[]
+    }
+}
+
+class TemperaturePieChart extends React.Component<TemperaturePieChartProps, TemperaturePieChartState> {
 
     private chartRef = React.createRef<ChartJS>()
 
-    private data = {
-        datasets: [
-            {
-              cutout: 98, 
-              circumference: 280,
-              rotation: -140,
-              borderWidth: [0, 0],
-              data: [3.5, 3],
-              borderRadius: 1000,
-              backgroundColor: ['#69ADA7', '#23C4D81F'],
-            }
-        ]
+    constructor(props: TemperaturePieChartProps) {
+        super(props);
+
+        this.state = {
+            data: TemperaturePieChart.getData(0)
+        }
     }
 
-    constructor(props: any) {
-        super(props);
+    componentDidUpdate(prevProps: Readonly<TemperaturePieChartProps>, prevState: Readonly<TemperaturePieChartState>, snapshot?: any): void {
+        if (prevProps.temperature != this.props.temperature
+            || prevProps.minTemp != this.props.minTemp
+            || prevProps.maxTemp != this.props.maxTemp
+            || prevProps.thresMinTemp != this.props.thresMinTemp
+            || prevProps.thresMaxTemp != this.props.thresMaxTemp
+        ) {
+            this.setState({ data: TemperaturePieChart.getData(this.props) });
+        }
+    }
+
+    static getData(props: TemperaturePieChartProps) {
+        const percent = Utils.toPercent(MIN_TEMPERATURE, MAX_TEMPERATURE, props.temperature ?? MIN_TEMPERATURE);
+        return {
+            datasets: [
+                {
+                  cutout: 98, 
+                  circumference: 280,
+                  rotation: -140,
+                  borderWidth: [0, 0],
+                  data: [percent, 1 - percent],
+                  borderRadius: 1000,
+                  backgroundColor: [this.getFillColor(props), '#23C4D81F'],
+                }
+            ]
+        };
+    }
+
+    static getFillColor(props: TemperaturePieChartProps) {
+        const t = props.temperature;
+        if ((props.thresMinTemp && t <= props.thresMinTemp) || (props.thresMaxTemp && t >= props.thresMaxTemp))
+            return '#FFD600';
+        if ((props.minTemp && t <= props.minTemp) || (props.maxTemp && t >= props.maxTemp))
+            return '#F44336';
+        return '#69ADA7';
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                <Chart ref={this.chartRef} type='doughnut' data={this.state.data} options={{
                     responsive: true,
                     plugins: {
                         legend: {
@@ -703,7 +754,7 @@ export {
     LaafiMonitorDeviceUsageChart,
     LaafiMonitorDeviceStatusChart,
     DeviceUsageChart3,
-    TemperatureChart,
+    TemperaturePieChart,
     TemperatureChart2,
     TemperatureLineChart,
     ActivitesConnectionStatusChart,

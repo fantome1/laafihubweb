@@ -74,6 +74,18 @@ class Utils {
         return past.from(now);
     }
 
+    static toPercent(min: number, max: number, value: number) {
+        const start = Math.abs(min);
+        const length = start + max;
+        return (start + value) / length;
+    }
+
+    static clamp(v0: number, v1: number, t: number) {
+        return (1 - t) * v0 + t * v1;
+    }
+
 }
+
+
 
 export { Utils };
