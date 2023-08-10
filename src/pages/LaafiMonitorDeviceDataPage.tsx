@@ -9,16 +9,19 @@ import { Api } from "../services/api";
 import { BatteryIcon } from "../components/BatteryIcon";
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from "../constants/temperature";
 import { Marker, Popup } from "react-leaflet";
+import { NavigateFunction } from "react-router-dom";
+import { routes } from "../constants/routes";
 
 
 type Props = {
+    navigate: NavigateFunction;
     params: Record<string, string>;
 }
 
 type State = {
     data: IReceiveDeviceData|null;
     chartTabIndex: number;
-    temperature: [];
+    temperature: { id: string, value: number, date: string }[];
     humidity: [];
     exposure: [];
 }
@@ -69,20 +72,39 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
     }
 
     listen(data: IReceiveDeviceData) {
-        this.setState((prevState) => {
-            
+        console.log(data);
 
+        if (data.dataSent == null)
+            return;
+
+        this.setState((prevState) => {
             return {
-                data
+                data,
+                temperature: [...prevState.temperature, data.dataSent.data.temperature]
             };
-        })
+        });
+
+        // setInterval(() => {
+        //     this.setState((prevState) => {
+        //         return {
+        //             data,
+        //             temperature: [...prevState.temperature, data.dataSent.data.temperature]
+        //         };
+        //     });
+        // }, 2000)
+
+    }
+
+    goToActivityPage() {
+        if (this.state.data)
+            this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(this.state.data.dataSent.data.activityId));
     }
 
     render() {
 
         const { data, chartTabIndex } = this.state;
-        const position = null;
-        // const position = data == null ? null : { lat: data?.dataSent?.data?.coordinates?.latitude, lng: data?.dataSent?.data?.coordinates?.longitude };
+        // const position = null;
+        const position = data == null ? null : { lat: data?.dataSent?.data?.coordinates?.latitude, lng: data?.dataSent?.data?.coordinates?.longitude };
 
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
@@ -106,16 +128,20 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                                 </div>
                             </div>
 
-                            <div className="mb-2">
+                            <div className="mb-2 flex items-center space-x-4">
                                 <div className="flex items-center space-x-2">
                                     <div className="w-[14px] h-[14px] bg-[#309E3A]"></div>
                                     <p className="text-sm text-[#A2A2A2]">Online</p>
                                 </div>
 
-                                <div className="flex items-center space-x-2">
+                                <div>{data == null || !data.dataSent?.bluetoothConnected ? (<span className="material-symbols-rounded text-base">bluetooth</span>) : (<span className="material-symbols-outlined text-base text-[#309E3A]">bluetooth_connected</span>)}</div>
+
+                                <div onClick={() => this.goToActivityPage()} className="text-sm text-[--primary] font-medium cursor-pointer">View activity</div>
+
+                                {/* <div className="flex items-center space-x-2">
                                     <div className="w-[14px] h-[14px] bg-[#D80303]"></div>
                                     <p className="text-sm text-[#A2A2A2]">Offline</p>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
@@ -283,8 +309,8 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                                         value={chartTabIndex}
                                         onChange={(_, index) => this.setState({ chartTabIndex: index })}
                                     >
-                                        <Tab label='Humidity' />
                                         <Tab label='Temperature' />
+                                        <Tab label='Humidity' />
                                         <Tab label='Exposure' />
                                     </Tabs>
                                 </Box>
@@ -292,7 +318,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                         </div>
                         <div className="flex justify-end items-center mt-4">
                             <Paper sx={{ width: '100%', height: '300px', padding: '20px', backgroundColor: '#223046' }}>
-                                <TemperatureLineChart />
+                                <TemperatureLineChart data={this.state.temperature ?? []} />
                             </Paper>
                         </div>
                     </Paper>

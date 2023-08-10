@@ -379,7 +379,7 @@ class TemperatureChart2 extends React.Component {
 }
 
 type TemperatureLineChartProps = {
-
+    data: ({ id: string, value: number, date: string }|null)[]
 }
 
 type TemperatureLineChartState = {
@@ -395,7 +395,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
 
         this.state = {
             data: {
-                labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
+                labels: [],
                 datasets: [
                     {
                       fill: true,
@@ -404,7 +404,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                       borderColor: '#69ADA7',
                       pointRadius: 0,
                       //   backgroundColor: '#AA69ADA7',
-                      data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
+                      data: []
                     }
                 ]
             }
@@ -412,13 +412,24 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
     }
 
     componentDidMount(): void {
+        this.update()
+    }
+
+    componentDidUpdate(prevProps: Readonly<TemperatureLineChartProps>, prevState: Readonly<TemperatureLineChartState>, snapshot?: any): void {
+        if (prevProps.data != this.props.data) {
+            this.update();
+        }
+    }
+
+    update() {
         const ctx = document.getElementById('temperature-line-chart').getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 260);
         gradient.addColorStop(0, 'rgba(84, 176, 84, 0.4)');
-        gradient.addColorStop(1, 'rgba(84, 176, 84, 0)');
+        gradient.addColorStop(1, 'rgba(84, 176, 84, 0)');        
 
         this.setState({ data: {
-            labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
+            labels: this.props.data.map(v => v == null ? null : v.date.split(' ')[1].substring(0, 5)),
+            // labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
             datasets: [
                 {
                   fill: true,
@@ -431,7 +442,8 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                 // pointHighlightFill: "#fff",
                 // pointHighlightStroke: "#ff6c23",
                   backgroundColor: gradient,
-                  data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
+                  data: this.props.data.map(v => v?.value)
+                //   data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
                 }
             ]
         } })
@@ -443,21 +455,25 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                 <Chart ref={this.chartRef} type='line' data={this.state.data} id='temperature-line-chart' options={{
                     responsive: true,
                     maintainAspectRatio: false,
-                    scaleShowVerticalLines: false,
                     scales: {
                         x: {
                             ticks: {
-                                display: false
+                                // display: false,
+                                autoSkip: true,
+                                stepSize: 1,
+                                maxTicksLimit: 40,
                             },
                             grid: {
-                                display: false
+                                display: false,
+                                // lineWidth: 10
                             }
                         },
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                display: false
-                            },
+                            stacked: true,
+                            // ticks: {
+                            //     display: false
+                            // },
                             grid: {
                                 color: 'rgb(255, 255, 255, 0.08)'
                             }
