@@ -425,10 +425,18 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
         const ctx = document.getElementById('temperature-line-chart').getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 260);
         gradient.addColorStop(0, 'rgba(84, 176, 84, 0.4)');
-        gradient.addColorStop(1, 'rgba(84, 176, 84, 0)');        
+        gradient.addColorStop(1, 'rgba(84, 176, 84, 0)');   
+        
+        const values = [...this.props.data];
+
+        const r = 40 - values.length;
+
+        for (let i=0; i<r; ++i) {
+            values.push(null)
+        }
 
         this.setState({ data: {
-            labels: this.props.data.map(v => v == null ? null : v.date.split(' ')[1].substring(0, 5)),
+            labels: values.map(v => v == null ? null : v.date.split(' ')[1].substring(0, 5)),
             // labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
             datasets: [
                 {
@@ -442,7 +450,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                 // pointHighlightFill: "#fff",
                 // pointHighlightStroke: "#ff6c23",
                   backgroundColor: gradient,
-                  data: this.props.data.map(v => v?.value)
+                  data: values.map(v => v?.value)
                 //   data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
                 }
             ]
@@ -459,7 +467,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                         x: {
                             ticks: {
                                 // display: false,
-                                autoSkip: true,
+                                // autoSkip: true,
                                 stepSize: 1,
                                 maxTicksLimit: 40,
                             },
