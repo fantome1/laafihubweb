@@ -271,7 +271,35 @@ class Api {
     // ###################################################################################################
     // ###################################################################################################
 
-    // L'encadrer en violet pour obtenir les activités d'une infrastructure : https://hub-api-test.laafi-concepts.com/activities?InfrastructureId=LF-I-N1710
+    static async createActivity(data: Record<string, any>): Promise<{ id: string, infrastructureId: string, name: string }> {
+        const response = await fetch(`${this.BASE_URL}/activities`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());;
+        return response.json();
+    }
+
+    static async updateActivityUsers(activityId: string, data: { userId: string, deviceIds: string[] }[]): Promise<{ id: string, infrastructureId: string, name: string }> {
+        const response = await fetch(`${this.BASE_URL}/activities/${activityId}/users`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());;
+        return response.json();
+    }
 
     static async getActivies(options: { InfrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
         const response = await fetch(

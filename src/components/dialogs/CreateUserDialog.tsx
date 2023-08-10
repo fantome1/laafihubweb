@@ -21,8 +21,8 @@ type Props = {
 
 type State = {
     validator: FormValidator|null; // Not [null] juste late
-    error: any;
     formState: FormValidatorData|null;
+    error: any;
 };
 
 // https://hub.laafi-concepts.com/home/dashboard
@@ -41,8 +41,8 @@ class CreateUserDialog extends React.Component<Props, State> {
 
         this.state = {
             validator,
+            formState: validator?.getData ?? null,
             error: null,
-            formState: validator?.getData ?? null
         };
 
         this.listen = this.listen.bind(this);

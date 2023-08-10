@@ -19,6 +19,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { RealtimeTestPage } from "./pages/RealtimeTestPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./mui_theme";
+import CreateActivityPage from "./pages/CreateActivityPage";
 
 function ScrollToTop() {
   const location = useLocation();
@@ -52,6 +53,7 @@ function App() {
             <Route path={routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.route} element={<AnotherLaafiMonitorDeviceDataPage />} />
             <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />
             <Route path={routes.NOTIFICATIONS_2} element={<NotificationsPage2 />} />
+            <Route path={routes.CREATE_ACTIVITY} element={<CreateActivityPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

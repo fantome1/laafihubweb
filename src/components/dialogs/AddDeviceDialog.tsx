@@ -14,8 +14,8 @@ type Props = {
 
 type State = {
     validator: FormValidator;
-    error: any;
     formState: FormValidatorData;
+    error: any;
 };
 
 // FIXME more detailed error message
@@ -28,8 +28,8 @@ class AddDeviceDialog extends React.Component<Props, State> {
 
         this.state = {
             validator,
+            formState: validator.getData,
             error: null,
-            formState: validator.getData
         };
 
         this.listen = this.listen.bind(this);
@@ -48,7 +48,7 @@ class AddDeviceDialog extends React.Component<Props, State> {
     onSubmit() {
         const validator = this.state.validator!;
 
-        if (!validator.validate() || validator!.getData.isLoading)
+        if (!validator.validate() || validator.getData.isLoading)
             return;
 
         const values = validator.getValues();

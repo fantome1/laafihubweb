@@ -19,6 +19,14 @@ class FormValidator {
 
     constructor(private data: FormValidatorData) {}
 
+    static build(
+        fields: Record<string, FormValidatorField<any>>,
+        isValid: boolean = true,
+        isLoading: boolean = false
+    ) {
+        return new FormValidator(new FormValidatorData(fields, isValid, isLoading));
+    }
+
     get getData() {
         return this.data;
     }

@@ -5,9 +5,7 @@ import { Utils } from "../services/utils";
 function getLoginFormValidator() {
     return new FormValidator(
         new FormValidatorData({
-            'organizationId': new FormValidatorField('', {
-                requiredMessage: 'Veuillez renseigner l\'ID de votre organisation'
-            }),
+            'organizationId': new FormValidatorField('', { requiredMessage: 'Veuillez renseigner l\'ID de votre organisation' }),
             'email': new FormValidatorField('', {
                 requiredMessage: 'Veuillez renseigner votre adresse email',
                 validator: (value, _) => {
@@ -17,9 +15,7 @@ function getLoginFormValidator() {
                     return Utils.isEmail(value) ?  null : 'Veuillez renseigner une adresse email valide';
                 },
             }),
-            'password': new FormValidatorField('', {
-                requiredMessage: 'Veuillez renseigner votre mot de passe'
-            })
+            'password': new FormValidatorField('', { requiredMessage: 'Veuillez renseigner votre mot de passe' })
         })
     );
 }

@@ -84,6 +84,18 @@ class Utils {
         return (1 - t) * v0 + t * v1;
     }
 
+    static isValidNumber(value: string) {
+        if (value.includes(','))
+            value = value.replace(',', '.');
+        return !isNaN(parseFloat(value));
+    }
+
+    static parseNumber(value: string) {
+        if (value.includes(','))
+            value = value.replace(',', '.');
+        return parseFloat(value);
+    }
+
 }
 
 

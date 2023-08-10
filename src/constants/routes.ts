@@ -22,7 +22,8 @@ const routes = {
         build: (id: string) => `/another-laafi-monitor-device-data/${id}`
     },
     NOTIFICATIONS: '/notifications',
-    NOTIFICATIONS_2: '/notifications-2'
+    NOTIFICATIONS_2: '/notifications-2',
+    CREATE_ACTIVITY: '/create-activity'
 };
 
 export { routes };

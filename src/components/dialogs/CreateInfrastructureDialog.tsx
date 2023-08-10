@@ -17,8 +17,8 @@ type Props = {
 
 type State = {
     validator: FormValidator|null; // Not [null] juste late
-    error: any;
     formState: FormValidatorData|null;
+    error: any;
     chooseLocationCompleter: Completer<{ latitude: number, longitude: number }|null>|null;
 };
 
@@ -36,8 +36,8 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
 
         this.state = {
             validator,
-            error: null,
             formState: validator?.getData ?? null,
+            error: null,
             chooseLocationCompleter: null
         };
 
