@@ -23,7 +23,11 @@ const routes = {
     },
     NOTIFICATIONS: '/notifications',
     NOTIFICATIONS_2: '/notifications-2',
-    CREATE_ACTIVITY: '/create-activity'
+    CREATE_ACTIVITY: '/create-activity',
+    MODIFY_ACTIVITY: {
+        route: '/update-activity/:id',
+        build: (id: string) => `/update-activity/${id}`
+    }
 };
 
 export { routes };

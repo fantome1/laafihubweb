@@ -16,15 +16,18 @@ import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Completer } from "../services/completer";
 import { SelectedUsersDevicesDialog } from "../components/dialogs/SelectedUserDevicesDialog";
 import { routes } from "../constants/routes";
+import moment from "moment";
 
 type Props = {
     navigate: NavigateFunction;
+    params: Record<string, string>;
 }
 
 type State = {
-    validator: FormValidator;
-    formState: FormValidatorData;
+    validator: FormValidator|null;
+    formState: FormValidatorData|null;
     error: any;
+    fetchError: any;
     infrastructurePromise: Promise<IInfrastructure[]>|null;
     usersPromise: Promise<IGetUsersResult>|null;
     selectedUsersId: Set<string>;
@@ -38,16 +41,22 @@ async function getInfrastructures() {
 }
 
 class CreateActivityPage extends React.Component<Props, State> {
+    
+    private readonly isEdit: boolean;
+    private isPermanant: boolean;
 
     constructor(props: Props) {
         super(props);
 
-        const validator = getCreateActivityValidator();
+        this.isEdit = location.pathname != routes.CREATE_ACTIVITY;
+        this.isPermanant = false;
+        const validator = this.isEdit ? null : getCreateActivityValidator();
 
         this.state = {
             validator,
-            formState: validator.getData,
+            formState: validator?.getData ?? null,
             error: null,
+            fetchError: null,
             infrastructurePromise: null,
             usersPromise: null,
             selectedUsersId: new Set(),
@@ -57,12 +66,24 @@ class CreateActivityPage extends React.Component<Props, State> {
 
         this.listen = this.listen.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-        validator.listen(this.listen);
+        validator?.listen(this.listen);
 
     }
 
     componentDidMount(): void {
         this.setState({ infrastructurePromise: getInfrastructures() });
+
+        if (this.isEdit) {
+            Api.getActivity(this.props.params.id)
+                .then(value => {
+                    this.isPermanant = value.type == 'Permanent';                
+                    const validator = getCreateActivityValidator(value);
+                    validator.listen(this.listen);
+                    this.setState({ validator, formState: validator.getData });
+                }).catch(err => {
+                    this.setState({ fetchError: err });
+                });
+        }
     }
 
     listen(data: FormValidatorData) {
@@ -79,12 +100,11 @@ class CreateActivityPage extends React.Component<Props, State> {
                 devices: {}
             });
         }
-
     }
 
     async onSubmit() {
 
-        const validator = this.state.validator;
+        const validator = this.state.validator!;
 
         if (!validator.validate() || validator.getData.isLoading)
             return;
@@ -108,50 +128,55 @@ class CreateActivityPage extends React.Component<Props, State> {
                 temperatureCover: Utils.parseNumber(values.temperatureCover),
                 humidityCover: Utils.parseNumber(values.humidityCover),
             },
-            activitySetupOption: {
+            setupOption: {
                 reminderDate: values.reminderDate.toISOString(),
                 startDate: values.startDate.toISOString(),
                 endDate: values.endDate?.toISOString()
+            },
+            statusOptions: {
+                isFavorite: true,
+                stop: true
             }
         }
 
         let activityId: string|null = null;
 
         try {
-            const result = await Api.createActivity(data);
-            console.log(result);
-
+            const promise = this.isEdit ? Api.modifyActivity(this.props.params.id, data) : Api.createActivity(data)
+            const result = await promise;
             activityId = result.id;
         } catch (err) {
-            console.log(err);
             validator.setLoadingStatus(false);
             this.setState({ error: err });
             return;
         }
-        
+
         const userData = Object.entries(this.state.devices)
             .filter(v => this.state.selectedUsersId.has(v[0]))
             .map(v => ({ userId: v[0], deviceIds: v[1] }));
 
         if (userData.length == 0) {
+            this.navigateAfterSubmit();
             this.props.navigate(routes.ANOTHER_LAAFI_MONITOR, { replace: false });
             return;
         }
 
         try {
-
             const result = await Api.updateActivityUsers(activityId, userData);
             validator.setLoadingStatus(false);
-
-            console.log('result 2', result);
-
-            this.props.navigate(routes.ANOTHER_LAAFI_MONITOR, { replace: false });
+            this.navigateAfterSubmit();
         } catch(err) {
-            console.log('Error 2', err);
-
             validator.setLoadingStatus(false);
             this.setState({ error: err });
             return;
+        }
+    }
+
+    navigateAfterSubmit() {
+        if (this.isEdit) {
+            this.props.navigate(-1);
+        } else {
+            this.props.navigate(routes.ANOTHER_LAAFI_MONITOR, { replace: false }); 
         }
     }
 
@@ -185,23 +210,31 @@ class CreateActivityPage extends React.Component<Props, State> {
 
     render() {
 
-        const { formState, selectedUsersId, devicesDialogData } = this.state;
-        const nameField = formState.fields.name;
-        const typeField = formState.fields.type;
-        const infrastructureField = formState.fields.infrastructure;
-        const remindAtField = formState.fields.reminderDate;
-        const startDateField = formState.fields.startDate;
-        const endDateField = formState.fields.endDate;
+        if (this.isEdit && this.state.validator == null) {
+            if (this.state.fetchError) {
+                return (<div className="max-w-3xl mx-auto py-16 text-lg text-red-500 text-center">Une erreur s'est produite</div>)
+            } else {
+                return (<div className="max-w-3xl mx-auto py-16 text-red-500 flex justify-center"><CircularProgress color="inherit" /></div>);
+            }
+        }
 
-        const tempMinField = formState.fields.temperatureMin;
-        const tempMaxField = formState.fields.temperatureMax;
-        const tempMinTresField = formState.fields.temperatureMinSeul;
-        const tempMaxTresField = formState.fields.temperatureMaxSeul;
-        const humidityMinField = formState.fields.humidityMin;
-        const humidityMaxField = formState.fields.humidityMax;
-        const minuteCoverField = formState.fields.minuteCover;
-        const tempCoverField = formState.fields.temperatureCover;
-        const humidityCoverField = formState.fields.humidityCover;
+        const { formState, selectedUsersId, devicesDialogData } = this.state;
+        const nameField = formState!.fields.name;
+        const typeField = formState!.fields.type;
+        const infrastructureField = formState!.fields.infrastructure;
+        const remindAtField = formState!.fields.reminderDate;
+        const startDateField = formState!.fields.startDate;
+        const endDateField = formState!.fields.endDate;
+
+        const tempMinField = formState!.fields.temperatureMin;
+        const tempMaxField = formState!.fields.temperatureMax;
+        const tempMinTresField = formState!.fields.temperatureMinSeul;
+        const tempMaxTresField = formState!.fields.temperatureMaxSeul;
+        const humidityMinField = formState!.fields.humidityMin;
+        const humidityMaxField = formState!.fields.humidityMax;
+        const minuteCoverField = formState!.fields.minuteCover;
+        const tempCoverField = formState!.fields.temperatureCover;
+        const humidityCoverField = formState!.fields.humidityCover;
 
         return (
             <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -211,6 +244,7 @@ class CreateActivityPage extends React.Component<Props, State> {
 
                     <div className="flex space-x-2">
                         <TextField
+                            value={nameField.value}
                             label='Activity Name'
                             fullWidth
                             onChange={v => this.onChanged('name', v.target.value)}
@@ -218,7 +252,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                             helperText={nameField.errorMessage}
                         />
 
-                        <FormControl fullWidth error={Boolean(typeField.errorMessage)}>
+                        <FormControl fullWidth error={Boolean(typeField.errorMessage)} disabled={this.isEdit && this.isPermanant}>
                             <InputLabel id="type-select">Type</InputLabel>
                             <Select
                                 labelId="type-select"
@@ -232,19 +266,22 @@ class CreateActivityPage extends React.Component<Props, State> {
                     </div>
 
                     <div className="flex space-x-2 mt-4">
-                        <PromiseSelect
-                            id='Infrasrtruture'
-                            label="Infrasrtruture"
-                            value={infrastructureField.value ?? ''}
-                            promise={this.state.infrastructurePromise}
-                            onChange={value => this.onChanged('infrastructure', value.target.value)}
-                            getValue={value => value.id}
-                            getLabel={value => value.name}
-                            errorMessage={infrastructureField.errorMessage}
-                        />
+                        {this.isEdit
+                            ? (<TextField label='Infrasrtruture' fullWidth disabled />)
+                            : (<PromiseSelect
+                                id='Infrasrtruture'
+                                label="Infrasrtruture"
+                                value={infrastructureField.value ?? ''}
+                                promise={this.state.infrastructurePromise}
+                                onChange={value => this.onChanged('infrastructure', value.target.value)}
+                                getValue={value => value.id}
+                                getLabel={value => value.name}
+                                errorMessage={infrastructureField.errorMessage}
+                            />)}
 
                         <DateTimePicker
-                            label="Remind at"
+                            defaultValue={remindAtField.value ? moment(remindAtField.value) : null}
+                            label="Remind date"
                             ampm={false}
                             format="DD/MM/YYYY HH:mm"
                             onChange={(value: any) => this.onChanged('reminderDate', value._d)}
@@ -252,7 +289,8 @@ class CreateActivityPage extends React.Component<Props, State> {
                                 textField: {
                                     error: Boolean(remindAtField.errorMessage),
                                     helperText: remindAtField.errorMessage,
-                                    fullWidth: true
+                                    fullWidth: true,
+                                    disabled: this.isEdit
                                 }
                             }}
                         />
@@ -260,7 +298,8 @@ class CreateActivityPage extends React.Component<Props, State> {
 
                     <div className="flex space-x-2 mt-4">
                         <DateTimePicker
-                            label="Start At"
+                            defaultValue={startDateField.value ? moment(startDateField.value) : null}
+                            label="Start date"
                             ampm={false}
                             format="DD/MM/YYYY HH:mm"
                             onChange={(value: any) => this.onChanged('startDate', value._d)}
@@ -268,13 +307,15 @@ class CreateActivityPage extends React.Component<Props, State> {
                                 textField: {
                                     error: Boolean(startDateField.errorMessage),
                                     helperText: startDateField.errorMessage,
-                                    fullWidth: true
+                                    fullWidth: true,
+                                    disabled: this.isEdit
                                 }
                             }}
                         />
 
                         <DateTimePicker
-                            label="End At"
+                            defaultValue={endDateField.value ? moment(endDateField.value) : null}
+                            label="End date"
                             ampm={false}
                             format="DD/MM/YYYY HH:mm"
                             onChange={(value: any) => this.onChanged('endDate', value._d)}
@@ -282,7 +323,8 @@ class CreateActivityPage extends React.Component<Props, State> {
                                 textField: {
                                     error: Boolean(endDateField.errorMessage),
                                     helperText: endDateField.errorMessage,
-                                    fullWidth: true
+                                    fullWidth: true,
+                                    disabled: typeField.value == 0
                                 }
                             }}
                         />
@@ -293,6 +335,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                     
                     <div className="flex space-x-2 mt-2">
                         <TextField
+                            defaultValue={tempMinField.value}
                             label='Min'
                             fullWidth
                             onChange={v => this.onChanged('temperatureMin', v.target.value)}
@@ -302,6 +345,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         />
 
                         <TextField
+                            defaultValue={tempMaxField.value}
                             label='Max'
                             fullWidth
                             onChange={v => this.onChanged('temperatureMax', v.target.value)}
@@ -311,6 +355,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         />
 
                         <TextField
+                            defaultValue={tempMinTresField.value}
                             label='Min. threshold'
                             fullWidth
                             onChange={v => this.onChanged('temperatureMinSeul', v.target.value)}
@@ -320,6 +365,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         />
 
                         <TextField
+                            defaultValue={tempMaxTresField.value}
                             label='Max. threshold'
                             fullWidth
                             onChange={v => this.onChanged('temperatureMaxSeul', v.target.value)}
@@ -334,6 +380,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                     
                     <div className="flex space-x-2 mt-2">
                         <TextField
+                            defaultValue={humidityMinField.value}
                             label='Min'
                             fullWidth
                             onChange={v => this.onChanged('humidityMin', v.target.value)}
@@ -343,6 +390,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         />
 
                         <TextField
+                            defaultValue={humidityMaxField.value}
                             label='Max'
                             fullWidth
                             onChange={v => this.onChanged('humidityMax', v.target.value)}
@@ -359,6 +407,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                     
                     <div className="flex space-x-2 mt-2">
                         <TextField
+                            defaultValue={minuteCoverField.value}
                             label='Minute'
                             fullWidth
                             onChange={v => this.onChanged('minuteCover', v.target.value)}
@@ -368,6 +417,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         />
 
                         <TextField
+                            defaultValue={tempCoverField.value}
                             label='Temperature'
                             fullWidth
                             onChange={v => this.onChanged('temperatureCover', v.target.value)}
@@ -377,6 +427,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         />
 
                         <TextField
+                            defaultValue={humidityCoverField.value}
                             label='Humidity'
                             fullWidth
                             onChange={v => this.onChanged('humidityCover', v.target.value)}
@@ -389,7 +440,7 @@ class CreateActivityPage extends React.Component<Props, State> {
                         <div className="w-full"></div>
                     </div>
                     
-                    {infrastructureField.value && (
+                    {infrastructureField.value && !this.isEdit && (
                         <div>
                             <div className="mt-16 mb-1 text-lg">Select users with thier devices</div>
 
@@ -428,11 +479,11 @@ class CreateActivityPage extends React.Component<Props, State> {
 
                         <LoadingButton
                             variant="contained"
-                            loading={formState.isLoading}
-                            disabled={!formState.isValid}
+                            loading={formState!.isLoading}
+                            disabled={!formState!.isValid}
                             onClick={this.onSubmit}
                             sx={{ width: 128, color: "#fff" }}
-                        >Save</LoadingButton>
+                        >{this.isEdit ? 'Update' : 'Save'}</LoadingButton>
                     </div>
 
                 </div>

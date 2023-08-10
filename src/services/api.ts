@@ -1,4 +1,4 @@
-import { IGetActivitiesResult } from "../models/activity_model";
+import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { IGetDeviceResult } from "../models/device_mdoel";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { IGetUsersResult, IUser } from "../models/user_model";
@@ -286,6 +286,21 @@ class Api {
         return response.json();
     }
 
+    static async modifyActivity(actvityId: string, data: Record<string, any>): Promise<{ id: string, infrastructureId: string, name: string }> {
+        const response = await fetch(`${this.BASE_URL}/activities/${actvityId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());;
+        return response.json();
+    }
+
     static async updateActivityUsers(activityId: string, data: { userId: string, deviceIds: string[] }[]): Promise<{ id: string, infrastructureId: string, name: string }> {
         const response = await fetch(`${this.BASE_URL}/activities/${activityId}/users`, {
             method: 'PUT',
@@ -301,9 +316,21 @@ class Api {
         return response.json();
     }
 
-    static async getActivies(options: { InfrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
+    static async getActivities(options: { InfrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/activities', { query: options }), {
+                headers: {
+                    'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+                }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
+    static async getActivity(activityId: string): Promise<IActivity> {
+        const response = await fetch(`${this.BASE_URL}/activities/${activityId}`, {
                 headers: {
                     'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
                 }

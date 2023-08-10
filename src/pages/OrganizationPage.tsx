@@ -70,7 +70,7 @@ class OrganizationPage extends React.Component<Props, State> {
             infrastructuresPromise: Api.getInfrastructures(),
             usersPromise: Api.getUsers(),
             devicesPromise: Api.getDevices(),
-            activitesPromise: Api.getActivies()
+            activitesPromise: Api.getActivities()
         });
     }
 

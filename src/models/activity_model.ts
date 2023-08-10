@@ -8,6 +8,7 @@ interface IActivity {
     characteristic: { humidityMax: number, humidityMin: number, minuteCover: number, temperatureCover?: number, temperatureMax: number, temperatureMaxSeul?: number, temperatureMin: number, temperatureMinSeul?: number, tumidityCover?: number },
     infrastructureName: string;
     isFavorite: boolean;
+    setupOption: { startDate: string, endDate: string, reminderDate: string },
     startedDate: string;
     endDate: string|null;
     totalDevices: number;

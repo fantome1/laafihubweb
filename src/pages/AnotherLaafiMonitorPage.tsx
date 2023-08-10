@@ -44,7 +44,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
     componentDidMount(): void {
         this.setState({
-            promise: Api.getActivies(),
+            promise: Api.getActivities(),
             devicesPromise: Api.getDevices()
         });
     }
@@ -74,7 +74,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
             .then(() => {
                 this.setState({
                     snackbarData: { severity: 'success', message: 'Activité supprimé avec succès' },
-                    promise: Api.getActivies()
+                    promise: Api.getActivities()
                 });
             }).catch(err => {
                 console.log('err', err);

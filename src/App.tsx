@@ -54,6 +54,7 @@ function App() {
             <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />
             <Route path={routes.NOTIFICATIONS_2} element={<NotificationsPage2 />} />
             <Route path={routes.CREATE_ACTIVITY} element={<CreateActivityPage />} />
+            <Route path={routes.MODIFY_ACTIVITY.route} element={<CreateActivityPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

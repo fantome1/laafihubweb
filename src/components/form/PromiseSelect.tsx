@@ -10,13 +10,14 @@ type Props<T> = {
     getValue: (value: T) => string;
     getLabel: (value: T) => string;
     errorMessage?: string|null;
+    disabled?: boolean;
 }
 
 function PromiseSelect<T>(props: Props<T>) {
     return <PromiseBuilder
         promise={props.promise}
         dataBuilder={(items) => (
-            <FormControl fullWidth error={Boolean(props.errorMessage)}>
+            <FormControl fullWidth error={Boolean(props.errorMessage)} disabled={props.disabled}>
                 <InputLabel id={props.id}>{props.label}</InputLabel>
                 <Select
                     labelId={props.id}
@@ -29,7 +30,7 @@ function PromiseSelect<T>(props: Props<T>) {
             </FormControl>
         )}
         loadingBuilder={() => (
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={props.disabled}>
                 <InputLabel id="type-select">{props.label}</InputLabel>
                 <Select label={props.label} value='' IconComponent={() => (<div className="mr-1"><CircularProgress size={24} /></div>)}>
                     <MenuItem><CircularProgress /> <span className="pl-2">chargement...</span></MenuItem>
@@ -37,7 +38,7 @@ function PromiseSelect<T>(props: Props<T>) {
             </FormControl>
         )}
         errorBuilder={(props) => (
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={props.disabled}>
                 <InputLabel id="type-select">{props.label}</InputLabel>
                 <Select label={props.label} value=''></Select>
             </FormControl>

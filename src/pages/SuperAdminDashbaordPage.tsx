@@ -1,7 +1,6 @@
 import React from "react";
 import { Alert, AlertColor, Paper, Skeleton, Snackbar } from "@mui/material";
 import { NearMap } from "../components/NearMap";
-import { EntityCountCard } from "../components/EntityCountCard";
 import { IInfrastructure } from "../models/infrastructure_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { WithRouter } from "../components/WithRouterHook";
@@ -75,7 +74,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             promise: Api.getInfrastructure(this.props.params.id),
             usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
             devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
-            activitesPromise: Api.getActivies({ InfrastructureId: this.props.params.id })
+            activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
         });
     }
 
@@ -191,6 +190,30 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 });
     }
 
+    async onDeleteActivity(activityId: string) {
+
+        const completer = new Completer<boolean>();
+        this.setState({ deleteConfirmation: { completer, title: 'Cette action est irréversible', description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam' } });
+
+        const result = await completer.promise;
+        this.setState({ deleteConfirmation: null });
+
+        if (result != true)
+            return;
+
+            Api.deleteActivity(activityId)
+                .then(() => {
+                    this.setState({
+                        snackbarData: { severity: 'success', message: 'Activité supprimé avec succès' },
+                        devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+                        activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
+                    });
+                }).catch(err => {
+                    console.log('err', err);
+                    this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' } });
+                });
+    }
+
     onUserMenuContext(event: React.MouseEvent, userId: string) {
         event.preventDefault();
         this.setState({ userContextMenu: { left: event.clientX + 2, top: event.clientY - 6, userId } });
@@ -236,6 +259,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         switch(value) {
             case 'view':
                 this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(this.state.activityContextMenu!.activityId))
+            break;
+            case 'update':
+                this.props.navigate(routes.MODIFY_ACTIVITY.build(this.state.activityContextMenu!.activityId));
+            break;
+            case 'delete':
+                this.onDeleteActivity(this.state.activityContextMenu!.activityId);
             break;
         }
 
