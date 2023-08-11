@@ -138,7 +138,7 @@ class Api {
         return response.json();  
     }
 
-    static async getDevices(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}): Promise<IGetDeviceResult> {
+    static async getDevices(options: { InfrastructureId?: string, NotEnrolled?: 'true', NotInActivity?: 'true' } = {}): Promise<IGetDeviceResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/devices', {
                 query: options

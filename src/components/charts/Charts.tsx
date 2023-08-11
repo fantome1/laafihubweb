@@ -438,9 +438,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
             && prevProps.maxTemp != this.props.maxTemp
             && prevProps.minTempTres != this.props.minTempTres
             && prevProps.maxTempTres != this.props.maxTempTres
-        ) {
-            console.log('changed');
-            
+        ) {            
             this.setState({ annotation: [
                 { type: 'line', yMin: this.props.minTempTres, yMax: this.props.minTempTres, borderColor: '#F9A825', borderWidth: 1 },
                 { type: 'line', yMin: this.props.maxTempTres, yMax: this.props.maxTempTres, borderColor: '#F9A825', borderWidth: 1 },

@@ -30,7 +30,7 @@ class SelectedUsersDevicesDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ promise: Api.getDevices({ InfrastructureId: this.props.infrastructureId }) });
+        this.setState({ promise: Api.getDevices({ InfrastructureId: this.props.infrastructureId, NotInActivity: 'true' }) });
     }
 
     onSubmit() {
