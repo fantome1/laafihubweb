@@ -19,6 +19,7 @@ import { IGetDeviceResult } from '../../models/device_mdoel';
 import { IGetActivitiesResult } from '../../models/activity_model';
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from '../../constants/temperature';
 import { Utils } from '../../services/utils';
+import annotationPlugin from 'chartjs-plugin-annotation';
 
 ChartJS.register(
     ArcElement,
@@ -31,7 +32,8 @@ ChartJS.register(
     DoughnutController,
     BarController,
     PieController,
-    Filler
+    Filler,
+    annotationPlugin
 );
 
 type LaafiMonitorDeviceUsageChartProps = {
@@ -379,11 +381,16 @@ class TemperatureChart2 extends React.Component {
 }
 
 type TemperatureLineChartProps = {
-    data: ({ id: string, value: number, date: string }|null)[]
+    data: ({ id: string, value: number, date: string }|null)[];
+    minTemp?: number;
+    maxTemp?: number;
+    minTempTres?: number;
+    maxTempTres?: number;
 }
 
 type TemperatureLineChartState = {
-
+    annotation: [],
+    data: any;
 }
 
 class TemperatureLineChart extends React.Component<TemperatureLineChartProps, TemperatureLineChartState> {
@@ -394,6 +401,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
         super(props);
 
         this.state = {
+            annotation: [],
             data: {
                 labels: [],
                 datasets: [
@@ -416,21 +424,43 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
     }
 
     componentDidUpdate(prevProps: Readonly<TemperatureLineChartProps>, prevState: Readonly<TemperatureLineChartState>, snapshot?: any): void {
+        console.log(this.props);
+        
         if (prevProps.data != this.props.data) {
             this.update();
+        }
+
+        if (this.props.minTemp != undefined
+            && this.props.maxTemp != undefined
+            && this.props.minTempTres != undefined
+            && this.props.maxTempTres != undefined
+            && prevProps.minTemp != this.props.minTemp
+            && prevProps.maxTemp != this.props.maxTemp
+            && prevProps.minTempTres != this.props.minTempTres
+            && prevProps.maxTempTres != this.props.maxTempTres
+        ) {
+            console.log('changed');
+            
+            this.setState({ annotation: [
+                { type: 'line', yMin: this.props.minTempTres, yMax: this.props.minTempTres, borderColor: '#F9A825', borderWidth: 1 },
+                { type: 'line', yMin: this.props.maxTempTres, yMax: this.props.maxTempTres, borderColor: '#F9A825', borderWidth: 1 },
+                { type: 'line', yMin: this.props.minTemp, yMax: this.props.minTemp, borderColor: '#F44336', borderWidth: 1 },
+                { type: 'line', yMin: this.props.maxTemp, yMax: this.props.maxTemp, borderColor: '#F44336', borderWidth: 1 }
+            ] });
         }
     }
 
     update() {
+        const colors = this.getColors();
         const ctx = document.getElementById('temperature-line-chart').getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-        gradient.addColorStop(0, 'rgba(84, 176, 84, 0.4)');
-        gradient.addColorStop(1, 'rgba(84, 176, 84, 0)');   
-        
+        gradient.addColorStop(0, colors.start);
+        gradient.addColorStop(1, colors.end);
+
         const values = [...this.props.data];
+        // const values = [{ value: 10, date: 'a a' },{ value: -15, date: 'a a' }, { value: -8, date: 'a a' }, { value: 4, date: 'a a' }, { value: 15, date: 'a a' }, { value: 20, date: 'a a' }, { value: 30, date: 'a a' },];
 
         const r = 40 - values.length;
-
         for (let i=0; i<r; ++i) {
             values.push(null)
         }
@@ -443,18 +473,28 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                   fill: true,
                   // tension: 0.1,
                   borderWidth: 1,
-                  borderColor: '#54b054',
+                  borderColor: colors.color,
                   pointRadius: 0,
-                //   pointColor : "#fff",
-                // pointStrokeColor : "#ff6c23",
-                // pointHighlightFill: "#fff",
-                // pointHighlightStroke: "#ff6c23",
+                  // pointColor : "#fff",
+                  // pointStrokeColor : "#ff6c23",
+                  // pointHighlightFill: "#fff",
+                  // pointHighlightStroke: "#ff6c23",
                   backgroundColor: gradient,
                   data: values.map(v => v?.value)
                 //   data: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100))
                 }
             ]
         } })
+    }
+
+    getColors() {
+        const value = this.props.data[this.props.data.length - 1];
+
+        if (value <= this.props.minTemp || value >= this.props.maxTemp)
+            return { color: '#F44336', start: 'rgba(244, 67, 54, 0.4)', end: 'rgba(244, 67, 54, 0)' };
+        if (value <= this.props.minTempTres || value >= this.props.maxTempTres)
+            return { color: '#F9A825', start: 'rgba(249, 168, 37, 0.4)', end: 'rgba(249, 168, 37, 0)' };
+        return { color: '#54b054', start: 'rgba(84, 176, 84, 0.4)', end: 'rgba(84, 176, 84, 0)' };
     }
 
     render() {
@@ -478,7 +518,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                         },
                         y: {
                             beginAtZero: true,
-                            stacked: true,
+                            // stacked: true,
                             // ticks: {
                             //     display: false
                             // },
@@ -493,8 +533,12 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
                         },
                         datalabels: {
                             display: false
+                        },
+                        annotation: {
+                            annotations: this.state.annotation
                         }
                     },
+                    
                 }} />
             </div>
         );

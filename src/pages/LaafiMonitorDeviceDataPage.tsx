@@ -318,7 +318,13 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                         </div>
                         <div className="flex justify-end items-center mt-4">
                             <Paper sx={{ width: '100%', height: '300px', padding: '20px', backgroundColor: '#223046' }}>
-                                <TemperatureLineChart data={this.state.temperature ?? []} />
+                                <TemperatureLineChart
+                                    data={this.state.temperature ?? []}
+                                    minTemp={data?.dataSent?.data?.characteristics?.minTemp}
+                                    maxTemp={data?.dataSent?.data?.characteristics?.maxTemp}
+                                    minTempTres={data?.dataSent?.data?.characteristics?.thresMinTemp}
+                                    maxTempTres={data?.dataSent?.data?.characteristics?.thresMaxTemp}
+                                />
                             </Paper>
                         </div>
                     </Paper>
