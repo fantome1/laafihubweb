@@ -22,6 +22,13 @@ function parseDate(value?: string) {
 }
 
 function getCreateActivityValidator(value?: IActivity) {
+    return [
+        getInformationBloc(value),
+        getCharacteristicBloc(value)
+    ];
+}
+
+function getInformationBloc(value?: IActivity) {
     return FormValidator.build({
         'name': new FormValidatorField(value?.name ?? '', { requiredMessage: 'Veuillez donner un nom à l\'actvité' }),
         'type': new FormValidatorField<number|null>(getTypeIndex(value?.type), { requiredMessage: 'Veuillez choisir une valeur' }),
@@ -50,6 +57,11 @@ function getCreateActivityValidator(value?: IActivity) {
                 return value.toString() == 'Invalid Date' ? 'Veuillez renseigner une date valide' : null;
             }
         }),
+    });
+}
+
+function getCharacteristicBloc(value?: IActivity) {
+    return FormValidator.build({
         'temperatureMin': new FormValidatorField<string>(value?.characteristic?.temperatureMin?.toString() ?? '', {
             requiredMessage: 'Veuillez renseigner une valeur',
             validator: (value) => {
@@ -98,23 +110,7 @@ function getCreateActivityValidator(value?: IActivity) {
                 return Utils.isValidNumber(value) ? null : 'Veuillez renseigner un nombre invalide';
             }
         }),
-        'minuteCover': new FormValidatorField<string>(value?.characteristic?.minuteCover?.toString() ?? '', {
-            requiredMessage: 'Veuillez renseigner une valeur',
-            validator: (value) => {
-                if (value == '')
-                    return null;
-                return Utils.isValidNumber(value) ? null : 'Veuillez renseigner un nombre invalide';
-            }
-        }),
-        'temperatureCover': new FormValidatorField<string>(value?.characteristic?.temperatureCover?.toString() ?? '', {
-            requiredMessage: 'Veuillez renseigner une valeur',
-            validator: (value) => {
-                if (value == '')
-                    return null;
-                return Utils.isValidNumber(value) ? null : 'Veuillez renseigner un nombre invalide';
-            }
-        }),
-        'humidityCover': new FormValidatorField<string>(value?.characteristic?.temperatureCover?.toString() ?? '', {
+        'exposureDelay': new FormValidatorField<string>(value?.characteristic?.minuteCover?.toString() ?? '', {
             requiredMessage: 'Veuillez renseigner une valeur',
             validator: (value) => {
                 if (value == '')

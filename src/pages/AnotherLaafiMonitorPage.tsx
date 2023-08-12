@@ -185,8 +185,8 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                                 <td>{data.infrastructureName}</td>
                                                 <td>
                                                     <div className="flex justify-center items-center space-x-1">
-                                                        <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#309E3A]' : 'text-[#999999]'} cursor-pointer`}>play_circle</span>
-                                                        <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#999999]' : 'text-[#0038FF]'} cursor-pointer`}>stop_circle</span>
+                                                        <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#309E3A]' : 'text-[#999999]'} cursor-pointer`}>play_circle</span> {/* stop_circle: #0038FF */}
+                                                        <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#999999]' : 'text-[#FDD835]'} cursor-pointer`}>star</span>
                                                         <span onClick={(e) => {
                                                             e.stopPropagation();
                                                             this.onDelete(data)

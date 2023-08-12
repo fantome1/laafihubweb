@@ -219,7 +219,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({ userContextMenu: { left: event.clientX + 2, top: event.clientY - 6, userId } });
     }
 
-    onSelectedUserMenuAction(value: 'view'|'update'|'delete') {
+    onSelectedUserMenuAction(value: string) {
         switch(value) {
             case 'update':
                 this.showUpdateUserDialog(this.state.userContextMenu!.userId);
@@ -237,7 +237,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({ deviceContextMenu: { left: event.clientX + 2, top: event.clientY - 6, deviceId } });
     }
 
-    onSelectedDeviceMenuAction(value: 'view'|'update'|'delete') {
+    onSelectedDeviceMenuAction(value: string) {
         switch(value) {
             case 'view':
                 this.props.navigate(routes.LAAFI_MONITOR_DEVICE_DATA.build(this.state.deviceContextMenu!.deviceId))
@@ -255,7 +255,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({ activityContextMenu: { left: event.clientX + 2, top: event.clientY - 6, activityId } });
     }
 
-    onSelectedActivityMenuAction(value: 'view'|'update'|'delete') {
+    onSelectedActivityMenuAction(value: string) {
         switch(value) {
             case 'view':
                 this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(this.state.activityContextMenu!.activityId))
@@ -540,19 +540,35 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 </Snackbar>
 
                 <CrudMenu
+                    actions={[
+                        { action: 'view', label: 'View', icon: 'visibility' },
+                        { action: 'update', label: 'Edit', icon: 'edit' },
+                        { action: 'delete', label: 'Delete from infrastructure', icon: 'delete', color: 'text-red-500' }
+                    ]}
                     position={state.userContextMenu}
                     onSelected={this.onSelectedUserMenuAction}
                     onClose={() => this.setState({ userContextMenu: null })}
-                    hideView={true}
                 />
 
                 <CrudMenu
+                    actions={[
+                        { action: 'view', label: 'View', icon: 'visibility' },
+                        { action: 'update', label: 'Edit', icon: 'edit' },
+                        { action: 'delete', label: 'Delete from infrastructure', icon: 'delete', color: 'text-red-500' }
+                    ]}
                     position={state.deviceContextMenu}
                     onSelected={this.onSelectedDeviceMenuAction}
                     onClose={() => this.setState({ deviceContextMenu: null })}
                 />
 
                 <CrudMenu
+                    actions={[
+                        { action: 'start_or_stop', label: 'Start', icon: 'play_arrow' },
+                        { action: 'star', label: 'Set as favorite', icon: 'star' },
+                        { action: 'view', label: 'View', icon: 'visibility' },
+                        { action: 'update', label: 'Edit', icon: 'edit' },
+                        { action: 'delete', label: 'Delete', icon: 'delete', color: 'text-red-500' }
+                    ]}
                     position={state.activityContextMenu}
                     onSelected={this.onSelectedActivityMenuAction}
                     onClose={() => this.setState({ activityContextMenu: null })}
