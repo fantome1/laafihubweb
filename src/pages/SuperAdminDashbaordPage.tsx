@@ -15,8 +15,8 @@ import { NavigateFunction } from "react-router-dom";
 import { routes } from "../constants/routes";
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
 import { Marker, Popup } from "react-leaflet";
-import { CrudMenu } from "../components/CrudMenu";
-import { IGetActivitiesResult } from "../models/activity_model";
+import CrudMenu from "../components/CrudMenu";
+import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { ActivityChart } from "../components/charts/ActivityChart";
@@ -34,10 +34,10 @@ type State = {
     enrollItemsCompleter: Completer<boolean>|null;
     updateDialogCompleter: Completer<boolean>|null;
     deleteConfirmation: { title: string, description: string, completer: Completer<boolean> }|null;
-    snackbarData: {  severity: AlertColor, message: string }|null;
+    snackbarData: { severity: AlertColor, message: string }|null;
     userContextMenu: { top: number, left: number, userId: string }|null;
     deviceContextMenu: { top: number, left: number, deviceId: string }|null;
-    activityContextMenu: { top: number, left: number, activityId: string }|null;
+    activityContextMenu: { top: number, left: number, activityId: string, isFavorite?: boolean }|null;
     updateUserDialog: { userId: string, completer: Completer<boolean> }|null;
 };
 
@@ -250,12 +250,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({ deviceContextMenu: null });
     }
 
-    onActivityMenuContext(event: React.MouseEvent, activityId: string) {
+    onActivityMenuContext(event: React.MouseEvent, value: IActivity) {
         event.preventDefault();
-        this.setState({ activityContextMenu: { left: event.clientX + 2, top: event.clientY - 6, activityId } });
+        this.setState({ activityContextMenu: { left: event.clientX + 2, top: event.clientY - 6, activityId: value.id, isFavorite: value.isFavorite } });
     }
 
-    onSelectedActivityMenuAction(value: string) {
+    async onSelectedActivityMenuAction(value: string) {
         switch(value) {
             case 'view':
                 this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(this.state.activityContextMenu!.activityId))
@@ -265,6 +265,18 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             break;
             case 'delete':
                 this.onDeleteActivity(this.state.activityContextMenu!.activityId);
+            break;
+            case 'favorite':
+                const isFavorite = this.state.activityContextMenu!.isFavorite;
+                Api.changeActivityFavoriteStatus(this.state.activityContextMenu!.activityId, !isFavorite)
+                    .then(() => {
+                        this.setState({
+                            snackbarData: { severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' },
+                            activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
+                        });
+                    }).catch(err => {
+                        this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' } });
+                    });
             break;
         }
 
@@ -463,7 +475,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                     </thead>
                                     <tbody>
                                         {data.activities.map((value, index) => (
-                                            <tr key={value.id} onContextMenu={(event) => this.onActivityMenuContext(event, value.id)} onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(value.id))} className="cursor-pointer">
+                                            <tr key={value.id} onContextMenu={(event) => this.onActivityMenuContext(event, value)} onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(value.id))} className="cursor-pointer">
                                                 <td>
                                                     <div className="flex items-center">
                                                         <div className='w-[12px] h-[12px] rounded-full ml-2' style={{ backgroundColor: ['#7EC381', '#D80303', '#999999'][index % 3] }}></div>
@@ -564,7 +576,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 <CrudMenu
                     actions={[
                         { action: 'start_or_stop', label: 'Start', icon: 'play_arrow' },
-                        { action: 'star', label: 'Set as favorite', icon: 'star' },
+                        { action: 'favorite', label: state.activityContextMenu?.isFavorite ? 'Remove from favorites' : 'Set as favorite', icon: 'star' },
                         { action: 'view', label: 'View', icon: 'visibility' },
                         { action: 'update', label: 'Edit', icon: 'edit' },
                         { action: 'delete', label: 'Delete', icon: 'delete', color: 'text-red-500' }

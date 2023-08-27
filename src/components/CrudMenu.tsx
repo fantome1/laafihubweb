@@ -1,3 +1,4 @@
+import React from "react";
 import { ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
 
 type Props = {
@@ -6,6 +7,21 @@ type Props = {
     onSelected: (action: string) => void;
     onClose: () => void;
 }
+
+// function equals(prevProps: Props, nextProps: Props) {
+//     if (prevProps.actions.length != nextProps.actions.length)
+//         return false;
+
+//     const a1 = prevProps.actions;
+//     const a2 = nextProps.actions;
+
+//     for (let i=0; i<a1.length; ++i) {
+//         if (a1[i].action !=  a2[i].action) // FIXME add icon
+//             return false;
+//     }
+
+//     return true;
+// }
 
 function CrudMenu(props: Props) {
     return (
@@ -38,4 +54,4 @@ function CrudMenu(props: Props) {
     );
 }
 
-export { CrudMenu };
+export default React.memo(CrudMenu);

@@ -301,6 +301,25 @@ class Api {
         return response.json();
     }
 
+    static async changeActivityFavoriteStatus(actvityId: string, isFavorite: boolean): Promise<{ id: string, infrastructureId: string, name: string }> {
+        const response = await fetch(`${this.BASE_URL}/activities/${actvityId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify({
+                statusOptions: {
+                    isFavorite
+                }
+            })
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());;
+        return response.json();
+    }
+
     static async updateActivityUsers(activityId: string, data: { userId: string, deviceIds: string[] }[]): Promise<{ id: string, infrastructureId: string, name: string }> {
         const response = await fetch(`${this.BASE_URL}/activities/${activityId}/users`, {
             method: 'PUT',

@@ -208,9 +208,9 @@ class CreateActivityPage extends React.Component<Props, State> {
                     <div className="flex flex-col py-6" style={{ height: 'calc(100% - 56px)' }}>
 
                         <Box sx={{ width: '100%' }} className='mb-6'>
-                            <Stepper activeStep={0} alternativeLabel>
-                                {getStepperLabel(this.isEdit).map((label, index) => (
-                                    <Step key={label} completed={index < index}><StepLabel error={index < 2 ? !isValidBloc[index] : false}>{label}</StepLabel></Step>
+                            <Stepper activeStep={index} alternativeLabel>
+                                {getStepperLabel(this.isEdit).map((label, i) => (
+                                    <Step key={label} completed={i < index}><StepLabel error={i < 2 ? !isValidBloc[i] : false}>{label}</StepLabel></Step>
                                 ))}
                             </Stepper>
                         </Box>
