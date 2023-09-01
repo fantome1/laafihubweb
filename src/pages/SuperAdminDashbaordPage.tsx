@@ -529,7 +529,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
 
                 {state.enrollItemsCompleter && (<EnrollItemsDialog completer={state.enrollItemsCompleter} infrastructureId={this.props.params.id} />)}
-                
+
                 {Boolean(state.updateDialogCompleter) && <CreateInfrastructureDialog completer={state.updateDialogCompleter} infrastructureId={this.props.params.id} />}
 
                 {Boolean(state.updateUserDialog) && <CreateUserDialog completer={state.updateUserDialog!.completer} userId={state.updateUserDialog!.userId} />}

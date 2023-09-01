@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, AlertColor, Paper, Skeleton, Snackbar } from "@mui/material";
+import { Alert, AlertColor, CircularProgress, Paper, Skeleton, Snackbar } from "@mui/material";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
@@ -10,6 +10,8 @@ import { UserCountSkeleton } from "../components/Skeletons";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { IGetDeviceResult } from "../models/device_mdoel";
+import { DialogService } from "../components/dialogs/DialogsComponent";
+import { IGetDevicesGroupResult } from "../models/devices_group_model";
 
 type Props = {
     navigate: (route: string) => void
@@ -19,6 +21,7 @@ type State = {
     addDeviceCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
+    deviceGroups: Promise<IGetDevicesGroupResult>|null;
 };
 
 class LaafiMonitorPage extends React.Component<Props, State> {
@@ -30,14 +33,19 @@ class LaafiMonitorPage extends React.Component<Props, State> {
             addDeviceCompleter: null,
             snackbarData: null,
             devicesPromise: null,
+            deviceGroups: null
         };
 
         this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
         this.showAddDeviceDialog = this.showAddDeviceDialog.bind(this);
+        this.onRegisterDevicesGroup = this.onRegisterDevicesGroup.bind(this);
     }
 
     componentDidMount(): void {
-        this.setState({ devicesPromise: Api.getDevices() });
+        this.setState({
+            devicesPromise: Api.getDevices(),
+            deviceGroups: Api.getDevicesGroups()
+        });
     }
 
     async showAddDeviceDialog() {
@@ -50,7 +58,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
             if (result == true) {
                 this.setState({
-                    snackbarData: { severity: 'success', message: 'Appareil ajouté avec succès' },
+                    snackbarData: { severity: 'success', message: 'Device successfully added' },
                     devicesPromise: Api.getDevices()
                 });
             }
@@ -58,6 +66,17 @@ class LaafiMonitorPage extends React.Component<Props, State> {
             this.setState({
                 addDeviceCompleter: null,
                 snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
+            });
+        }
+    }
+
+    async onRegisterDevicesGroup() {
+        var result = await DialogService.showRegisterDevicesGroup();
+
+        if (result) {
+            this.setState({
+                snackbarData: { severity: 'success', message: 'Device group successfully created' },
+                deviceGroups: Api.getDevicesGroups()
             });
         }
     }
@@ -70,6 +89,50 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
     onTapRow(device: { id: string }) {
         this.props.navigate(routes.LAAFI_MONITOR_DEVICE_DATA.build(device.id));
+    }
+
+    async onDeleteDevice(event: React.MouseEvent, id: string) {
+        event.stopPropagation();
+
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
+
+        if (!result)
+            return;
+
+        Api.deleteDevice(id)
+            .then(() => {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Device successfully deleted' },
+                    devicesPromise: Api.getDevices()
+                });
+            }).catch(err => {
+                console.log('err', err);
+                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du device' } });
+            });
+    }
+
+    async onDeleteDevicesGroup(id: string) {
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
+
+        if (!result)
+            return;
+
+        Api.deleteDevicesGroups(id)
+            .then(() => {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Groupe supprimé avec succès' },
+                    deviceGroups: Api.getDevicesGroups()
+                });
+            }).catch(err => {
+                console.log('err', err);
+                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du groupe' } });
+            });
     }
 
     render() {
@@ -163,7 +226,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             <p className="text-xl text-white">Monitor</p>
                         </div>
 
-                        <div className="flex items-center w-[120px] h-[46px] px-2 cursor-pointer" style={{ backgroundColor: '#00A6F9', borderRadius: '6px' }}>
+                        <div onClick={this.onRegisterDevicesGroup} className="flex items-center w-[120px] h-[46px] px-2 cursor-pointer" style={{ backgroundColor: '#00A6F9', borderRadius: '6px' }}>
                             <span className="material-symbols-rounded text-[28px] text-white">add</span>
                             <p className="text-xl text-white">Group</p>
                         </div>
@@ -179,7 +242,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
-                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Activity ID', 'Last connexion date',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Activity ID', 'Last connexion date', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
                                         {data.devicies.map(value => (
@@ -192,6 +255,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                                                 <td>{value.infrastructureName}</td>
                                                 <td>{value.activityId}</td>
                                                 <td>{value.lastConnexion}</td>
+                                                <td><span onClick={e => this.onDeleteDevice(e, value.id)} className="material-symbols-outlined text-red-500">delete</span></td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -222,12 +286,17 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                             <p className="text-lg text-[#3C4858]">Groups</p>
 
                             <div className="grid grid-cols-2 gap-2 rounded-md my-4 py-3">
-                                {Array.from({ length: 6 }, (_, index) => (
-                                    <div key={index} className="flex bg-[#C4C4C4] h-[26px] rounded">
-                                        <div className="grow"></div>
-                                        <div className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
-                                    </div>
-                                ))}
+                                <PromiseBuilder
+                                    promise={state.deviceGroups}
+                                    dataBuilder={data => data.groups.map(group => (
+                                        <div key={group.devicesGroupId} className="flex bg-[#C4C4C4] h-[26px] rounded">
+                                            <div className="grow flex items-center"><p className="pl-2 text-sm text-black">{group.name}</p></div>
+                                            <div onClick={() => this.onDeleteDevicesGroup(group.devicesGroupId)} className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
+                                        </div>
+                                    ))}
+                                    loadingBuilder={() => (<CircularProgress />)}
+                                    errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -249,7 +318,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                 >
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
-                
+
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
                 {/* #################################### MODAL AND OTHER ############################################ */}

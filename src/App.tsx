@@ -20,6 +20,7 @@ import { RealtimeTestPage } from "./pages/RealtimeTestPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./mui_theme";
 import CreateActivityPage from "./pages/CreateActivityPage";
+import { DialogsComponent } from "./components/dialogs/DialogsComponent";
 
 function ScrollToTop() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <ScrollToTop />
+        <DialogsComponent />
         <Routes>
           <Route path={routes.LOGIN} element={<LoginPage />} />
           <Route path={routes.SIGN_UP} element={<SignUpPage />} />

@@ -1,5 +1,6 @@
 import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDevicesGroupResult } from "../models/devices_group_model";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { IGetUsersResult, IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
@@ -153,6 +154,18 @@ class Api {
         return response.json();  
     }
 
+    static async deleteDevice(id: string): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/devices/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
     // ###################################################################################################
     // ###################################################################################################
     // #################################### INFRASTRUCTURE  ##############################################
@@ -170,7 +183,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw ApiError.parse(response.status, await response.text());;
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -185,7 +198,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw ApiError.parse(response.status, await response.text());;
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -282,7 +295,7 @@ class Api {
         });
 
         if (!response.ok)
-            throw ApiError.parse(response.status, await response.text());;
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -297,26 +310,21 @@ class Api {
         });
 
         if (!response.ok)
-            throw ApiError.parse(response.status, await response.text());;
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
     static async changeActivityFavoriteStatus(actvityId: string, isFavorite: boolean): Promise<{ id: string, infrastructureId: string, name: string }> {
-        const response = await fetch(`${this.BASE_URL}/activities/${actvityId}`, {
+        const response = await fetch(`${this.BASE_URL}/activities/${actvityId}/set-favorite?value=${isFavorite}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
-            },
-            body: JSON.stringify({
-                statusOptions: {
-                    isFavorite
-                }
-            })
+            }
         });
 
         if (!response.ok)
-            throw ApiError.parse(response.status, await response.text());;
+            throw ApiError.parse(response.status, await response.text());
         return response.json();
     }
 
@@ -371,6 +379,52 @@ class Api {
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
     }
+
+    // ###################################################################################################
+    // ###################################################################################################
+    // #################################### GET DEVICE GROUP  ############################################
+    // ###################################################################################################
+    // ###################################################################################################
+
+    static async registerDevicesGroup(groupName: string, devices: string[]): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/devices-groups`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify({ groupName, devices })
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async getDevicesGroups(query: Record<string, any> = {}): Promise<IGetDevicesGroupResult> {
+        const response = await fetch(Utils.buildUrl(this.BASE_URL, '/devices-groups', { query }), {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
+    static async deleteDevicesGroups(id: string): Promise<any> {
+        const response = await fetch(`${this.BASE_URL}/devices-groups/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
 
 }
 
