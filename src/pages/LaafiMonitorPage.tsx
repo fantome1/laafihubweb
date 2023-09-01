@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, AlertColor, CircularProgress, Paper, Skeleton, Snackbar } from "@mui/material";
+import { CircularProgress, Paper, Skeleton } from "@mui/material";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
@@ -19,7 +19,6 @@ type Props = {
 
 type State = {
     addDeviceCompleter: Completer<boolean>|null;
-    snackbarData: {  severity: AlertColor, message: string }|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
     deviceGroups: Promise<IGetDevicesGroupResult>|null;
 };
@@ -31,12 +30,10 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
         this.state = {
             addDeviceCompleter: null,
-            snackbarData: null,
             devicesPromise: null,
             deviceGroups: null
         };
 
-        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
         this.showAddDeviceDialog = this.showAddDeviceDialog.bind(this);
         this.onRegisterDevicesGroup = this.onRegisterDevicesGroup.bind(this);
     }
@@ -57,16 +54,12 @@ class LaafiMonitorPage extends React.Component<Props, State> {
             this.setState({ addDeviceCompleter: null });
 
             if (result == true) {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Device successfully added' },
-                    devicesPromise: Api.getDevices()
-                });
+                this.setState({ devicesPromise: Api.getDevices() });
+                DialogService.showSnackbar({ severity: 'success', message: 'Device successfully added' });
             }
         } catch(err) {
-            this.setState({
-                addDeviceCompleter: null,
-                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
-            });
+            this.setState({ addDeviceCompleter: null });
+            DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
         }
     }
 
@@ -74,17 +67,9 @@ class LaafiMonitorPage extends React.Component<Props, State> {
         var result = await DialogService.showRegisterDevicesGroup();
 
         if (result) {
-            this.setState({
-                snackbarData: { severity: 'success', message: 'Device group successfully created' },
-                deviceGroups: Api.getDevicesGroups()
-            });
+            this.setState({ deviceGroups: Api.getDevicesGroups() });
+            DialogService.showSnackbar({ severity: 'success', message: 'Device group successfully created' })
         }
-    }
-
-    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
-        if (reason === 'clickaway')
-            return;
-        this.setState({ snackbarData: null });
     }
 
     onTapRow(device: { id: string }) {
@@ -104,13 +89,10 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteDevice(id)
             .then(() => {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Device successfully deleted' },
-                    devicesPromise: Api.getDevices()
-                });
+                this.setState({ devicesPromise: Api.getDevices() });
+                DialogService.showSnackbar({ severity: 'success', message: 'Device successfully deleted' });
             }).catch(err => {
-                console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du device' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du device' });
             });
     }
 
@@ -125,13 +107,10 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteDevicesGroups(id)
             .then(() => {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Groupe supprimé avec succès' },
-                    deviceGroups: Api.getDevicesGroups()
-                });
+                this.setState({ deviceGroups: Api.getDevicesGroups() });
+                DialogService.showSnackbar({ severity: 'success', message: 'Groupe supprimé avec succès' })
             }).catch(err => {
-                console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du groupe' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du groupe' });
             });
     }
 
@@ -309,15 +288,6 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
 
                 {Boolean(state.addDeviceCompleter) && <AddDeviceDialog completer={state.addDeviceCompleter} />}
-
-                <Snackbar
-                    open={Boolean(state.snackbarData)}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
-                </Snackbar>
 
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}

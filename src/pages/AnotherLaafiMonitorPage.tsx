@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, AlertColor, Paper, Skeleton, Snackbar } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
 import { ActivitesConnectionStatusChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { IActivity, IGetActivitiesResult } from "../models/activity_model";
@@ -21,11 +21,9 @@ type Props = {
 type State = {
     promise: Promise<IGetActivitiesResult>|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
-    snackbarData: {  severity: AlertColor, message: string }|null;
 }
 
 class AnotherLaafiMonitorPage extends React.Component<Props, State> {
-
 
     constructor(props: Props) {
         super(props);
@@ -33,10 +31,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         this.state = {
             promise: null,
             devicesPromise: null,
-            snackbarData: null
         };
-
-        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     }
 
     componentDidMount(): void {
@@ -48,12 +43,6 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
     onTapRow(activity: { id: string }) {
         this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(activity.id));
-    }
-
-    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
-        if (reason === 'clickaway')
-            return;
-        this.setState({ snackbarData: null });
     }
 
     async onDelete(value: IActivity) {
@@ -68,13 +57,10 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteActivity(value.id)
             .then(() => {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Activité supprimé avec succès' },
-                    promise: Api.getActivities()
-                });
+                this.setState({ promise: Api.getActivities() });
+                DialogService.showSnackbar({ severity: 'success', message: 'Activité supprimé avec succès' })
             }).catch(err => {
-                console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' });
             });
     }
 
@@ -224,27 +210,6 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                         />
                     </div>
                 </div>
-
-                {/* ################################################################################################# */}
-                {/* ################################################################################################# */}
-                {/* #################################### MODAL AND OTHER ############################################ */}
-                {/* ################################################################################################# */}
-                {/* ################################################################################################# */}
-
-                <Snackbar
-                    open={Boolean(state.snackbarData)}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
-                </Snackbar>
-
-                {/* ################################################################################################# */}
-                {/* ################################################################################################# */}
-                {/* #################################### MODAL AND OTHER ############################################ */}
-                {/* ################################################################################################# */}
-                {/* ################################################################################################# */}
 
             </div>
         );

@@ -6,6 +6,7 @@ import { getRegisterUserValidator } from "../form_validator/register_user_valida
 import { Api } from "../services/api";
 import { CountrySelector } from "../packages/country_selector/CountrySelector";
 import ReactPhoneInput2 from "react-phone-input-2";
+import { DialogService } from "./dialogs/DialogsComponent";
 
 const PhoneInput = (ReactPhoneInput2 as any).default || ReactPhoneInput2;
 
@@ -18,7 +19,6 @@ type State = {
     user: IUser|null; // For update user
     formState: FormValidatorData|null,
     isLoading: boolean;
-    snackbarData: {  severity: AlertColor, message: string }|null;
 };
 
 class EditUserComponent extends React.Component<Props, State> {
@@ -31,12 +31,10 @@ class EditUserComponent extends React.Component<Props, State> {
             user: null,
             formState: null,
             isLoading: false,
-            snackbarData: null
         };
 
         this.onSubmit = this.onSubmit.bind(this);
         this.listen = this.listen.bind(this);
-        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -65,7 +63,6 @@ class EditUserComponent extends React.Component<Props, State> {
         this.setState({ isLoading: true })
 
         try {
-
             const user = await Api.getUser(value.id);
 
             const validator = getRegisterUserValidator(user);
@@ -78,21 +75,13 @@ class EditUserComponent extends React.Component<Props, State> {
                 isLoading: false
             });
         } catch(err) {
-            this.setState({
-                isLoading: false,
-                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' }
-            });
+            this.setState({ isLoading: false });
+            DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' });
         }
     }
 
     onChanged(key: string, value: any) {
         this.state.validator?.changeValue(key, value);
-    }
-
-    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
-        if (reason === 'clickaway')
-            return;
-        this.setState({ snackbarData: null });
     }
 
     onSubmit() {
@@ -127,11 +116,10 @@ class EditUserComponent extends React.Component<Props, State> {
         Api.updateUser(this.state.user!.id, data)
             .then(result => {
                 validator.setLoadingStatus(false);
-                this.setState({ snackbarData: { severity: 'success', message: 'Information modifiée de l\'utilisateur avec succès' } });
+                DialogService.showSnackbar({ severity: 'success', message: 'Information modifiée de l\'utilisateur avec succès' });
             }).catch(err => {
                 validator.setLoadingStatus(false);
-                console.log('error', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' } })
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' });
             });
     }
 
@@ -142,15 +130,6 @@ class EditUserComponent extends React.Component<Props, State> {
         return (
             <Paper className="p-3" elevation={0}>
                 {state.isLoading ? this.lodingComponent() : this.formComponent()}
-
-                <Snackbar
-                    open={Boolean(state.snackbarData)}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
-                </Snackbar>
             </Paper>
         );
     }

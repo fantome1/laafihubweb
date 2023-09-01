@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, AlertColor, Paper, Skeleton, Snackbar } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
 import { NearMap } from "../components/NearMap";
 import { IInfrastructure } from "../models/infrastructure_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
@@ -33,7 +33,6 @@ type State = {
     activitesPromise: Promise<IGetActivitiesResult>|null;
     enrollItemsCompleter: Completer<boolean>|null;
     updateDialogCompleter: Completer<boolean>|null;
-    snackbarData: { severity: AlertColor, message: string }|null;
     userContextMenu: { top: number, left: number, userId: string }|null;
     deviceContextMenu: { top: number, left: number, deviceId: string }|null;
     activityContextMenu: { top: number, left: number, activityId: string, isFavorite?: boolean }|null;
@@ -52,14 +51,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             activitesPromise: null,
             enrollItemsCompleter: null,
             updateDialogCompleter: null,
-            snackbarData: null,
             userContextMenu: null,
             deviceContextMenu: null,
             activityContextMenu: null,
             updateUserDialog: null,
         };
 
-        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
         this.onRollitems = this.onRollitems.bind(this);
         this.showUpdateDialog = this.showUpdateDialog.bind(this);
         this.onSelectedUserMenuAction = this.onSelectedUserMenuAction.bind(this);
@@ -76,12 +73,6 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         });
     }
 
-    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
-        if (reason === 'clickaway')
-            return;
-        this.setState({ snackbarData: null });
-    }
-
     async onRollitems() {
         const completer = new Completer<boolean>();
         this.setState({ enrollItemsCompleter: completer });
@@ -91,10 +82,11 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         if (result == true) {
             this.setState({
-                snackbarData: { severity: 'success', message: 'Enrôlement effectué avec succès' },
                 usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
                 devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
             });
+
+            DialogService.showSnackbar({ severity: 'success', message: 'Enrôlement effectué avec succès' });
         }
     }
 
@@ -107,16 +99,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             this.setState({ updateDialogCompleter: null });
 
             if (result == true) {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Les informations de l\'infrastructure ont été modifié avec succès' },
-                    promise: Api.getInfrastructure(this.props.params.id)
-                });
+                this.setState({ promise: Api.getInfrastructure(this.props.params.id) });
+                DialogService.showSnackbar({ severity: 'success', message: 'Les informations de l\'infrastructure ont été modifié avec succès' })
             }
         } catch(err) {
-            this.setState({
-                updateDialogCompleter: null,
-                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
-            });
+            this.setState({ updateDialogCompleter: null });
+            DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
         }
     }
 
@@ -129,16 +117,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             this.setState({ updateUserDialog: null });
 
             if (result == true) {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Les informations de l\'utilisateur ont été modifié avec succès' },
-                    usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
-                });
+                this.setState({ usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }) });
+                DialogService.showSnackbar( { severity: 'success', message: 'Les informations de l\'utilisateur ont été modifié avec succès' })
             }
         } catch(err) {
-            this.setState({
-                updateUserDialog: null,
-                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
-            });
+            this.setState({ updateUserDialog: null });
+            DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
         }
     }
 
@@ -154,13 +138,10 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         Api.deleteUserFromInfrastructure(this.props.params.id, userId)
             .then(() => {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' },
-                    usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id })
-                });
+                this.setState({ usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }) });
+                DialogService.showSnackbar({ severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' });
             }).catch(err => {
-                console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' });
             });
     }
 
@@ -176,13 +157,11 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         Api.deleteDeviceFromInfrastructure(this.props.params.id, deviceId)
             .then(() => {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' },
-                    devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
-                });
+                this.setState({ devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }) });
+                DialogService.showSnackbar({ severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' });
             }).catch(err => {
                 console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'appareil de l\'infrastructure' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'appareil de l\'infrastructure' });
             });
     }
 
@@ -199,13 +178,13 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         Api.deleteActivity(activityId)
             .then(() => {
                 this.setState({
-                    snackbarData: { severity: 'success', message: 'Activité supprimé avec succès' },
                     devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
                     activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
                 });
+
+                DialogService.showSnackbar({ severity: 'success', message: 'Activité supprimé avec succès' })
             }).catch(err => {
-                console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' });
             });
     }
 
@@ -265,12 +244,11 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 const isFavorite = this.state.activityContextMenu!.isFavorite;
                 Api.changeActivityFavoriteStatus(this.state.activityContextMenu!.activityId, !isFavorite)
                     .then(() => {
-                        this.setState({
-                            snackbarData: { severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' },
-                            activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
-                        });
-                    }).catch(err => {
-                        this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' } });
+                        this.setState({ activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }) });
+                        DialogService.showSnackbar({ severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
+                    })
+                    .catch(err => {
+                        DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
                     });
             break;
         }
@@ -528,15 +506,6 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 {Boolean(state.updateDialogCompleter) && <CreateInfrastructureDialog completer={state.updateDialogCompleter} infrastructureId={this.props.params.id} />}
 
                 {Boolean(state.updateUserDialog) && <CreateUserDialog completer={state.updateUserDialog!.completer} userId={state.updateUserDialog!.userId} />}
-
-                <Snackbar
-                    open={Boolean(state.snackbarData)}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
-                </Snackbar>
 
                 <CrudMenu
                     actions={[

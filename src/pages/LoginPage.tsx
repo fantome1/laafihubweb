@@ -8,6 +8,7 @@ import { Api } from "../services/api";
 import { WithRouter } from "../components/WithRouterHook";
 import { AuthService } from "../services/auth_service";
 import { routes } from "../constants/routes";
+import { DialogService } from "../components/dialogs/DialogsComponent";
 
 // Laafi_DataBase
 // user@example.com
@@ -31,7 +32,6 @@ type Props = {
 
 type State = {
     formState: FormValidatorData;
-    snackbarErrorMessage: string|null;
 }
 
 class LoginPage extends React.Component<Props, State> {
@@ -44,14 +44,12 @@ class LoginPage extends React.Component<Props, State> {
         this.validator = getLoginFormValidator();
 
         this.state = {
-            formState: this.validator.getData,
-            snackbarErrorMessage: null
+            formState: this.validator.getData
         };
 
         this.listen = this.listen.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.validator.listen(this.listen);
-        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     }
 
     listen(value: FormValidatorData) {
@@ -82,14 +80,8 @@ class LoginPage extends React.Component<Props, State> {
                     message = 'Veuillez verifier votre connexion internet et reesayer' // FIXME typo
                 }
 
-                this.setState({ snackbarErrorMessage: message });
+                DialogService.showSnackbar({ severity: "error", message })
             });
-    }
-
-    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
-        if (reason === 'clickaway')
-            return;
-        this.setState({ snackbarErrorMessage: null });
     }
 
     render() {
@@ -178,15 +170,6 @@ class LoginPage extends React.Component<Props, State> {
                     </div>
 
                 </form>
-
-                <Snackbar
-                    open={Boolean(this.state.snackbarErrorMessage)}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert onClose={this.handleCloseSnackbar} severity="error" variant="filled" sx={{ width: '100%' }}>{this.state.snackbarErrorMessage}</Alert>
-                </Snackbar>
 
             </div>
         );

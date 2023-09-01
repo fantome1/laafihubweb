@@ -1,5 +1,4 @@
 import React from "react";
-import { Alert, AlertColor, Snackbar } from "@mui/material";
 import { CircleMarker, Popup } from "react-leaflet";
 import { OrganizationFirstCardGroup } from "../components/OrganizationFirstCardGroup";
 import { Utils } from "../services/utils";
@@ -23,7 +22,6 @@ type Props = {
 
 type State = {
     createDialogCompleter: Completer<boolean>|null;
-    snackbarData: {  severity: AlertColor, message: string }|null;
     infrastructureId: string|null;
     infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
     usersPromise: Promise<IGetUsersResult>|null;
@@ -38,7 +36,6 @@ class OrganizationPage extends React.Component<Props, State> {
 
         this.state = {
             createDialogCompleter: null,
-            snackbarData: null,
             infrastructureId: null,
             infrastructuresPromise: null,
             usersPromise: null,
@@ -47,7 +44,6 @@ class OrganizationPage extends React.Component<Props, State> {
         };
 
         this.showCreateInfrastructureDialog = this.showCreateInfrastructureDialog.bind(this);
-        this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
     }
 
     componentDidMount(): void {
@@ -68,24 +64,13 @@ class OrganizationPage extends React.Component<Props, State> {
             this.setState({ createDialogCompleter: null, infrastructureId: null });
 
             if (result == true) {
-                this.setState({
-                    snackbarData: { severity: 'success', message: infrastructureId ? 'Les informations de l\'infrastructure ont été modifié avec succès' : 'Infrastructure ajouté avec succès' },
-                    infrastructuresPromise: Api.getInfrastructures()
-                });
+                this.setState({ infrastructuresPromise: Api.getInfrastructures() });
+                DialogService.showSnackbar({ severity: 'success', message: infrastructureId ? 'Les informations de l\'infrastructure ont été modifié avec succès' : 'Infrastructure ajouté avec succès' });
             }
         } catch(err) {
-            this.setState({
-                createDialogCompleter: null,
-                snackbarData: { severity: 'error', message: 'Une erreur s\'est produite' },
-                infrastructureId: null
-            });
+            this.setState({ createDialogCompleter: null, infrastructureId: null });
+            DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
         }
-    }
-
-    handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
-        if (reason === 'clickaway')
-            return;
-        this.setState({ snackbarData: null });
     }
 
     async onDeleteInfrastructure(value: IInfrastructure) {
@@ -100,13 +85,11 @@ class OrganizationPage extends React.Component<Props, State> {
 
         Api.deleteInfrastructure(value.id)
             .then(() => {
-                this.setState({
-                    snackbarData: { severity: 'success', message: 'Infrastructure supprimé avec succès' },
-                    infrastructuresPromise: Api.getInfrastructures()
-                });
+                this.setState({ infrastructuresPromise: Api.getInfrastructures() });
+                DialogService.showSnackbar({ severity: 'success', message: 'Infrastructure supprimé avec succès' });
             }).catch(err => {
                 console.log('err', err);
-                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'infrastructure' } });
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'infrastructure' });
             });
     }
 
@@ -200,15 +183,6 @@ class OrganizationPage extends React.Component<Props, State> {
 
                 {Boolean(state.createDialogCompleter) && <CreateInfrastructureDialog completer={state.createDialogCompleter} infrastructureId={state.infrastructureId} />}
 
-                <Snackbar
-                    open={Boolean(state.snackbarData)}
-                    autoHideDuration={6000}
-                    onClose={this.handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
-                </Snackbar>
-                
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
                 {/* #################################### MODAL AND OTHER ############################################ */}
