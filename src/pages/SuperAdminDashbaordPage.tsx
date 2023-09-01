@@ -8,7 +8,6 @@ import { Api } from "../services/api";
 import { IUser } from "../models/user_model";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { IGetDeviceResult } from "../models/device_mdoel";
-import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Completer } from "../services/completer";
 import { EnrollItemsDialog } from "../components/dialogs/EnrollItemsDialog";
 import { NavigateFunction } from "react-router-dom";
@@ -20,6 +19,7 @@ import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { ActivityChart } from "../components/charts/ActivityChart";
+import { DialogService } from "../components/dialogs/DialogsComponent";
 
 type Props = {
     params: { id: string },
@@ -33,7 +33,6 @@ type State = {
     activitesPromise: Promise<IGetActivitiesResult>|null;
     enrollItemsCompleter: Completer<boolean>|null;
     updateDialogCompleter: Completer<boolean>|null;
-    deleteConfirmation: { title: string, description: string, completer: Completer<boolean> }|null;
     snackbarData: { severity: AlertColor, message: string }|null;
     userContextMenu: { top: number, left: number, userId: string }|null;
     deviceContextMenu: { top: number, left: number, deviceId: string }|null;
@@ -53,7 +52,6 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             activitesPromise: null,
             enrollItemsCompleter: null,
             updateDialogCompleter: null,
-            deleteConfirmation: null,
             snackbarData: null,
             userContextMenu: null,
             deviceContextMenu: null,
@@ -146,13 +144,12 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
     async onDeleteUser(userId: string) {
 
-        const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmation: { completer, title: 'Cette action est irréversible', description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam' } });
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
 
-        const result = await completer.promise;
-        this.setState({ deleteConfirmation: null });
-
-        if (result != true)
+        if (!result)
             return;
 
         Api.deleteUserFromInfrastructure(this.props.params.id, userId)
@@ -169,49 +166,47 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
     async onDeleteDevice(deviceId: string) {
 
-        const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmation: { completer, title: 'Cette action est irréversible', description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam' } });
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
 
-        const result = await completer.promise;
-        this.setState({ deleteConfirmation: null });
-
-        if (result != true)
+        if (!result)
             return;
 
-            Api.deleteDeviceFromInfrastructure(this.props.params.id, deviceId)
-                .then(() => {
-                    this.setState({
-                        snackbarData: { severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' },
-                        devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
-                    });
-                }).catch(err => {
-                    console.log('err', err);
-                    this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'appareil de l\'infrastructure' } });
+        Api.deleteDeviceFromInfrastructure(this.props.params.id, deviceId)
+            .then(() => {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' },
+                    devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
                 });
+            }).catch(err => {
+                console.log('err', err);
+                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'appareil de l\'infrastructure' } });
+            });
     }
 
     async onDeleteActivity(activityId: string) {
 
-        const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmation: { completer, title: 'Cette action est irréversible', description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam' } });
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
 
-        const result = await completer.promise;
-        this.setState({ deleteConfirmation: null });
-
-        if (result != true)
+        if (!result)
             return;
 
-            Api.deleteActivity(activityId)
-                .then(() => {
-                    this.setState({
-                        snackbarData: { severity: 'success', message: 'Activité supprimé avec succès' },
-                        devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
-                        activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
-                    });
-                }).catch(err => {
-                    console.log('err', err);
-                    this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' } });
+        Api.deleteActivity(activityId)
+            .then(() => {
+                this.setState({
+                    snackbarData: { severity: 'success', message: 'Activité supprimé avec succès' },
+                    devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+                    activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
                 });
+            }).catch(err => {
+                console.log('err', err);
+                this.setState({ snackbarData: { severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' } });
+            });
     }
 
     onUserMenuContext(event: React.MouseEvent, userId: string) {
@@ -533,14 +528,6 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 {Boolean(state.updateDialogCompleter) && <CreateInfrastructureDialog completer={state.updateDialogCompleter} infrastructureId={this.props.params.id} />}
 
                 {Boolean(state.updateUserDialog) && <CreateUserDialog completer={state.updateUserDialog!.completer} userId={state.updateUserDialog!.userId} />}
-
-                {state.deleteConfirmation && (
-                    <ConfirmSuppressionDialog
-                        completer={state.deleteConfirmation.completer}
-                        title={state.deleteConfirmation.title}
-                        description={state.deleteConfirmation.description}
-                    />
-                )}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}

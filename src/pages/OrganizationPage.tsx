@@ -6,7 +6,6 @@ import { Utils } from "../services/utils";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Api } from "../services/api";
-import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { Completer } from "../services/completer";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
@@ -16,6 +15,7 @@ import { IGetDeviceResult } from "../models/device_mdoel";
 import { IGetActivitiesResult } from "../models/activity_model";
 import { BubleMap } from "../components/BubleMap";
 import { IGetUsersResult } from "../models/user_model";
+import { DialogService } from "../components/dialogs/DialogsComponent";
 
 type Props = {
     navigate: (url: string) => void;
@@ -23,7 +23,6 @@ type Props = {
 
 type State = {
     createDialogCompleter: Completer<boolean>|null;
-    deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
     infrastructureId: string|null;
     infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
@@ -34,25 +33,11 @@ type State = {
 
 class OrganizationPage extends React.Component<Props, State> {
 
-    public tableData = Array.from({ length: 20 }, (_, index) => ({
-        color: [0, 1, 3, 6, 7, 8].includes(index)
-            ? '#69ADA7'
-            : [2, 4, 5].includes(index)
-                ? '#D80303'
-                : '#999999',
-        type: 'LM0077',
-        deviceCount: 'B',
-        monitorCount: 'Laafi Monitor',
-        supervisors: 'MS Burkina Faso',
-        createAt: new Date(2020, 5, 27, 10, 10)
-    }));
-
     constructor(props: Props) {
         super(props);  
 
         this.state = {
             createDialogCompleter: null,
-            deleteConfirmationCompleter: null,
             snackbarData: null,
             infrastructureId: null,
             infrastructuresPromise: null,
@@ -105,13 +90,12 @@ class OrganizationPage extends React.Component<Props, State> {
 
     async onDeleteInfrastructure(value: IInfrastructure) {
 
-        const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmationCompleter: completer });
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
 
-        const result = await completer.promise;
-        this.setState({ deleteConfirmationCompleter: null });
-
-        if (result != true)
+        if (!result)
             return;
 
         Api.deleteInfrastructure(value.id)
@@ -224,12 +208,6 @@ class OrganizationPage extends React.Component<Props, State> {
                 >
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
-
-                <ConfirmSuppressionDialog
-                    completer={state.deleteConfirmationCompleter}
-                    title="Cette action est irréversible"
-                    description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam"
-                />
                 
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}

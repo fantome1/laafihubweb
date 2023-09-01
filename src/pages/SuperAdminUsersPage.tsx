@@ -1,14 +1,14 @@
 import React from "react";
-import { Alert, AlertColor, CircularProgress, Paper, Snackbar, TextField } from "@mui/material";
+import { Alert, AlertColor, Paper, Snackbar } from "@mui/material";
 import { Completer } from "../services/completer";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
-import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
 import { EditUserComponent } from "../components/EditUser";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
+import { DialogService } from "../components/dialogs/DialogsComponent";
 
 type Props = {
 
@@ -16,7 +16,6 @@ type Props = {
 
 type State = {
     addUserDialogCompleter: Completer<boolean>|null;
-    deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
     usersPromise?: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
     selectedUser: IUser|null; // for edit user
@@ -29,7 +28,6 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
 
         this.state = {
             addUserDialogCompleter: null,
-            deleteConfirmationCompleter: null,
             snackbarData: null,
             usersPromise: null,
             selectedUser: null
@@ -66,13 +64,12 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
 
     async onDeleteUser(user: IUser) {
 
-        const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmationCompleter: completer });
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
 
-        const result = await completer.promise;
-        this.setState({ deleteConfirmationCompleter: null });
-
-        if (result != true)
+        if (!result)
             return;
 
         Api.deleteUser(user.id)
@@ -174,7 +171,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                 {/* #################################### MODAL AND OTHER ############################################ */}
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
-                
+
                 {/* La condition ne sert pas a afficher/cacher le component mais a le re-builder  */}
                 {Boolean(state.addUserDialogCompleter) && <CreateUserDialog completer={state.addUserDialogCompleter} />}
 
@@ -186,12 +183,6 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                 >
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
-
-                <ConfirmSuppressionDialog
-                    completer={state.deleteConfirmationCompleter}
-                    title="Cette action est irréversible"
-                    description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam"
-                />
 
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}

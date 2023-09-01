@@ -6,14 +6,13 @@ import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { Utils } from "../services/utils";
-import { ConfirmSuppressionDialog } from "../components/dialogs/ConfirmSuppressionDialog";
-import { Completer } from "../services/completer";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { AnotherActivityList } from "../components/AnotherActivityList";
 import { ActivityList } from "../components/ActivityList";
 import { IGetDeviceResult } from "../models/device_mdoel";
 import { UserCountSkeleton } from "../components/Skeletons";
+import { DialogService } from "../components/dialogs/DialogsComponent";
 
 type Props = {
     navigate: (route: string) => void;
@@ -22,7 +21,6 @@ type Props = {
 type State = {
     promise: Promise<IGetActivitiesResult>|null;
     devicesPromise: Promise<IGetDeviceResult>|null;
-    deleteConfirmationCompleter: Completer<boolean>|null;
     snackbarData: {  severity: AlertColor, message: string }|null;
 }
 
@@ -35,7 +33,6 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         this.state = {
             promise: null,
             devicesPromise: null,
-            deleteConfirmationCompleter: null,
             snackbarData: null
         };
 
@@ -61,13 +58,12 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
     async onDelete(value: IActivity) {
 
-        const completer = new Completer<boolean>();
-        this.setState({ deleteConfirmationCompleter: completer });
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
 
-        const result = await completer.promise;
-        this.setState({ deleteConfirmationCompleter: null });
-
-        if (result != true)
+        if (!result)
             return;
 
         Api.deleteActivity(value.id)
@@ -243,12 +239,6 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                 >
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
-
-                {/* <ConfirmSuppressionDialog
-                    completer={state.deleteConfirmationCompleter}
-                    title="Cette action est irréversible"
-                    description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam"
-                /> */}
 
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}

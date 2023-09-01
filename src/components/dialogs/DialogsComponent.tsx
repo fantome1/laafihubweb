@@ -65,7 +65,7 @@ class DialogsComponent extends React.PureComponent<Props, State> {
                 {state.deleteConfirmation && <ConfirmSuppressionDialog completer={state.deleteConfirmation.completer} title={state.deleteConfirmation.title} description={state.deleteConfirmation.description}/>}
 
                 {state.registerDevicesGroup && (<RegisterDevicesGroupDialog completer={state.registerDevicesGroup.completer} id={state.registerDevicesGroup.id} />)}
-            
+
             </>
         );
     }
