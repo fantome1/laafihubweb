@@ -328,6 +328,19 @@ class Api {
         return response.json();
     }
 
+    static async changeActivityState(activityId: string, value: 'start'|'stop'): Promise<{ id: string, infrastructureId: string, name: string }> {
+        const response = await fetch(`${this.BASE_URL}/activities/${activityId}/change-state?value=${value}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());;
+        return response.json();
+    }
+
     static async updateActivityUsers(activityId: string, data: { userId: string, deviceIds: string[] }[]): Promise<{ id: string, infrastructureId: string, name: string }> {
         const response = await fetch(`${this.BASE_URL}/activities/${activityId}/users`, {
             method: 'PUT',
@@ -343,7 +356,7 @@ class Api {
         return response.json();
     }
 
-    static async getActivities(options: { InfrastructureId?: string } = {}): Promise<IGetActivitiesResult> {
+    static async getActivities(options: { InfrastructureId?: string, userId?: string } = {}): Promise<IGetActivitiesResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/activities', { query: options }), {
                 headers: {
@@ -380,6 +393,18 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
+    static async deleteUserFromActivity(actvityId: string, userId: string): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/activities/${actvityId}/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
     // ###################################################################################################
     // ###################################################################################################
     // #################################### GET DEVICE GROUP  ############################################
@@ -400,7 +425,7 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
-    static async getDevicesGroups(query: Record<string, any> = {}): Promise<IGetDevicesGroupResult> {
+    static async getDevicesGroups(query: { PageNumber?: number, PageSize?: number } = {}): Promise<IGetDevicesGroupResult> {
         const response = await fetch(Utils.buildUrl(this.BASE_URL, '/devices-groups', { query }), {
             method: 'GET',
             headers: {

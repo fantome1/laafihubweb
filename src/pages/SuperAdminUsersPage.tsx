@@ -1,11 +1,11 @@
 import React from "react";
-import { Alert, AlertColor, Paper, Snackbar } from "@mui/material";
+import { Paper } from "@mui/material";
 import { Completer } from "../services/completer";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
-import { EditUserComponent } from "../components/EditUser";
+import EditUserComponent from "../components/EditUser";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { DialogService } from "../components/dialogs/DialogsComponent";
@@ -51,7 +51,8 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         }
     }
 
-    async onDeleteUser(user: IUser) {
+    async onDeleteUser(event: React.MouseEvent, user: IUser) {
+        event.stopPropagation();
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
@@ -136,7 +137,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                                 <td>{user.role}</td>
                                                 <td>{user.infrastructureId}</td>
                                                 <td>{user.activities}</td>
-                                                <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span onClick={() => this.onDeleteUser(user)} className="material-symbols-rounded text-[#999999] cursor-pointer">delete_forever</span></div></div></td>
+                                                <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span onClick={(e) => this.onDeleteUser(e, user)} className="material-symbols-rounded text-red-500 cursor-pointer">delete</span></div></div></td>
                                             </tr>
                                         ))}
                                     </tbody>

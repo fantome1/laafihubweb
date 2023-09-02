@@ -5,7 +5,7 @@ interface IActivity {
     id: string;
     name: string;
     type: 'Permanent'|'Temporary';
-    status: 'Active';
+    status: 'Expired'|'Active'|'Stopped';
     characteristic: { humidityMax: number, humidityMin: number, minuteCover: number, temperatureCover?: number, temperatureMax: number, temperatureMaxSeul?: number, temperatureMin: number, temperatureMinSeul?: number, tumidityCover?: number },
     infrastructureName: string;
     isFavorite: boolean;

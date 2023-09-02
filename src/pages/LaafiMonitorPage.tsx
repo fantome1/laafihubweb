@@ -41,7 +41,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
     componentDidMount(): void {
         this.setState({
             devicesPromise: Api.getDevices(),
-            deviceGroups: Api.getDevicesGroups()
+            deviceGroups: Api.getDevicesGroups({ PageSize: 2, PageNumber: 0 })
         });
     }
 
@@ -262,7 +262,10 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
                         {/* Group */}
                         <div className='bg-white rounded-lg mt-2 p-4'>
-                            <p className="text-lg text-[#3C4858]">Groups</p>
+                            <div className="flex justify-between">
+                                <p className="text-lg text-[#3C4858]">Groups</p>
+                                <p onClick={DialogService.showDevicesGroups} className="text-sm text-blue-500 font-medium text-[#3C4858] cursor-pointer">View all</p>
+                            </div>
 
                             <div className="grid grid-cols-2 gap-2 rounded-md my-4 py-3">
                                 <PromiseBuilder

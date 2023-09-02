@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, AlertColor, CircularProgress, FormHelperText, Paper, Snackbar, TextField } from "@mui/material";
+import { CircularProgress, FormHelperText, Paper, TextField } from "@mui/material";
 import { FormValidator, FormValidatorData } from "../packages/form_validator/form_validator";
 import { IUser } from "../models/user_model";
 import { getRegisterUserValidator } from "../form_validator/register_user_validator";
@@ -7,11 +7,17 @@ import { Api } from "../services/api";
 import { CountrySelector } from "../packages/country_selector/CountrySelector";
 import ReactPhoneInput2 from "react-phone-input-2";
 import { DialogService } from "./dialogs/DialogsComponent";
+import { IGetActivitiesResult } from "../models/activity_model";
+import { PromiseBuilder } from "./PromiseBuilder";
+import { WithRouter } from "./WithRouterHook";
+import { NavigateFunction } from "react-router-dom";
+import { routes } from "../constants/routes";
 
 const PhoneInput = (ReactPhoneInput2 as any).default || ReactPhoneInput2;
 
 type Props = {
-    user: IUser|null
+    navigate: NavigateFunction;
+    user: IUser|null;
 };
 
 type State = {
@@ -19,6 +25,7 @@ type State = {
     user: IUser|null; // For update user
     formState: FormValidatorData|null,
     isLoading: boolean;
+    activitiesPromise: Promise<IGetActivitiesResult>|null;
 };
 
 class EditUserComponent extends React.Component<Props, State> {
@@ -31,6 +38,7 @@ class EditUserComponent extends React.Component<Props, State> {
             user: null,
             formState: null,
             isLoading: false,
+            activitiesPromise: null
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -49,11 +57,13 @@ class EditUserComponent extends React.Component<Props, State> {
 
     async onUserChanged(value: IUser|null) {
         if (value == null) {
+
             this.setState({
                 validator: null,
                 user: null,
                 formState: null,
-                isLoading: false
+                isLoading: false,
+                activitiesPromise: null 
             });
 
             return;
@@ -72,7 +82,8 @@ class EditUserComponent extends React.Component<Props, State> {
                 validator,
                 user: user,
                 formState: validator.getData,
-                isLoading: false
+                isLoading: false,
+                activitiesPromise: Api.getActivities({ userId: value.id })
             });
         } catch(err) {
             this.setState({ isLoading: false });
@@ -136,6 +147,26 @@ class EditUserComponent extends React.Component<Props, State> {
 
     lodingComponent() {
         return (<div className="flex justify-center"><CircularProgress /></div>);
+    }
+
+    async onDeleteUserFromActivity(activityId: string) {
+        console.log('call');
+        
+        const result = await DialogService.showDeleteConfirmation(
+            'Cette action est irréversible',
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+        );
+
+        if (!result)
+            return;
+
+        Api.deleteUserFromActivity(activityId, this.state.user!.id)
+            .then(() => {
+                this.setState({ activitiesPromise: Api.getActivities({ userId: this.state.user!.id }) });
+                DialogService.showSnackbar({ severity: 'success', message: 'User has been successfully removed from the activity' });
+            }).catch(err => {
+                DialogService.showSnackbar({ severity: 'error', message: 'An error occurred while deleting the user in an activity' });
+            });
     }
 
     formComponent() {
@@ -261,14 +292,27 @@ class EditUserComponent extends React.Component<Props, State> {
                 <div className="mt-8">
                     <p className="font-medium text-[#3C4858]">Activities enrolled</p>
 
-                    <div className="grid grid-cols-2 gap-2 border-2 rounded-md my-4 py-3 px-2">
-                        {Array.from({ length: 6 }, (_, index) => (
-                            <div key={index} className="flex bg-[var(--primary)] h-[26px] rounded">
-                                <div className="grow"></div>
-                                <div className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
+                    <PromiseBuilder
+                        promise={this.state.activitiesPromise}
+                        dataBuilder={data => (
+                            <div className="grid grid-cols-2 gap-2 border-2 rounded-md my-4 py-3 px-2">
+                                {data.activities.map(activity => (
+                                    <div key={activity.id} className="flex bg-[var(--primary)] h-[26px] rounded">
+                                        <div onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(activity.id))} className="grow cursor-pointer"><p className="pl-2 text-xs text-white font-medium">{activity.name}</p></div>
+                                        <div onClick={() => this.onDeleteUserFromActivity(activity.id)} className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        )}
+                        loadingBuilder={() => {
+                            if (this.state.activitiesPromise == null)
+                                return (<div></div>);
+                            return (
+                                <div className="flex justify-center items-center py-4"><CircularProgress /></div>
+                            );
+                        }}
+                        errorBuilder={() => (<p>Une erreur s'est produite</p>)}
+                    />
                 </div>
             </>
         );
@@ -292,4 +336,4 @@ function EditButton(props: EditButtonProps) {
     );
 }
 
-export { EditUserComponent };
+export default WithRouter(EditUserComponent);

@@ -35,7 +35,7 @@ type State = {
     updateDialogCompleter: Completer<boolean>|null;
     userContextMenu: { top: number, left: number, userId: string }|null;
     deviceContextMenu: { top: number, left: number, deviceId: string }|null;
-    activityContextMenu: { top: number, left: number, activityId: string, isFavorite?: boolean }|null;
+    activityContextMenu: { top: number, left: number, activityId: string, status: 'Expired'|'Active'|'Stopped', isFavorite: boolean }|null;
     updateUserDialog: { userId: string, completer: Completer<boolean> }|null;
 };
 
@@ -226,7 +226,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
     onActivityMenuContext(event: React.MouseEvent, value: IActivity) {
         event.preventDefault();
-        this.setState({ activityContextMenu: { left: event.clientX + 2, top: event.clientY - 6, activityId: value.id, isFavorite: value.isFavorite } });
+        this.setState({ activityContextMenu: { left: event.clientX + 2, top: event.clientY - 6, activityId: value.id, status: value.status, isFavorite: value.isFavorite } });
     }
 
     async onSelectedActivityMenuAction(value: string) {
@@ -239,6 +239,17 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             break;
             case 'delete':
                 this.onDeleteActivity(this.state.activityContextMenu!.activityId);
+            break;
+            case 'start_or_stop':
+                const started = this.state.activityContextMenu!.status == 'Active';
+                Api.changeActivityState(this.state.activityContextMenu!.activityId, started ? 'stop' : 'start')
+                    .then(() => {
+                        this.setState({ activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }) });
+                        DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
+                    })
+                    .catch(err => {
+                        DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
+                    });
             break;
             case 'favorite':
                 const isFavorite = this.state.activityContextMenu!.isFavorite;
@@ -257,7 +268,8 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
     }
 
     render() {
-        const state = this.state;
+
+        const { promise, usersPromise, devicesPromise, activitesPromise, enrollItemsCompleter, updateDialogCompleter, updateUserDialog, userContextMenu, deviceContextMenu, activityContextMenu } = this.state;
 
         return (
             <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
@@ -266,7 +278,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                     {/* Infrastruture name */}
                     <div className="grow">
                         <PromiseBuilder
-                            promise={state.promise}
+                            promise={promise}
                             dataBuilder={data => (
                                 <div className="h-[120px] grow flex flex-col justify-between bg-white px-4 rounded-md">
                                     <div className="relative">
@@ -296,7 +308,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                     {/* details canrd and edit, enroll buttons */}
                     <div className="flex grow space-x-2">
                         <PromiseBuilder
-                            promise={state.promise}
+                            promise={promise}
                             dataBuilder={data => (
                                 <div className="grow h-[120px] flex flex-col bg-white px-4 rounded-md">
                                     <p className="text-[#3C4858] mt-2">Details</p>
@@ -343,7 +355,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
                             <div className="flex flex-col divide-y mt-2">
                                 {<PromiseBuilder
-                                    promise={state.usersPromise}
+                                    promise={usersPromise}
                                     dataBuilder={data => (data.roles.map((e, index) => (
                                         <div key={index} className="flex flex-col justify-center my-2">
                                             <p className="text-left text-sm text-[#999999] mt-2">{e.name}</p>
@@ -365,20 +377,20 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                     <p className="text-lg text-[#999999] mb-2">Devices usage</p>
 
                                     {/* <DeviceUsageChart /> */}
-                                    <LaafiMonitorDeviceUsageChart promise={state.devicesPromise} />
+                                    <LaafiMonitorDeviceUsageChart promise={devicesPromise} />
                                 </div>
                                 {/* activities */}
                                 <div className="bg-white rounded-md p-2 grow-[5]">
                                     <p className="text-lg text-[#999999] mb-2">Activities</p>
 
-                                    <ActivityChart promise={state.activitesPromise} />
+                                    <ActivityChart promise={activitesPromise} />
                                 </div>
                             </div>
 
                             {/* (minotor + centrals + gateways) card */}
                             <div className="flex divide-x h-[90px] bg-white rounded-md">
                                 {<PromiseBuilder
-                                    promise={state.devicesPromise}
+                                    promise={devicesPromise}
                                     dataBuilder={data => (data.totalModel.map((e, index) => (
                                         <div key={index} className="flex flex-col justify-around my-2 mx-2 grow">
                                             <p className="text-left text-sm text-[#999999] ml-2">{e.id}</p>
@@ -394,7 +406,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
                     <div className="w-[50%]">
                         <PromiseBuilder
-                            promise={this.state.promise}
+                            promise={promise}
                             dataBuilder={data => {
                                 const position = { lat: data.coordinates.latitude, lng: data.coordinates.longitude };
                                 return (
@@ -412,7 +424,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 <div className="flex space-x-2 mt-4">
                     <div className="w-[33%]">
                         <PromiseBuilder
-                            promise={state.usersPromise}
+                            promise={usersPromise}
                             dataBuilder={data => (
                                 <table className="styled-table">
                                         <thead>
@@ -440,18 +452,18 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
                     <div className="w-[33%]">
                         <PromiseBuilder
-                            promise={state.activitesPromise}
+                            promise={activitesPromise}
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
                                         <tr>{['Activity ID', 'Name'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.activities.map((value, index) => (
+                                        {data.activities.map(value => (
                                             <tr key={value.id} onContextMenu={(event) => this.onActivityMenuContext(event, value)} onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(value.id))} className="cursor-pointer">
                                                 <td>
                                                     <div className="flex items-center">
-                                                        <div className='w-[12px] h-[12px] rounded-full ml-2' style={{ backgroundColor: ['#7EC381', '#D80303', '#999999'][index % 3] }}></div>
+                                                        <div className='w-[12px] h-[12px] rounded-full ml-2' style={{ backgroundColor: value.status == 'Expired' ? '#999999' : value.status == 'Active' ? '#7EC381' : '#D80303' }}></div>
                                                         <p className="pl-1">{value.id}</p>
                                                     </div>
                                                 </td>
@@ -468,7 +480,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
                     <div className="w-[33%]">
                         <PromiseBuilder
-                            promise={state.devicesPromise}
+                            promise={devicesPromise}
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
@@ -501,11 +513,11 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 {/* ################################################################################################# */}
                 {/* ################################################################################################# */}
 
-                {state.enrollItemsCompleter && (<EnrollItemsDialog completer={state.enrollItemsCompleter} infrastructureId={this.props.params.id} />)}
+                {enrollItemsCompleter && (<EnrollItemsDialog completer={enrollItemsCompleter} infrastructureId={this.props.params.id} />)}
 
-                {Boolean(state.updateDialogCompleter) && <CreateInfrastructureDialog completer={state.updateDialogCompleter} infrastructureId={this.props.params.id} />}
+                {Boolean(updateDialogCompleter) && <CreateInfrastructureDialog completer={updateDialogCompleter} infrastructureId={this.props.params.id} />}
 
-                {Boolean(state.updateUserDialog) && <CreateUserDialog completer={state.updateUserDialog!.completer} userId={state.updateUserDialog!.userId} />}
+                {Boolean(updateUserDialog) && <CreateUserDialog completer={updateUserDialog!.completer} userId={updateUserDialog!.userId} />}
 
                 <CrudMenu
                     actions={[
@@ -513,7 +525,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         { action: 'update', label: 'Edit', icon: 'edit' },
                         { action: 'delete', label: 'Delete from infrastructure', icon: 'delete', color: 'text-red-500' }
                     ]}
-                    position={state.userContextMenu}
+                    position={userContextMenu}
                     onSelected={this.onSelectedUserMenuAction}
                     onClose={() => this.setState({ userContextMenu: null })}
                 />
@@ -524,20 +536,20 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         { action: 'update', label: 'Edit', icon: 'edit' },
                         { action: 'delete', label: 'Delete from infrastructure', icon: 'delete', color: 'text-red-500' }
                     ]}
-                    position={state.deviceContextMenu}
+                    position={deviceContextMenu}
                     onSelected={this.onSelectedDeviceMenuAction}
                     onClose={() => this.setState({ deviceContextMenu: null })}
                 />
 
                 <CrudMenu
                     actions={[
-                        { action: 'start_or_stop', label: 'Start', icon: 'play_arrow' },
-                        { action: 'favorite', label: state.activityContextMenu?.isFavorite ? 'Remove from favorites' : 'Set as favorite', icon: 'star' },
+                        { action: 'start_or_stop', label: activityContextMenu?.status == 'Active' ? 'Stop' : 'Start', icon: activityContextMenu?.status == 'Active' ? 'pause' : 'play_arrow', disabled: activityContextMenu?.status == 'Expired' },
+                        { action: 'favorite', label: activityContextMenu?.isFavorite ? 'Remove from favorites' : 'Set as favorite', icon: 'star' },
                         { action: 'view', label: 'View', icon: 'visibility' },
                         { action: 'update', label: 'Edit', icon: 'edit' },
                         { action: 'delete', label: 'Delete', icon: 'delete', color: 'text-red-500' }
                     ]}
-                    position={state.activityContextMenu}
+                    position={activityContextMenu}
                     onSelected={this.onSelectedActivityMenuAction}
                     onClose={() => this.setState({ activityContextMenu: null })}
                 />

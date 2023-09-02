@@ -45,7 +45,8 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(activity.id));
     }
 
-    async onDelete(value: IActivity) {
+    async onDelete(event: React.MouseEvent, value: IActivity) {
+        event.stopPropagation();
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
@@ -63,6 +64,30 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' });
             });
     }
+
+    async changeActivityState(event: React.MouseEvent, value: IActivity) {
+        event.stopPropagation();
+
+        if (value.status == 'Expired')
+            return;
+
+        const started = value.status == 'Active';
+        Api.changeActivityState(value.id, started ? 'stop' : 'start')
+            .then(() => {
+                this.setState({ promise: Api.getActivities() });
+                DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
+            })
+            .catch(err => {
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
+            });
+    }
+
+    async setActivityFavoriteStatus(event: React.MouseEvent, value: IActivity) {
+        event.stopPropagation();
+        
+    }
+
+
 
     render() {
 
@@ -152,11 +177,11 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                         <tr>{['ID', 'Name', 'Type', 'Date of Start', 'Date of End', 'Infrastructure', 'Status',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.activities.map((data, index) => (
+                                        {data.activities.map(data => (
                                             <tr key={data.id} className="cursor-pointer" onClick={() => this.onTapRow(data)}>
                                                 <td>
                                                     <div className="flex items-center px-2">
-                                                        <div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: ['#7EC381', '#D80303', '#999999'][index % 3] }}></div>
+                                                        <div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: data.status == 'Expired' ? '#999999' : data.status == 'Active' ? '#7EC381' : '#D80303' }}></div>
                                                         <p className="pl-1">{data.id}</p>
                                                     </div>
                                                 </td>
@@ -167,12 +192,9 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                                 <td>{data.infrastructureName}</td>
                                                 <td>
                                                     <div className="flex justify-center items-center space-x-1">
-                                                        <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#309E3A]' : 'text-[#999999]'} cursor-pointer`}>play_circle</span> {/* stop_circle: #0038FF */}
-                                                        <span className={`material-symbols-rounded text-[20px] ${isPlaying(index) ? 'text-[#999999]' : 'text-[#FDD835]'} cursor-pointer`}>star</span>
-                                                        <span onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            this.onDelete(data)
-                                                        }} className="material-symbols-rounded text-[20px] text-[#D80303] cursor-pointer">delete</span>
+                                                        <span onClick={e => this.changeActivityState(e, data)} className={`material-symbols-rounded text-[20px] ${data.status == 'Expired' ? 'text-[#999999]' : data.status == 'Active' ? 'text-[#D80303]' : 'text-[#7EC381]'} cursor-pointer`}>{data.status == 'Active' ? 'stop_circle' : 'play_circle'}</span>
+                                                        <span onClick={e => this.setActivityFavoriteStatus(e, data)} className={`material-symbols-rounded text-[20px] ${data.isFavorite ? 'text-[#FDD835]' : 'text-[#999999]'} cursor-pointer`}>star</span>
+                                                        <span onClick={e => this.onDelete(e, data)} className="material-symbols-rounded text-[20px] text-[#D80303] cursor-pointer">delete</span>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -214,10 +236,6 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
             </div>
         );
     }
-}
-
-function isPlaying(index: number) {
-    return index >= 2;
 }
 
 export default WithRouter(AnotherLaafiMonitorPage);
