@@ -41,7 +41,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
     componentDidMount(): void {
         this.setState({
             devicesPromise: Api.getDevices(),
-            deviceGroups: Api.getDevicesGroups({ PageSize: 2, PageNumber: 0 })
+            deviceGroups: Api.getDevicesGroups({ PageSize: 10 })
         });
     }
 
@@ -267,19 +267,22 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                                 <p onClick={DialogService.showDevicesGroups} className="text-sm text-blue-500 font-medium text-[#3C4858] cursor-pointer">View all</p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-2 rounded-md my-4 py-3">
-                                <PromiseBuilder
-                                    promise={state.deviceGroups}
-                                    dataBuilder={data => data.groups.map(group => (
-                                        <div key={group.devicesGroupId} className="flex bg-[#C4C4C4] h-[26px] rounded">
-                                            <div className="grow flex items-center"><p className="pl-2 text-sm text-black">{group.name}</p></div>
-                                            <div onClick={() => this.onDeleteDevicesGroup(group.devicesGroupId)} className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
-                                        </div>
-                                    ))}
-                                    loadingBuilder={() => (<CircularProgress />)}
-                                    errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
-                                />
-                            </div>
+                            <PromiseBuilder
+                                promise={state.deviceGroups}
+                                dataBuilder={data => (
+                                    <div className="grid grid-cols-2 gap-2 rounded-md my-4 py-3">
+                                        {data.groups.map(group => (
+                                            <div key={group.devicesGroupId} className="flex bg-[#C4C4C4] h-[26px] rounded">
+                                                <div onClick={() => DialogService.showDevicesGroupsItems(group.devicesGroupId)} className="grow flex items-center cursor-pointer"><p className="pl-2 text-sm text-black">{group.name}</p></div>
+                                                <div onClick={() => this.onDeleteDevicesGroup(group.devicesGroupId)} className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                loadingBuilder={() => (<div className="flex justify-center items-center my-4"><CircularProgress /></div>)}
+                                errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
+                            />
+
                         </div>
                     </div>
                 </div>

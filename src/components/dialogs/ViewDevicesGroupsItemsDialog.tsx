@@ -1,21 +1,22 @@
 import React from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Button,  Dialog, DialogActions, DialogContent, DialogTitle, Tooltip } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
 import { PromiseBuilder } from "../PromiseBuilder";
-import { IDevicesGroup, IGetDevicesGroupResult } from "../../models/devices_group_model";
 import { TableSkeletonComponent } from "../TableSkeletonComponent";
 import { DialogService } from "./DialogsComponent";
+import { IDevice, IGetDeviceResult } from "../../models/device_mdoel";
 
 type Props = {
+    id: string;
     completer: Completer<void>;
 };
 
 type State = {
-    promise: Promise<IGetDevicesGroupResult>|null;
+    promise: Promise<IGetDeviceResult>|null;
 };
 
-class ViewDevicesGroupsDialog extends React.Component<Props, State> {
+class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -26,16 +27,15 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ promise: Api.getDevicesGroups() });
+        this.setState({ promise: Api.getDevices() });
     }
 
-    onTap(value: IDevicesGroup) {
-        // this.props.completer?.complete();
+    onTap(value: IDevice) {
+        this.props.completer?.complete();
 
-        DialogService.showDevicesGroupsItems(value.devicesGroupId);
     }
 
-    async onDelete(event: React.MouseEvent, value: IDevicesGroup) {
+    async onDelete(event: React.MouseEvent, value: IDevice) {
         event.stopPropagation();
 
         const result = await DialogService.showDeleteConfirmation(
@@ -46,13 +46,15 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
         if (!result)
             return;
 
-        Api.deleteDevicesGroups(value.devicesGroupId)
-            .then(() => {
-                this.setState({ promise: Api.getDevicesGroups() });
-                DialogService.showSnackbar({ severity: 'success', message: 'Groupe supprimé avec succès' })
-            }).catch(err => {
-                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du groupe' });
-            });
+        // FIXME implement
+
+        // Api.deleteDevice(value.id)
+        //     .then(() => {
+        //         this.setState({ promise: Api.getDevices() });
+        //         DialogService.showSnackbar({ severity: 'success', message: 'Device successfully deleted' })
+        //     }).catch(err => {
+        //         DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression' });
+        //     });
     }
 
     render() {
@@ -65,23 +67,22 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
                 fullWidth
                 onClose={() => this.props.completer?.complete()}
             >
-                <DialogTitle>Devices groups</DialogTitle>
+                <DialogTitle>Devices group items</DialogTitle>
                 <DialogContent>
-                    
                     <PromiseBuilder
                         promise={this.state.promise}
                         dataBuilder={data => (
                             <table className="styled-table">
                                 <thead>
-                                    <tr>{['ID', 'Name', 'Device count', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
+                                    <tr>{['ID', 'Infrastructure', 'Model', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                 </thead>
                                 <tbody>
-                                    {data.groups.map(value => (
-                                        <tr key={value.devicesGroupId} onClick={() => this.onTap(value)} className="cursor-pointer">
-                                            <td>{value.devicesGroupId}</td>
-                                            <td>{value.name}</td>
-                                            <td>{value.devicies.length}</td>
-                                            <td><span onClick={e => this.onDelete(e, value)} className="material-symbols-outlined text-red-500 cursor-pointer">delete</span></td>
+                                    {data.devicies.map(value => (
+                                        <tr key={value.id} onClick={() => this.onTap(value)} className="cursor-pointer">
+                                            <td>{value.id}</td>
+                                            <td>{value.infrastructureName}</td>
+                                            <td>{value.model}</td>
+                                            <td><Tooltip title='Delete from devices group'><span onClick={e => this.onDelete(e, value)} className="material-symbols-outlined text-red-500 cursor-pointer">delete</span></Tooltip></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -90,7 +91,6 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
                         loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={4} />)}
                         errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                     />
-                    
                 </DialogContent>
                 <DialogActions className="mb-2 mr-4">
                     <Button onClick={() => this.props.completer?.complete()} sx={{ width: 128 }}>Close</Button>
@@ -101,4 +101,4 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
 
 }
 
-export { ViewDevicesGroupsDialog };
+export { ViewDevicesGroupsItemsDialog };

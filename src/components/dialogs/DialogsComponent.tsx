@@ -4,12 +4,14 @@ import { Completer } from "../../services/completer";
 import { RegisterDevicesGroupDialog } from "./RegisterDevicesGroupDialog ";
 import { ConfirmSuppressionDialog } from "./ConfirmSuppressionDialog";
 import { ViewDevicesGroupsDialog } from "./ViewDevicesGroupsDialog";
+import { ViewDevicesGroupsItemsDialog } from "./ViewDevicesGroupsItemsDialog";
 
 class DialogService {
 
     static showDeleteConfirmation: (title: string, description: string) => Promise<boolean>;
     static showRegisterDevicesGroup: (id?: string) => Promise<boolean>;
     static showDevicesGroups: () => Promise<void>;
+    static showDevicesGroupsItems: (id: string) => Promise<void>;
     static showSnackbar: (data: { severity: AlertColor, message: string }) => void;
 
 }
@@ -22,6 +24,7 @@ type State = {
     deleteConfirmation: { title: string, description: string, completer: Completer<boolean> }|null;
     registerDevicesGroup: { id?: string, completer: Completer<boolean> }|null;
     devicesGroups: Completer<void>|null;
+    deviceGroupsItems: { id: string, completer: Completer<void> }|null;
     snackbarData: { severity: AlertColor, message: string }|null;
 };
 
@@ -33,8 +36,9 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         this.state = {
             deleteConfirmation: null,
             registerDevicesGroup: null,
-            snackbarData: null,
-            devicesGroups: null
+            devicesGroups: null,
+            deviceGroupsItems: null,
+            snackbarData: null
         };
 
         this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
@@ -44,6 +48,7 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         DialogService.showDeleteConfirmation = this.showDeleteConfirmation.bind(this);
         DialogService.showRegisterDevicesGroup = this.showRegisterDevicesGroup.bind(this);
         DialogService.showDevicesGroups = this.showDevicesGroups.bind(this);
+        DialogService.showDevicesGroupsItems = this.showDevicesGroupsItems.bind(this);
         DialogService.showSnackbar = this.showSnackbar.bind(this);
     }
 
@@ -77,6 +82,16 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         return result;
     }
 
+    async showDevicesGroupsItems(id: string) {
+        const completer = new Completer<void>();
+        this.setState({ deviceGroupsItems: { id, completer } });
+
+        const result = await completer.promise;
+        this.setState({ deviceGroupsItems: null });
+
+        return result;
+    }
+
     showSnackbar(data: { severity: AlertColor, message: string }) {
         this.setState({ snackbarData: data });
     }
@@ -86,7 +101,6 @@ class DialogsComponent extends React.PureComponent<Props, State> {
             return;
         this.setState({ snackbarData: null });
     }
-
 
     render() {
         const state = this.state;
@@ -100,7 +114,7 @@ class DialogsComponent extends React.PureComponent<Props, State> {
 
                 {state.devicesGroups && (<ViewDevicesGroupsDialog completer={state.devicesGroups} />)}
 
-                
+                {state.deviceGroupsItems && (<ViewDevicesGroupsItemsDialog completer={state.deviceGroupsItems.completer} id={state.deviceGroupsItems.id} />)}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}

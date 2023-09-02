@@ -356,7 +356,7 @@ class Api {
         return response.json();
     }
 
-    static async getActivities(options: { InfrastructureId?: string, userId?: string } = {}): Promise<IGetActivitiesResult> {
+    static async getActivities(options: { InfrastructureId?: string, userId?: string, PageSize?: number } = {}): Promise<IGetActivitiesResult> {
         const response = await fetch(
             Utils.buildUrl(this.BASE_URL, '/activities', { query: options }), {
                 headers: {
@@ -425,7 +425,7 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
-    static async getDevicesGroups(query: { PageNumber?: number, PageSize?: number } = {}): Promise<IGetDevicesGroupResult> {
+    static async getDevicesGroups(query: { PageSize?: number } = {}): Promise<IGetDevicesGroupResult> {
         const response = await fetch(Utils.buildUrl(this.BASE_URL, '/devices-groups', { query }), {
             method: 'GET',
             headers: {

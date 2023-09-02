@@ -83,7 +83,7 @@ class EditUserComponent extends React.Component<Props, State> {
                 user: user,
                 formState: validator.getData,
                 isLoading: false,
-                activitiesPromise: Api.getActivities({ userId: value.id })
+                activitiesPromise: Api.getActivities({ userId: value.id, PageSize: 10 })
             });
         } catch(err) {
             this.setState({ isLoading: false });
