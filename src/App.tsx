@@ -2,7 +2,7 @@ import { useLayoutEffect } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { routes } from "./constants/routes";
 import { LayoutBase } from "./layouts/LayoutBase";
-import { DashboardPage } from "./pages/DashboardPage";
+import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { EditProfilPage } from "./pages/EditProfilPage";

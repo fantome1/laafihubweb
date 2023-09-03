@@ -264,7 +264,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                         <div className='bg-white rounded-lg mt-2 p-4'>
                             <div className="flex justify-between">
                                 <p className="text-lg text-[#3C4858]">Groups</p>
-                                <p onClick={DialogService.showDevicesGroups} className="text-sm text-blue-500 font-medium text-[#3C4858] cursor-pointer">View all</p>
+                                <p onClick={DialogService.showDevicesGroups} className="text-sm text-[var(--primary)] font-medium cursor-pointer">View all</p>
                             </div>
 
                             <PromiseBuilder

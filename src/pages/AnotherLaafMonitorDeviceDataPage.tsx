@@ -28,7 +28,7 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
 
         this.connection.start()
             .then(() => {
-                this.connection.invoke('SubscribeToGetActivityData', { activityId: this.props.params.id });
+                this.connection.invoke('SubscribeToGetActivityData', this.props.params.id);
 
                 this.connection.on('ReceiveActivityData', this.listen);
             }).catch(err => {

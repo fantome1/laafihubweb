@@ -3,6 +3,8 @@ import { Utils } from "../services/utils";
 import { IActivity } from "../models/activity_model";
 import { useNavigate } from "react-router-dom";
 import { routes } from "../constants/routes";
+import { DialogService } from "./dialogs/DialogsComponent";
+import { Api } from "../services/api";
 
 type ActivityCardModel = {
     activity: IActivity;
@@ -14,11 +16,27 @@ type Props = {
     columnCount: number;
     data: ActivityCardModel[];
     showMoreBtn?: boolean;
+    onReload: () => void;
 };
 
 function ActivityList(props: Props) {
 
     const navigate = useNavigate();
+
+    function onDelete(value: IActivity) {
+        DialogService.showLoadingDialog();
+
+        Api.deleteActivity(value.id)
+            .then(() => {
+                props.onReload();
+                DialogService.closeLoadingDialog();
+                DialogService.showSnackbar({ severity: 'success', message: 'L\'activité a bien été supprimé' })
+            })
+            .catch(err => {
+                DialogService.closeLoadingDialog();
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
+            });
+    }
 
     return (
         <Paper sx={{ borderRadius: '4px' }} elevation={0}>
@@ -33,13 +51,13 @@ function ActivityList(props: Props) {
             </div>
 
             <div className={`grid grid-cols-${props.columnCount} px-4 py-6 gap-4`}>
-                {props.data.map((e, index) => (<ActivityCard key={index} value={e} /> ))}
+                {props.data.map((e, index) => (<ActivityCard key={index} value={e} onDelete={onDelete} /> ))}
             </div>
         </Paper>
     );
 }
 
-function ActivityCard({ value }: { value: ActivityCardModel }) {
+function ActivityCard({ value, onDelete }: { value: ActivityCardModel, onDelete: (value: IActivity) => void }) {
 
     const navigate = useNavigate();
 
@@ -54,8 +72,8 @@ function ActivityCard({ value }: { value: ActivityCardModel }) {
                     : (<div className="grow"><p className="text-sm font-medium text-white">{value.activity.name}</p></div>)}
                 <div className="flex space-x-1">
                     <div className="bg-[#3C4858] px-2 rounded flex justify-center items-center"><p className="text-xs text-white">{value.activity.type}</p></div>
-                    <div className="w-[24px] h-[24px] flex justify-center items-center bg-[#3C4858] rounded cursor-pointer"><span className="material-symbols-rounded text-[16px] text-white">edit</span></div>
-                    <div className="w-[24px] h-[24px] flex justify-center items-center bg-[#3C4858] rounded cursor-pointer"><span className="material-symbols-rounded text-[16px] text-white">delete_forever</span></div>
+                    <div onClick={e => { e.stopPropagation(); navigate(routes.MODIFY_ACTIVITY.build(value.activity.id)) }} className="w-[24px] h-[24px] flex justify-center items-center bg-[#3C4858] rounded cursor-pointer"><span className="material-symbols-rounded text-[16px] text-white">edit</span></div>
+                    <div onClick={e => { e.stopPropagation(); onDelete(value.activity) }} className="w-[24px] h-[24px] flex justify-center items-center bg-[#3C4858] rounded cursor-pointer"><span className="material-symbols-rounded text-[16px] text-white">delete_forever</span></div>
                 </div>
             </div>
             <div className="flex h-[70px] divide-x-2 divide-[var(--primary)]">

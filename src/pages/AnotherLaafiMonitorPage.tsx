@@ -8,7 +8,6 @@ import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { Utils } from "../services/utils";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
-import { AnotherActivityList } from "../components/AnotherActivityList";
 import { ActivityList } from "../components/ActivityList";
 import { IGetDeviceResult } from "../models/device_mdoel";
 import { UserCountSkeleton } from "../components/Skeletons";
@@ -237,6 +236,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                         label='Favorite Activities'
                                         columnCount={1}
                                         data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
+                                        onReload={() => this.setState({ promise: Api.getActivities(), })}
                                     />
                                 </div>
                             )}

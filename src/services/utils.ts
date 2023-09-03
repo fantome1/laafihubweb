@@ -2,6 +2,7 @@ import moment from "moment";
 import * as signalR from '@microsoft/signalr';
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IUser } from "../models/user_model";
+import { AuthService } from "./auth_service";
 
 var emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 var macAddressRegex = /^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$/
@@ -103,7 +104,7 @@ class Utils {
 
     static signalRConnectionBuilder() {
         return new signalR.HubConnectionBuilder()
-            .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect')
+            .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect', { accessTokenFactory: () => AuthService.getAuthData()?.accessToken ?? '' })
             .build();
     }
 

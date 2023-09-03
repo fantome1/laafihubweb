@@ -12,9 +12,11 @@ import { IUser } from "../models/user_model";
 import { Api } from "../services/api";
 import { IGetInfrastructureResult } from "../models/infrastructure_model";
 import { CircleMarker, Popup } from "react-leaflet";
+import { NavigateFunction } from "react-router-dom";
+import { WithRouter } from "../components/WithRouterHook";
 
 type Props = {
-
+    navigate: NavigateFunction;
 }
 
 type State = {
@@ -34,7 +36,8 @@ class DashboardPage extends React.Component<Props, State> {
             activitiesPromise: null,
             usersPromise: null,
             infrastructuresPromise: null
-        }
+        };
+
     }
 
     componentDidMount(): void {
@@ -155,6 +158,7 @@ class DashboardPage extends React.Component<Props, State> {
                                         columnCount={2}
                                         showMoreBtn={true}
                                         data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
+                                        onReload={() => this.setState({ activitiesPromise: Api.getActivities({ PageSize: 4 }) })}
                                     />
                                 </div>
                             )}
@@ -163,23 +167,25 @@ class DashboardPage extends React.Component<Props, State> {
                         />
                     </div>
 
-                    <div className="flex flex-col" style={{ flex: '1 1 0', backgroundColor: '#fff', borderRadius: '4px' }}>
-                        <div className="bg-[var(--primary)] py-1 text-center" style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
-                            <p className="text-lg text-white font-medium">Devices</p>
-                        </div>
-
-                        <div className="flex p-4 grow">
-                            <div className="w-[50%] flex flex-col justify-between">
-                                <p className="text-xl text-[#3C4858]">Total Connected</p>
-                                <div className="flex justify-center items-center">
-                                    <div className="w-[80%] border-r"> <LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
-                                </div>
+                    <div className="flex flex-col" style={{ flex: '1 1 0' }}>
+                        <div style={{ backgroundColor: '#fff', borderRadius: '4px' }}>
+                            <div className="bg-[var(--primary)] py-1 text-center" style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
+                                <p className="text-lg text-white font-medium">Devices</p>
                             </div>
 
-                            <div className="w-[50%] w-[50%] flex flex-col justify-between">
-                                <p className="text-xl text-[]">Devices usage</p>
-                                <div className="flex justify-center items-center">
-                                    <div className="w-[80%]"><LaafiMonitorDeviceUsageChart promise={state.devicesPromise} /></div>
+                            <div className="flex p-4 grow">
+                                <div className="w-[50%] flex flex-col justify-between">
+                                    <p className="text-xl text-[#3C4858]">Total Connected</p>
+                                    <div className="flex justify-center items-center">
+                                        <div className="w-[80%] border-r"> <LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
+                                    </div>
+                                </div>
+
+                                <div className="w-[50%] w-[50%] flex flex-col justify-between">
+                                    <p className="text-xl text-[]">Devices usage</p>
+                                    <div className="flex justify-center items-center">
+                                        <div className="w-[80%]"><LaafiMonitorDeviceUsageChart promise={state.devicesPromise} /></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -190,4 +196,4 @@ class DashboardPage extends React.Component<Props, State> {
     }
 }
 
-export { DashboardPage };
+export default WithRouter(DashboardPage);
