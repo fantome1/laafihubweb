@@ -1,6 +1,6 @@
 import React from "react";
 import * as signalR from '@microsoft/signalr';
-import { Box, Button, Checkbox, FormControlLabel, Paper, Tab, Tabs } from "@mui/material";
+import { Box, Button, Paper, Tab, Tabs } from "@mui/material";
 import { TemperaturePieChart, TemperatureLineChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
@@ -11,7 +11,7 @@ import { MAX_TEMPERATURE, MIN_TEMPERATURE } from "../constants/temperature";
 import { Marker, Popup } from "react-leaflet";
 import { NavigateFunction } from "react-router-dom";
 import { routes } from "../constants/routes";
-
+import { Utils } from "../services/utils";
 
 type Props = {
     navigate: NavigateFunction;
@@ -28,9 +28,7 @@ type State = {
 
 class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
 
-    private connection = new signalR.HubConnectionBuilder()
-        .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect')
-        .build();
+    private connection = Utils.signalRConnectionBuilder();
 
     constructor(props: Props) {
         super(props);
@@ -52,7 +50,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
 
         this.connection.start()
             .then(() => {
-                this.connection.invoke('SubscribeToGetDeviceData', { DeviceId: 'ID' });
+                this.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
 
                 this.connection.on('ReceiveDeviceData', this.listen);
             }).catch(err => {
@@ -60,10 +58,10 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                 // this.setState({ error: true });
             });
 
-        Api.getDevice(this.props.params.id)
-            .then(data => {
-                console.log(data);
-            })
+        // Api.getDevice(this.props.params.id)
+        //     .then(data => {
+        //         console.log(data);
+        //     })
     }
 
     componentWillUnmount(): void {

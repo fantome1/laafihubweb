@@ -1,4 +1,5 @@
 import moment from "moment";
+import * as signalR from '@microsoft/signalr';
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IUser } from "../models/user_model";
 
@@ -96,8 +97,12 @@ class Utils {
         return parseFloat(value);
     }
 
+    static signalRConnectionBuilder() {
+        return new signalR.HubConnectionBuilder()
+            .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect')
+            .build();
+    }
+
 }
-
-
 
 export { Utils };

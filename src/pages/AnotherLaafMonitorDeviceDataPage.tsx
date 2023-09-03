@@ -1,8 +1,10 @@
 import React from "react";
+import * as signalR from '@microsoft/signalr';
 import { Paper } from "@mui/material";
 import { GroupedBarChart, GroupedBarChart2, TemperatureChart2, TemperatureCurveChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
+import { Utils } from "../services/utils";
 
 type Props = {
     params: { id: string };
@@ -14,8 +16,34 @@ type State = {
 
 class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
 
+    private connection = Utils.signalRConnectionBuilder();
+
     constructor(props: Props) {
         super(props);
+    }
+
+    componentDidMount(): void {
+        if (this.connection.state != signalR.HubConnectionState.Disconnected)
+            return;
+
+        this.connection.start()
+            .then(() => {
+                this.connection.invoke('SubscribeToGetActivityData', { activityId: this.props.params.id });
+
+                this.connection.on('ReceiveActivityData', this.listen);
+            }).catch(err => {
+                console.log(err);
+                // this.setState({ error: true });
+            });
+
+        // Api.getDevice(this.props.params.id)
+        //     .then(data => {
+        //         console.log(data);
+        //     })
+    }
+
+    listen(data: any) {
+        console.log(data);
     }
 
     render() {
