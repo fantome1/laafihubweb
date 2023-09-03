@@ -6,14 +6,18 @@ import { PromiseBuilder } from "../PromiseBuilder";
 import { TableSkeletonComponent } from "../TableSkeletonComponent";
 import { DialogService } from "./DialogsComponent";
 import { IDevice, IGetDeviceResult } from "../../models/device_mdoel";
+import { NavigateFunction } from "react-router-dom";
+import { routes } from "../../constants/routes";
+import { WithRouter } from "../WithRouterHook";
 
 type Props = {
     id: string;
     completer: Completer<void>;
+    navigate: NavigateFunction;
 };
 
 type State = {
-    promise: Promise<IGetDeviceResult>|null;
+    promise: Promise<IDevice[]>|null;
 };
 
 class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
@@ -27,12 +31,13 @@ class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ promise: Api.getDevices() });
+        this.setState({ promise: Api.getDevicesGroupsItems(this.props.id) });
     }
 
     onTap(value: IDevice) {
+        DialogService.close('devicesGroups');
         this.props.completer?.complete();
-
+        this.props.navigate(routes.LAAFI_MONITOR_DEVICE_DATA.build(value.id));
     }
 
     async onDelete(event: React.MouseEvent, value: IDevice) {
@@ -46,15 +51,13 @@ class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
         if (!result)
             return;
 
-        // FIXME implement
-
-        // Api.deleteDevice(value.id)
-        //     .then(() => {
-        //         this.setState({ promise: Api.getDevices() });
-        //         DialogService.showSnackbar({ severity: 'success', message: 'Device successfully deleted' })
-        //     }).catch(err => {
-        //         DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression' });
-        //     });
+        Api.deleteDeviceFromDevicesGroups(this.props.id, value.id)
+            .then(() => {
+                this.setState({ promise: Api.getDevicesGroupsItems(this.props.id) });
+                DialogService.showSnackbar({ severity: 'success', message: 'Device successfully deleted' })
+            }).catch(err => {
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression' });
+            });
     }
 
     render() {
@@ -77,10 +80,10 @@ class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
                                     <tr>{['ID', 'Infrastructure', 'Model', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                 </thead>
                                 <tbody>
-                                    {data.devicies.map(value => (
+                                    {data.map(value => (
                                         <tr key={value.id} onClick={() => this.onTap(value)} className="cursor-pointer">
-                                            <td>{value.id}</td>
-                                            <td>{value.infrastructureName}</td>
+                                            <td><div className="flex items-center pl-2"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div><span className="pl-2">{value.id}</span></div></td>
+                                            <td>{value.infrastructureId}</td>
                                             <td>{value.model}</td>
                                             <td><Tooltip title='Delete from devices group'><span onClick={e => this.onDelete(e, value)} className="material-symbols-outlined text-red-500 cursor-pointer">delete</span></Tooltip></td>
                                         </tr>
@@ -101,4 +104,4 @@ class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
 
 }
 
-export { ViewDevicesGroupsItemsDialog };
+export default WithRouter(ViewDevicesGroupsItemsDialog);

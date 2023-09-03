@@ -4,7 +4,7 @@ import { Completer } from "../../services/completer";
 import { RegisterDevicesGroupDialog } from "./RegisterDevicesGroupDialog ";
 import { ConfirmSuppressionDialog } from "./ConfirmSuppressionDialog";
 import { ViewDevicesGroupsDialog } from "./ViewDevicesGroupsDialog";
-import { ViewDevicesGroupsItemsDialog } from "./ViewDevicesGroupsItemsDialog";
+import ViewDevicesGroupsItemsDialog from "./ViewDevicesGroupsItemsDialog";
 
 class DialogService {
 
@@ -13,6 +13,8 @@ class DialogService {
     static showDevicesGroups: () => Promise<void>;
     static showDevicesGroupsItems: (id: string) => Promise<void>;
     static showSnackbar: (data: { severity: AlertColor, message: string }) => void;
+
+    static close: (key: string) => void; 
 
 }
 
@@ -49,7 +51,20 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         DialogService.showRegisterDevicesGroup = this.showRegisterDevicesGroup.bind(this);
         DialogService.showDevicesGroups = this.showDevicesGroups.bind(this);
         DialogService.showDevicesGroupsItems = this.showDevicesGroupsItems.bind(this);
+        DialogService.close = this.close.bind(this);
         DialogService.showSnackbar = this.showSnackbar.bind(this);
+
+    }
+
+    close(key: string): void {
+        // @ts-ignore
+        const data = this.state[key];
+
+        if (data instanceof Completer) {
+            data.complete(undefined);
+        } else if (data.completer instanceof Completer) {
+            data.completer.complete(undefined);
+        }
     }
 
     async showDeleteConfirmation(title: string, description: string) {

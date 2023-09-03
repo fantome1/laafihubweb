@@ -1,5 +1,5 @@
 import { IActivity, IGetActivitiesResult } from "../models/activity_model";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IDevice, IGetDeviceResult } from "../models/device_mdoel";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { IGetUsersResult, IUser } from "../models/user_model";
@@ -438,8 +438,33 @@ class Api {
         return response.json();
     }
 
+    static async getDevicesGroupsItems(id: string): Promise<IDevice[]> {
+        const response = await fetch(`${this.BASE_URL}/devices-groups/${id}/devices`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
     static async deleteDevicesGroups(id: string): Promise<any> {
         const response = await fetch(`${this.BASE_URL}/devices-groups/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async deleteDeviceFromDevicesGroups(id: string, deviceId: string): Promise<any> {
+        const response = await fetch(`${this.BASE_URL}/devices-groups/${id}/devices/${deviceId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`

@@ -1,1 +1,2 @@
 - Modifier une infrastruture
+- Valider les dates dans la creation d'une activie: remining < startDate < endDate
