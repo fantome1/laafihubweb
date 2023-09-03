@@ -20,13 +20,16 @@ import { RealtimeTestPage } from "./pages/RealtimeTestPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./mui_theme";
 import CreateActivityPage from "./pages/CreateActivityPage";
-import { DialogsComponent } from "./components/dialogs/DialogsComponent";
+import { DialogService, DialogsComponent } from "./components/dialogs/DialogsComponent";
 
 function ScrollToTop() {
   const location = useLocation();
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
+    // Ferme tous les dialog deja ouvert
+    if (DialogService.closeAll)
+      DialogService.closeAll();
   }, [location.pathname]);
 
   return null;

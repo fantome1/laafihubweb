@@ -241,24 +241,30 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 this.onDeleteActivity(this.state.activityContextMenu!.activityId);
             break;
             case 'start_or_stop':
+                DialogService.showLoadingDialog();
                 const started = this.state.activityContextMenu!.status == 'Active';
                 Api.changeActivityState(this.state.activityContextMenu!.activityId, started ? 'stop' : 'start')
                     .then(() => {
                         this.setState({ activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }) });
+                        DialogService.closeLoadingDialog();
                         DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
                     })
                     .catch(err => {
+                        DialogService.closeLoadingDialog();
                         DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
                     });
             break;
             case 'favorite':
+                DialogService.showLoadingDialog();
                 const isFavorite = this.state.activityContextMenu!.isFavorite;
                 Api.changeActivityFavoriteStatus(this.state.activityContextMenu!.activityId, !isFavorite)
                     .then(() => {
                         this.setState({ activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }) });
+                        DialogService.closeLoadingDialog();
                         DialogService.showSnackbar({ severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
                     })
                     .catch(err => {
+                        DialogService.closeLoadingDialog();
                         DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
                     });
             break;

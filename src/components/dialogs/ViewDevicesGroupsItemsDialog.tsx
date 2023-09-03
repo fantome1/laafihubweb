@@ -35,7 +35,6 @@ class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
     }
 
     onTap(value: IDevice) {
-        DialogService.close('devicesGroups');
         this.props.completer?.complete();
         this.props.navigate(routes.LAAFI_MONITOR_DEVICE_DATA.build(value.id));
     }

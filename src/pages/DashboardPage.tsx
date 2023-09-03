@@ -40,7 +40,7 @@ class DashboardPage extends React.Component<Props, State> {
     componentDidMount(): void {
         this.setState({
             devicesPromise: Api.getDevices(),
-            activitiesPromise: Api.getActivities(),
+            activitiesPromise: Api.getActivities({ PageSize: 4 }),
             usersPromise: Api.getUsers(),
             infrastructuresPromise: Api.getInfrastructures()
         });

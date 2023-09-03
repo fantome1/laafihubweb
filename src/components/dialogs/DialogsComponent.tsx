@@ -1,10 +1,11 @@
 import React from "react";
-import { Alert, AlertColor, Snackbar } from "@mui/material";
+import { Alert, AlertColor, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { RegisterDevicesGroupDialog } from "./RegisterDevicesGroupDialog ";
 import { ConfirmSuppressionDialog } from "./ConfirmSuppressionDialog";
 import { ViewDevicesGroupsDialog } from "./ViewDevicesGroupsDialog";
 import ViewDevicesGroupsItemsDialog from "./ViewDevicesGroupsItemsDialog";
+import { Utils } from "../../services/utils";
 
 class DialogService {
 
@@ -13,8 +14,11 @@ class DialogService {
     static showDevicesGroups: () => Promise<void>;
     static showDevicesGroupsItems: (id: string) => Promise<void>;
     static showSnackbar: (data: { severity: AlertColor, message: string }) => void;
+    static showLoadingDialog: () => void;
+    static closeLoadingDialog: () => void;
 
-    static close: (key: string) => void; 
+    static close: (key: string) => void;
+    static closeAll: () => void;
 
 }
 
@@ -28,6 +32,7 @@ type State = {
     devicesGroups: Completer<void>|null;
     deviceGroupsItems: { id: string, completer: Completer<void> }|null;
     snackbarData: { severity: AlertColor, message: string }|null;
+    loadingCompleter: Completer<void>|null;
 };
 
 class DialogsComponent extends React.PureComponent<Props, State> {
@@ -40,7 +45,8 @@ class DialogsComponent extends React.PureComponent<Props, State> {
             registerDevicesGroup: null,
             devicesGroups: null,
             deviceGroupsItems: null,
-            snackbarData: null
+            snackbarData: null,
+            loadingCompleter: null
         };
 
         this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
@@ -51,9 +57,14 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         DialogService.showRegisterDevicesGroup = this.showRegisterDevicesGroup.bind(this);
         DialogService.showDevicesGroups = this.showDevicesGroups.bind(this);
         DialogService.showDevicesGroupsItems = this.showDevicesGroupsItems.bind(this);
-        DialogService.close = this.close.bind(this);
+
         DialogService.showSnackbar = this.showSnackbar.bind(this);
 
+        DialogService.showLoadingDialog = this.showLoadingDialog.bind(this);
+        DialogService.closeLoadingDialog = this.closeLoadingDialog.bind(this);
+
+        DialogService.close = this.close.bind(this);
+        DialogService.closeAll = this.closeAll.bind(this);
     }
 
     close(key: string): void {
@@ -62,9 +73,14 @@ class DialogsComponent extends React.PureComponent<Props, State> {
 
         if (data instanceof Completer) {
             data.complete(undefined);
-        } else if (data.completer instanceof Completer) {
+        } else if (data?.completer instanceof Completer) {
             data.completer.complete(undefined);
         }
+    }
+
+    closeAll() {
+        for (const key of Object.keys(this.state))
+            this.close(key);
     }
 
     async showDeleteConfirmation(title: string, description: string) {
@@ -107,8 +123,26 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         return result;
     }
 
-    showSnackbar(data: { severity: AlertColor, message: string }) {
+    async showSnackbar(data: { severity: AlertColor, message: string }) {
+        if (this.state.snackbarData)
+            this.setState({ snackbarData: null });
+        await Utils.wait(100);
         this.setState({ snackbarData: data });
+    }
+
+    async showLoadingDialog() {
+        const completer = new Completer<void>();
+        this.setState({ loadingCompleter: completer });
+
+        const result = await completer.promise;
+        this.setState({ loadingCompleter: null });
+
+        return result;
+    }
+
+    closeLoadingDialog() {
+        if (this.state.loadingCompleter)
+            this.state.loadingCompleter.complete();
     }
 
     handleCloseSnackbar(_?: React.SyntheticEvent | Event, reason?: string) {
@@ -133,12 +167,19 @@ class DialogsComponent extends React.PureComponent<Props, State> {
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}
-                    autoHideDuration={6000}
+                    autoHideDuration={4000}
                     onClose={this.handleCloseSnackbar}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
                     <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
+
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={Boolean(state.loadingCompleter)}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
 
             </>
         );

@@ -67,6 +67,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
     async changeActivityState(event: React.MouseEvent, value: IActivity) {
         event.stopPropagation();
+        DialogService.showLoadingDialog();
 
         if (value.status == 'Expired')
             return;
@@ -75,19 +76,31 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         Api.changeActivityState(value.id, started ? 'stop' : 'start')
             .then(() => {
                 this.setState({ promise: Api.getActivities() });
+                DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
             })
             .catch(err => {
+                DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
             });
     }
 
     async setActivityFavoriteStatus(event: React.MouseEvent, value: IActivity) {
         event.stopPropagation();
-        
+        DialogService.showLoadingDialog();
+
+        const isFavorite = value.isFavorite;
+        Api.changeActivityFavoriteStatus(value.id, !isFavorite)
+            .then(() => {
+                this.setState({ promise: Api.getActivities() });
+                DialogService.closeLoadingDialog();
+                DialogService.showSnackbar({ severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
+            })
+            .catch(err => {
+                DialogService.closeLoadingDialog();
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
+            });
     }
-
-
 
     render() {
 
