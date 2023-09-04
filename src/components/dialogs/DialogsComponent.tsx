@@ -6,6 +6,10 @@ import { ConfirmSuppressionDialog } from "./ConfirmSuppressionDialog";
 import { ViewDevicesGroupsDialog } from "./ViewDevicesGroupsDialog";
 import ViewDevicesGroupsItemsDialog from "./ViewDevicesGroupsItemsDialog";
 import { Utils } from "../../services/utils";
+import { EnrollUserDialog } from "./EnrollUserDialog";
+import { IActivity } from "../../models/activity_model";
+import { IUser } from "../../models/user_model";
+import { ActivityPickerDialog } from "./ActivityPickerDialog";
 
 class DialogService {
 
@@ -13,6 +17,8 @@ class DialogService {
     static showRegisterDevicesGroup: (id?: string) => Promise<boolean>;
     static showDevicesGroups: () => Promise<void>;
     static showDevicesGroupsItems: (id: string) => Promise<void>;
+    static showEnrollUser: (user: IUser) => Promise<boolean>;
+    static showActivityPicker: (userId: string) => Promise<IActivity|null>;
     static showSnackbar: (data: { severity: AlertColor, message: string }) => void;
     static showLoadingDialog: () => void;
     static closeLoadingDialog: () => void;
@@ -31,6 +37,8 @@ type State = {
     registerDevicesGroup: { id?: string, completer: Completer<boolean> }|null;
     devicesGroups: Completer<void>|null;
     deviceGroupsItems: { id: string, completer: Completer<void> }|null;
+    enrollUser: { user: IUser, completer: Completer<boolean> }|null;
+    activityPicker: { userId: string, completer: Completer<IActivity|null> }|null;
     snackbarData: { severity: AlertColor, message: string }|null;
     loadingCompleter: Completer<void>|null;
 };
@@ -45,6 +53,8 @@ class DialogsComponent extends React.PureComponent<Props, State> {
             registerDevicesGroup: null,
             devicesGroups: null,
             deviceGroupsItems: null,
+            enrollUser: null,
+            activityPicker: null,
             snackbarData: null,
             loadingCompleter: null
         };
@@ -57,6 +67,8 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         DialogService.showRegisterDevicesGroup = this.showRegisterDevicesGroup.bind(this);
         DialogService.showDevicesGroups = this.showDevicesGroups.bind(this);
         DialogService.showDevicesGroupsItems = this.showDevicesGroupsItems.bind(this);
+        DialogService.showEnrollUser = this.showEnrollUser.bind(this);
+        DialogService.showActivityPicker = this.showActivityPicker.bind(this);
 
         DialogService.showSnackbar = this.showSnackbar.bind(this);
 
@@ -123,6 +135,26 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         return result;
     }
 
+    async showEnrollUser(user: IUser) {
+        const completer = new Completer<boolean>();
+        this.setState({ enrollUser: { user, completer } });
+
+        const result = await completer.promise;
+        this.setState({ enrollUser: null });
+
+        return result;
+    }
+
+    async showActivityPicker(userId: string) {
+        const completer = new Completer<IActivity|null>();
+        this.setState({ activityPicker: { userId, completer } });
+
+        const result = await completer.promise;
+        this.setState({ activityPicker: null });
+
+        return result;
+    }
+
     async showSnackbar(data: { severity: AlertColor, message: string }) {
         if (this.state.snackbarData)
             this.setState({ snackbarData: null });
@@ -164,6 +196,10 @@ class DialogsComponent extends React.PureComponent<Props, State> {
                 {state.devicesGroups && (<ViewDevicesGroupsDialog completer={state.devicesGroups} />)}
 
                 {state.deviceGroupsItems && (<ViewDevicesGroupsItemsDialog completer={state.deviceGroupsItems.completer} id={state.deviceGroupsItems.id} />)}
+
+                {state.enrollUser && (<EnrollUserDialog completer={state.enrollUser.completer} user={state.enrollUser.user} />)}
+
+                {state.activityPicker && (<ActivityPickerDialog completer={state.activityPicker.completer} userId={state.activityPicker.userId} />)}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}

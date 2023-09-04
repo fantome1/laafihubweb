@@ -7,7 +7,7 @@ import { Api } from "../services/api";
 import { CountrySelector } from "../packages/country_selector/CountrySelector";
 import ReactPhoneInput2 from "react-phone-input-2";
 import { DialogService } from "./dialogs/DialogsComponent";
-import { IGetActivitiesResult } from "../models/activity_model";
+import { IActivity } from "../models/activity_model";
 import { PromiseBuilder } from "./PromiseBuilder";
 import { WithRouter } from "./WithRouterHook";
 import { NavigateFunction } from "react-router-dom";
@@ -25,7 +25,7 @@ type State = {
     user: IUser|null; // For update user
     formState: FormValidatorData|null,
     isLoading: boolean;
-    activitiesPromise: Promise<IGetActivitiesResult>|null;
+    activitiesPromise: Promise<IActivity[]>|null;
 };
 
 class EditUserComponent extends React.Component<Props, State> {
@@ -43,6 +43,7 @@ class EditUserComponent extends React.Component<Props, State> {
 
         this.onSubmit = this.onSubmit.bind(this);
         this.listen = this.listen.bind(this);
+        this.enrollUser = this.enrollUser.bind(this);
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -83,7 +84,7 @@ class EditUserComponent extends React.Component<Props, State> {
                 user: user,
                 formState: validator.getData,
                 isLoading: false,
-                activitiesPromise: Api.getActivities({ userId: value.id, PageSize: 10 })
+                activitiesPromise: Api.getUserActivities(value.id)
             });
         } catch(err) {
             this.setState({ isLoading: false });
@@ -162,16 +163,30 @@ class EditUserComponent extends React.Component<Props, State> {
 
         Api.deleteUserFromActivity(activityId, this.state.user!.id)
             .then(() => {
-                this.setState({ activitiesPromise: Api.getActivities({ userId: this.state.user!.id }) });
+                this.setState({ activitiesPromise: Api.getUserActivities(this.state.user!.id) });
                 DialogService.showSnackbar({ severity: 'success', message: 'User has been successfully removed from the activity' });
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'An error occurred while deleting the user in an activity' });
             });
     }
 
+    async enrollUser() {
+
+        if (!this.state.user)
+            return;
+
+        const result = await DialogService.showEnrollUser(this.state.user);
+
+        if (result == true) {
+            DialogService.showSnackbar({ severity: 'success', message: 'Enrôlement effectué avec succès' });
+        }
+    }
+
     formComponent() {
 
         const state = this.state;
+
+        const hasUser = !!state.user;
 
         const formState = state.formState!;
         const disableField = state.validator == null;
@@ -204,7 +219,7 @@ class EditUserComponent extends React.Component<Props, State> {
                     <div>
                         <EditButton disabled={!Boolean(this.state.formState?.isValid)} onClick={this.onSubmit} />
 
-                        <div className="flex justify-center items-center w-[64px] h-[34px] bg-[var(--primary)] mt-2 cursor-pointer">
+                        <div onClick={this.enrollUser} className='flex justify-center items-center w-[64px] h-[34px] mt-2 cursor-pointer' style={{ backgroundColor: hasUser ? 'var(--primary)' : '#A2A2A2' }}>
                             <p className="text-white">Enroll</p>
                         </div>
                     </div>
@@ -296,9 +311,9 @@ class EditUserComponent extends React.Component<Props, State> {
                         promise={this.state.activitiesPromise}
                         dataBuilder={data => (
                             <div className="grid grid-cols-2 gap-2 border-2 rounded-md my-4 py-3 px-2">
-                                {data.activities.map(activity => (
-                                    <div key={activity.id} className="flex bg-[var(--primary)] h-[26px] rounded">
-                                        <div onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(activity.id))} className="grow cursor-pointer"><p className="pl-2 text-xs text-white font-medium">{activity.name}</p></div>
+                                {data.map(activity => (
+                                    <div key={activity.id} className="flex bg-[var(--primary)] min-h-[26px] rounded">
+                                        <div onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(activity.id))} className="grow flex items-center cursor-pointer"><p className="pl-2 text-xs text-white font-medium">{activity.name}</p></div>
                                         <div onClick={() => this.onDeleteUserFromActivity(activity.id)} className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
                                     </div>
                                 ))}

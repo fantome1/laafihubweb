@@ -369,6 +369,44 @@ class Api {
         return response.json();
     }
 
+    static async enrollUserInActivity(userId: string, data: { activityId: string, deviceIds: string[] }[]): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/activities/${userId}/enrolle`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async getActivitiesForEnrollement(userId: string): Promise<IGetActivitiesResult> {
+        const response = await fetch(`${this.BASE_URL}/activities/${userId}/activities-for-enrollement`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
+    static async getUserActivities(userId: string): Promise<IActivity[]> {
+        const response = await fetch(`${this.BASE_URL}/activities/${userId}/activities`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
+
     static async getActivity(activityId: string): Promise<IActivity> {
         const response = await fetch(`${this.BASE_URL}/activities/${activityId}`, {
                 headers: {
