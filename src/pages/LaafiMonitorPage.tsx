@@ -9,7 +9,7 @@ import { AddDeviceDialog } from "../components/dialogs/AddDeviceDialog";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDeviceResult } from "../models/device_model";
 import { DialogService } from "../components/dialogs/DialogsComponent";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
 

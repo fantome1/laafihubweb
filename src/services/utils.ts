@@ -1,6 +1,6 @@
 import moment from "moment";
 import * as signalR from '@microsoft/signalr';
-import { IGetActivitiesResult } from "../models/activity_model";
+import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { IUser } from "../models/user_model";
 import { AuthService } from "./auth_service";
 
@@ -15,6 +15,10 @@ class Utils {
 
     static formatDate(date: Date) {
         return `${this.addTrailingZero(date.getDate())}/${this.addTrailingZero(date.getMonth() + 1)}/${date.getFullYear()} ${this.addTrailingZero(date.getHours())}:${this.addTrailingZero(date.getMinutes())}`;
+    }
+
+    static formatTime(date: Date) {
+        return `${this.addTrailingZero(date.getHours())}:${this.addTrailingZero(date.getMinutes())}`;
     }
 
     static isEmail(value: string): boolean {
@@ -40,8 +44,6 @@ class Utils {
 
         const values = Object.entries(params);
         const len = values.length;
-
-        
         
         for (let i=0; i<len; ++i) {
           const e = values[i];
@@ -106,6 +108,31 @@ class Utils {
         return new signalR.HubConnectionBuilder()
             .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect', { accessTokenFactory: () => AuthService.getAuthData()?.accessToken ?? '' })
             .build();
+    }
+
+
+    static getActivityDuration(activity: IActivity) {
+
+        let remaining = activity.setupOption.endDate
+            ? new Date(activity.setupOption.endDate).getTime() - new Date().getTime()
+            : new Date().getTime() - new Date(activity.setupOption.startDate).getTime()
+
+        // Converti en seconds
+        remaining = Math.trunc(remaining / 1000);
+
+        if (remaining < 0)
+            return 'Expired';
+
+        const d = Math.trunc(remaining / (24 * 60 * 60));
+        remaining -= d * 24 * 60 * 60;
+
+        const h = Math.trunc(remaining / (60 * 60))
+        remaining -= h * 60 * 60;
+
+        const m = Math.trunc(remaining / 60)
+        remaining -= m * 60;
+
+        return `${d}j - ${this.addTrailingZero(h)}:${this.addTrailingZero(m)}:${this.addTrailingZero(remaining)}`;
     }
 
 }

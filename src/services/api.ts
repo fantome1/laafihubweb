@@ -1,5 +1,5 @@
 import { IActivity, IGetActivitiesResult } from "../models/activity_model";
-import { IDevice, IGetDeviceResult } from "../models/device_mdoel";
+import { IDevice, IGetDeviceResult } from "../models/device_model";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
 import { IGetUsersResult, IUser } from "../models/user_model";

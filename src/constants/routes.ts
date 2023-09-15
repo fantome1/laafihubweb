@@ -25,8 +25,8 @@ const routes = {
     NOTIFICATIONS_2: '/notifications-2',
     CREATE_ACTIVITY: '/create-activity',
     MODIFY_ACTIVITY: {
-        route: '/update-activity/:id',
-        build: (id: string) => `/update-activity/${id}`
+        route: '/edit-activity/:id',
+        build: (id: string) => `/edit-activity/${id}`
     }
 };
 

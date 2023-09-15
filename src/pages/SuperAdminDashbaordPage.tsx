@@ -7,7 +7,7 @@ import { WithRouter } from "../components/WithRouterHook";
 import { Api } from "../services/api";
 import { IUser } from "../models/user_model";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDeviceResult } from "../models/device_model";
 import { Completer } from "../services/completer";
 import { EnrollItemsDialog } from "../components/dialogs/EnrollItemsDialog";
 import { NavigateFunction } from "react-router-dom";

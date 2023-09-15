@@ -15,7 +15,7 @@ import {
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { IGetDeviceResult } from '../../models/device_mdoel';
+import { IGetDeviceResult } from '../../models/device_model';
 import { IGetActivitiesResult } from '../../models/activity_model';
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from '../../constants/temperature';
 import { Utils } from '../../services/utils';
@@ -339,32 +339,90 @@ class TemperaturePieChart extends React.Component<TemperaturePieChartProps, Temp
     }
 }
 
-class TemperatureChart2 extends React.Component {
+type CountPieChartProps = {
+    count: number|null;
+    total: number|null;
+}
+
+type CountPieChartState = {
+    data: {
+        datasets: {
+            cutout: number, 
+            circumference: number,
+            rotation: number,
+            borderWidth: number[],
+            data: number[],
+            borderRadius: number,
+            backgroundColor: string[],
+        }[]
+    }
+}
+
+
+class CountPieChart extends React.Component<CountPieChartProps, CountPieChartState> {
 
     private chartRef = React.createRef<ChartJS>()
 
-    private data = {
-        datasets: [
-            {
-              cutout: 40, 
-              circumference: 280,
-              rotation: -140,
-              borderWidth: [0, 0],
-              data: [3.5, 3],
-              borderRadius: 1000,
-              backgroundColor: ['#24C5D9', '#d0f2f6'],
+    // private data = {
+    //     datasets: [
+    //         {
+    //           cutout: 40, 
+    //           circumference: 280,
+    //           rotation: -140,
+    //           borderWidth: [0, 0],
+    //           data: [3.5, 3],
+    //           borderRadius: 1000,
+    //           backgroundColor: ['#24C5D9', '#d0f2f6'],
+    //         }
+    //     ]
+    // }
+
+    constructor(props: CountPieChartProps) {
+        super(props);
+
+        this.state = {
+            data: {
+                datasets: [
+                    {
+                        cutout: 40, 
+                        circumference: 280,
+                        rotation: -140,
+                        borderWidth: [0, 0],
+                        data: [0, 1],
+                        borderRadius: 1000,
+                        backgroundColor: ['#24C5D9', '#d0f2f6'],
+                    }
+                ]
             }
-        ]
+        }
     }
 
-    constructor(props: any) {
-        super(props);
+    componentDidUpdate(prevProps: Readonly<CountPieChartProps>, prevState: Readonly<any>, snapshot?: any): void {
+        if (prevProps.count != this.props.count
+            || prevProps.total != this.props.total
+        ) {
+            this.setState({
+                data: {
+                    datasets: [
+                        {
+                            cutout: 40, 
+                            circumference: 280,
+                            rotation: -140,
+                            borderWidth: [0, 0],
+                            data: [this.props.count ?? 0, (this.props.total ?? 0) - (this.props.count ?? 0)],
+                            borderRadius: 1000,
+                            backgroundColor: ['#24C5D9', '#d0f2f6'],
+                        }
+                    ]
+                }
+            });
+        }
     }
 
     render() {
         return (
             <div className='h-full'>
-                <Chart ref={this.chartRef} type='doughnut' data={this.data} options={{
+                <Chart ref={this.chartRef} type='doughnut' data={this.state.data} options={{
                     // responsive: true,
                     plugins: {
                         legend: {
@@ -642,9 +700,22 @@ class ActivitesConnectionStatusChart extends React.Component<ActivitesConnection
     }
 }
 
-class TemperatureCurveChart extends React.Component {
 
-    constructor(props: any) {
+type TemperatureCurveChartProps = {
+    suggestedMin: number;
+    suggestedMax: number;
+    data: { date: Date|null, value: number }[];
+    min?: number|null;
+    max?: number|null;
+}
+
+type TemperatureCurveChartState = {
+    data: any;
+}
+
+class TemperatureCurveChart extends React.Component<TemperatureCurveChartProps, TemperatureCurveChartState> {
+
+    constructor(props: TemperatureCurveChartProps) {
         super(props);
 
         this.state = {
@@ -656,6 +727,20 @@ class TemperatureCurveChart extends React.Component {
     }
 
     componentDidMount(): void {
+        this.update();
+    }
+
+    componentDidUpdate(prevProps: Readonly<TemperatureCurveChartProps>, prevState: Readonly<TemperatureCurveChartState>, snapshot?: any): void {
+        // FIXME ameliorer
+        if (prevProps.data != this.props.data) {
+            this.update();
+        } else {
+            console.log('indentique');
+            
+        }
+    }
+
+    update() {
         const ctx = document.getElementById('canvas').getContext("2d");
         const gradient = ctx.createLinearGradient(0, 0, 0, 220);
         gradient.addColorStop(0, '#ff6384');
@@ -667,30 +752,36 @@ class TemperatureCurveChart extends React.Component {
         // gradientLine.addColorStop(0, "rgb(255, 0, 110, 0.2)");
         // gradientLine.addColorStop(0.5, "rgb(255, 0, 110, 0.35)");
         // gradientLine.addColorStop(1, "rgb(255, 0, 110, 0.7)");
+        const values = [...this.props.data];
+        const rCount = 20 - values.length;
+        for (let i=0; i<rCount; ++i)
+            values.push(null);
+
+        console.log(values);
 
         const data = {
-            labels: ['15h26m45s', '15h27m45s', '15h28m13s', '15h29m45s', '15h30m45s', '15h31m45s', '15h32m45s', '15h33m45s', '15h34m45s'],
+            labels: values.map(v => v == null ? '' : v.date == null ? 'current' : Utils.formatTime(v.date)),
             datasets: [
+                // {
+                //     data: values.map(_ => this.props.min),
+                //     borderColor: '#ff6384',
+                //     borderDash: [5, 5],
+                //     fill: false,
+                //     pointRadius: 0,
+                // },
+                // {
+                //     data: values.map(_ => this.props.max),
+                //     borderColor: '#ff6384',
+                //     borderDash: [5, 5],
+                //     fill: false,
+                //     pointRadius: 0,
+                // },
                 {
-                    data: [39, 39, 39, 39, 39, 39, 39, 39, 39],
-                    borderColor: '#ff6384',
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0,
-                },
-                {
-                    data: [34, 34, 34, 34, 34, 34, 34, 34, 34],
-                    borderColor: '#ff6384',
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0,
-                },
-                {
-                    data: [37, 38, 38, 41, 42, 42, 39, 40, 38],
+                    data: values.map(v => v?.value),
                     borderColor: '#ff6384',
                     backgroundColor: gradient,
                     fill: 'origin',
-                    pointRadius: 0,
+                    pointRadius: 2,
                     cubicInterpolationMode: 'monotone',
                     tension: 0.4
                 },
@@ -712,13 +803,14 @@ class TemperatureCurveChart extends React.Component {
                                 // display: false
                                 font: {
                                     size: 12
-                                }
+                                },
+                                stepSize: 1,
+                                maxTicksLimit: 20
                             },
                             grid: {
                                 display: false,
                                 drawBorder: false,
-                            },
-                            
+                            }
                             // gridLines: { display: false }
                         },
                         y: {
@@ -732,8 +824,8 @@ class TemperatureCurveChart extends React.Component {
                                 // display: false
                                 // maxTicksLimit: 6
                             // },
-                            suggestedMin: 30,
-                            suggestedMax: 45
+                            suggestedMin: this.props.suggestedMin,
+                            suggestedMax: this.props.suggestedMax
                         }
                     },
                     plugins: {
@@ -867,7 +959,7 @@ export {
     LaafiMonitorDeviceStatusChart,
     DeviceUsageChart3,
     TemperaturePieChart,
-    TemperatureChart2,
+    CountPieChart,
     TemperatureLineChart,
     ActivitesConnectionStatusChart,
     TemperatureCurveChart,

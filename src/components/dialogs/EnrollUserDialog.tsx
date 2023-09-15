@@ -2,7 +2,7 @@ import React from "react";
 import { Avatar, Button,  Checkbox,  CircularProgress,  Dialog, DialogActions, DialogContent, DialogTitle, ListItem, ListItemAvatar, ListItemButton, ListItemText, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
-import { IGetDeviceResult } from "../../models/device_mdoel";
+import { IGetDeviceResult } from "../../models/device_model";
 import { PromiseBuilder } from "../PromiseBuilder";
 import { IActivity } from "../../models/activity_model";
 import { LoadingButton } from "@mui/lab";

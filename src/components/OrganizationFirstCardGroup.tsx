@@ -3,7 +3,7 @@ import { LaafiMonitorDeviceUsageChart } from "./charts/Charts";
 import { ActivityChart } from "./charts/ActivityChart";
 import { PromiseBuilder } from "./PromiseBuilder";
 import { IGetInfrastructureResult } from "../models/infrastructure_model";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDeviceResult } from "../models/device_model";
 import { IGetActivitiesResult } from "../models/activity_model";
 import { IGetUsersResult } from "../models/user_model";
 import { Utils } from "../services/utils";

@@ -10,7 +10,7 @@ import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastruct
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDeviceResult } from "../models/device_model";
 import { IGetActivitiesResult } from "../models/activity_model";
 import { BubleMap } from "../components/BubleMap";
 import { IGetUsersResult } from "../models/user_model";

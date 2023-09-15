@@ -9,7 +9,7 @@ import { Utils } from "../services/utils";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { ActivityList } from "../components/ActivityList";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDeviceResult } from "../models/device_model";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { DialogService } from "../components/dialogs/DialogsComponent";
 
@@ -35,7 +35,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
     componentDidMount(): void {
         this.setState({
-            promise: Api.getActivities(),
+            promise: Api.getActivities({ PageSize: 50 }), // FIXME fix this
             devicesPromise: Api.getDevices()
         });
     }
@@ -93,7 +93,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
             .then(() => {
                 this.setState({ promise: Api.getActivities() });
                 DialogService.closeLoadingDialog();
-                DialogService.showSnackbar({ severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
+                DialogService.showSnackbar({ severity: 'success', message: !isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
             })
             .catch(err => {
                 DialogService.closeLoadingDialog();
@@ -143,7 +143,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
                             <PromiseBuilder
                                 promise={state.promise}
-                                dataBuilder={(data) => (<p className="text-4xl text-[#3C4858] text-right">{Utils.getActivedActivityCount(data).toString().padStart(3, '0')}/{data.count.toString().padStart(3, '0')}</p>)}
+                                dataBuilder={(data) => (<p className="text-4xl text-[#3C4858] text-right">{Utils.getActivedActivityCount(data).toString().padStart(2, '0')}/{data.count.toString().padStart(2, '0')}</p>)}
                                 loadingBuilder={() => (<Skeleton className="text-4xl" width={120} />)}
                                 errorBuilder={err => (<span></span>)}
                             />
@@ -235,7 +235,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                     <ActivityList
                                         label='Favorite Activities'
                                         columnCount={1}
-                                        data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
+                                        data={data.activities.filter(v => v.isFavorite).map(v => ({ activity: v, showExtraData: true }))}
                                         onReload={() => this.setState({ promise: Api.getActivities(), })}
                                     />
                                 </div>

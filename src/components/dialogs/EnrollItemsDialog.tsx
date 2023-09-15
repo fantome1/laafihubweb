@@ -3,7 +3,7 @@ import { LoadingButton } from "@mui/lab";
 import { Alert, Avatar, Button,  Checkbox,  CircularProgress,  Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, ListItem, ListItemAvatar, ListItemButton, ListItemText, OutlinedInput, } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
-import { IGetDeviceResult } from "../../models/device_mdoel";
+import { IGetDeviceResult } from "../../models/device_model";
 import { IGetUsersResult } from "../../models/user_model";
 import { PromiseData } from "../../models/pomise_data";
 import { PromiseDataBuilder } from "../PromiseBuilder";

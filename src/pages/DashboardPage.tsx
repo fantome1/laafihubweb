@@ -6,7 +6,7 @@ import { BubleMap } from "../components/BubleMap";
 import { ActivityList } from "../components/ActivityList";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { IGetActivitiesResult } from "../models/activity_model";
-import { IGetDeviceResult } from "../models/device_mdoel";
+import { IGetDeviceResult } from "../models/device_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser } from "../models/user_model";
 import { Api } from "../services/api";
