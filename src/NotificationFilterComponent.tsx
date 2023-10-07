@@ -103,9 +103,9 @@ class NotificationFilterComponent extends React.PureComponent<Props, State> {
 
         const params = {
             types: types.length == 0 ? null : types.join(','),
-            activityId: this.searchType == 'activity' ? this.reference : null,
-            infrastructureId: this.searchType == 'infrastructureId' ? this.reference : null,
-            deviceId: this.searchType == 'device' ? this.reference : null
+            activityid: this.searchType == 'activity' ? this.reference : null,
+            infrastructureid: this.searchType == 'infrastructureId' ? this.reference : null,
+            deviceid: this.searchType == 'device' ? this.reference : null
         };
 
         if (types.length == 0 && !this.reference) {
