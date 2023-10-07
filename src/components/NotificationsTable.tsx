@@ -25,7 +25,7 @@ class NotificationsTable extends React.Component<NotificationsTableProps, Notifi
 
     this.state = {
       selected: [],
-      data: new PaginationBlocData(PaginationBlocEventType.loading),
+      data: new PaginationBlocData(PaginationBlocEventType.loading)
     };
 
     this.handleSelectAllClick = this.handleSelectAllClick.bind(this);

@@ -3,12 +3,14 @@ import React from "react";
 import { BubleMap } from "../components/BubleMap";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { NotificationsTable } from "../components/NotificationsTable";
-import { PaginationBloc } from "../bloc/pagination_bloc";
+import { PaginationBloc, PaginationBlocData, PaginationBlocEventType } from "../bloc/pagination_bloc";
 import { INotification } from "../models/notification_model";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { INotificationStats, getNotificationCountFromStats } from "../models/notification_stats";
 import { NotificationFilterComponent } from "../NotificationFilterComponent";
+import { NearMap } from "../components/NearMap";
+import { Marker } from "react-leaflet";
 
 type Props = {
 
@@ -16,6 +18,7 @@ type Props = {
 
 type State = {
     stats: Promise<INotificationStats>|null;
+    data: PaginationBlocData<INotification>;
 };
 
 class NotificationsPage extends React.Component<Props, State> {
@@ -30,19 +33,26 @@ class NotificationsPage extends React.Component<Props, State> {
         super(props);
 
         this.state = {
-            stats: null
+            stats: null,
+            data: new PaginationBlocData(PaginationBlocEventType.loading)
         };
 
         this.onUpdate = this.onUpdate.bind(this);
+        this.listen = this.listen.bind(this);
     }
 
     componentDidMount(): void {
+        this.bloc.listen(this.listen);
         this.bloc.next();
         this.setState({ stats: Api.getNotificationStats() });
     }
 
     componentWillUnmount(): void {
        this.bloc.dispose(); 
+    }
+
+    listen(data: PaginationBlocData<INotification>) {
+        this.setState({ data });
     }
 
     onUpdate() {
@@ -103,7 +113,11 @@ class NotificationsPage extends React.Component<Props, State> {
 
                     {/* Map */}
                     <div style={{ flex: '1 1 0' }}>
-                        <BubleMap />
+                        {/* <BubleMap /> */}
+
+                        <NearMap zoom={3}>
+                            {getCoordinates(this.state.data).map(c => <Marker position={c}></Marker>)}
+                        </NearMap>
                     </div>
                 </div>
 
@@ -120,6 +134,18 @@ class NotificationsPage extends React.Component<Props, State> {
             </div>
         );
     }
+}
+
+function getCoordinates(data: PaginationBlocData<INotification>) {
+    if (!data.hasData)
+        return [];
+
+    const coords = new Set([...data.data!.items.map(v => `${v.coordinates.latitude} ${v.coordinates.longitude}`)]);
+
+    return Array.from(coords).map(v => {
+        const s = v.split(' ');
+        return { lat: parseFloat(s[0]), lng: parseFloat(s[1]) };
+    });
 }
 
 export { NotificationsPage };
