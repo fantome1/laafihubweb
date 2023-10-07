@@ -27,7 +27,7 @@ function ScrollToTop() {
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
-    // Ferme tous les dialog deja ouvert
+    // Ferme tous les dialog encore ouvert
     if (DialogService.closeAll)
       DialogService.closeAll();
   }, [location.pathname]);

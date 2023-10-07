@@ -1,13 +1,52 @@
-import { Paper } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
 import React from "react";
 import { BubleMap } from "../components/BubleMap";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { NotificationsTable } from "../components/NotificationsTable";
+import { PaginationBloc } from "../bloc/pagination_bloc";
+import { INotification } from "../models/notification_model";
+import { Api } from "../services/api";
+import { PromiseBuilder } from "../components/PromiseBuilder";
+import { INotificationStats, getNotificationCountFromStats } from "../models/notification_stats";
+import { NotificationFilterComponent } from "../NotificationFilterComponent";
 
-class NotificationsPage extends React.Component {
+type Props = {
 
-    constructor(props: any) {
+};
+
+type State = {
+    stats: Promise<INotificationStats>|null;
+};
+
+class NotificationsPage extends React.Component<Props, State> {
+
+    private bloc: PaginationBloc<INotification, any> = new PaginationBloc(
+        11,
+        null,
+        (count, page, params) => Api.getNotifications(count, page, params)
+    );
+
+    constructor(props: Props) {
         super(props);
+
+        this.state = {
+            stats: null
+        };
+
+        this.onUpdate = this.onUpdate.bind(this);
+    }
+
+    componentDidMount(): void {
+        this.bloc.next();
+        this.setState({ stats: Api.getNotificationStats() });
+    }
+
+    componentWillUnmount(): void {
+       this.bloc.dispose(); 
+    }
+
+    onUpdate() {
+        this.setState({ stats: Api.getNotificationStats() });
     }
 
     render() {
@@ -39,33 +78,27 @@ class NotificationsPage extends React.Component {
                             </div>
                         </div>
 
-                        <Paper elevation={0} sx={{ background: '#D9D9D9' }} className="h-[38px]"></Paper>
-
                         {/* Alert */}
-                        <div className="flex space-x-2">
-                            <div className="grow">
+                        <PromiseBuilder
+                            promise={this.state.stats}
+                            dataBuilder={data => (
                                 <EntityCountCard
                                     fullWidth
                                     elevation={0}
                                     label="Alerts"
-                                    count="060"
+                                    count={getNotificationCountFromStats(data).toString().padStart(3, '0')}
                                     items={[
-                                        { label: 'Temperatures', count: '020' },
-                                        { label: 'Humidity', count: '020' },
-                                        { label: 'UV Exposure', count: '020' },
-                                        { label: 'Battery Level', count: '020' },
-                                        { label: 'Discounct issues', count: '020' },
+                                        { label: 'Temperatures', count: data.temperatures.toString().padStart(3, '0') },
+                                        { label: 'Humidity', count: data.humidities.toString().padStart(3, '0') },
+                                        { label: 'UV Exposure', count: data.uvExposure.toString().padStart(3, '0') },
+                                        { label: 'Battery Level', count: data.batteryLevels.toString().padStart(3, '0') },
+                                        { label: 'Disconnect issues', count: data.diconnectIssues.toString().padStart(3, '0') },
                                     ]}
                                 />
-                            </div>
-
-                            <div className="flex flex-col justify-between">
-                                <div className="flex justify-center items-center w-[64px] h-[64px] rounded-md cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9' }}><span className="material-symbols-rounded text-3xl text-white">lock</span></div>
-                                <div className="flex justify-center items-center bg-[#E93975] w-[64px] h-[64px] rounded-md cursor-pointer"><span className="material-symbols-rounded text-3xl text-white">auto_delete</span></div>
-                            </div>
-                        </div>
-
-                        <Paper elevation={0} sx={{ background: '#D9D9D9' }} className="h-[104px]"></Paper>
+                            )}
+                            loadingBuilder={() => (<Skeleton variant='rounded' height={140} />)}
+                            errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
+                        />
                     </div>
 
                     {/* Map */}
@@ -74,10 +107,14 @@ class NotificationsPage extends React.Component {
                     </div>
                 </div>
 
+                <NotificationFilterComponent
+                    bloc={this.bloc}
+                    // onSearch={() => {}}
+                />
 
                 {/* Table */}
                 <div className="mt-4">
-                    <NotificationsTable firstVariant={true} />
+                    <NotificationsTable bloc={this.bloc} onDeleted={this.onUpdate} />
                 </div>
 
             </div>

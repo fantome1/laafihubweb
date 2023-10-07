@@ -156,7 +156,7 @@ class DashboardPage extends React.Component<Props, State> {
                                     <ActivityList
                                         label='Activities list'
                                         columnCount={2}
-                                        showMoreBtn={true}
+                                        showMoreBtn
                                         data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
                                         onReload={() => this.setState({ activitiesPromise: Api.getActivities({ PageSize: 4 }) })}
                                     />

@@ -2,6 +2,8 @@ import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { IDevice, IGetDeviceResult } from "../models/device_model";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
 import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
+import { INotification } from "../models/notification_model";
+import { INotificationStats } from "../models/notification_stats";
 import { IGetUsersResult, IUser } from "../models/user_model";
 import { ApiError } from "./api_error";
 import { AuthService } from "./auth_service";
@@ -513,6 +515,121 @@ class Api {
             throw ApiError.parse(response.status, await response.text());
     }
 
+    // ###################################################################################################
+    // ###################################################################################################
+    // ######################################## NOTIFICATION  ############################################
+    // ###################################################################################################
+    // ###################################################################################################
+
+    static async getNotifications(count: number, page: number, filter?: any): Promise<{ items: INotification[], page: number, totalCount: number }> {
+
+        const query = {
+            pageNumber: page + 1,
+            pageSize: count,
+            ...(filter ?? {})
+        };
+
+        const response = await fetch(Utils.buildUrl(this.BASE_URL, filter ? '/notifications/filtering' : '/notifications', { query }), {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+
+        const totalCount = JSON.parse(response.headers.get('X-Pagination')!).TotalCount;
+
+        return {
+            page,
+            totalCount,
+            items: await response.json()
+        };
+    }
+
+    // static async getNotifications(count: number, page: number, filter?: any): Promise<{ items: INotification[], page: number, totalCount: number }> {
+
+    //     await Utils.wait(3000);
+
+    //     const rows: INotification[] = [
+    //         { id: '1', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'TemperatureMin', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '2', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'TemperatureMax', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '3', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'SunExposure', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '4', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'HumidityMax', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '5', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'BatteryLevel', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '6', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'UserDisconnected', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '7', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'BluetoothLinkLost', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '8', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'TemperatureMax', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '9', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'HumidityMin', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '10', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'UserDisconnected', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } },
+    //         { id: '11', userName: 'Ethan Noah', triggerAt: new Date().toISOString(), type: 'TemperatureMin', activityId: 'LF-A-XXXXXXXX', infrastructureId: 'Magasin', deviceId: 'E1:B7:A3:XX:XX:XX', value: -1, description: '', coordinates: { latitude: 12.35, longitude: -1.516667, acccuracy: 0 } }
+    //     ];
+
+    //     return {
+    //         items: rows,
+    //         page,
+    //         totalCount: 22
+    //     };
+
+    //     // throw new TypeError('Failed to fetch');
+    // }
+
+    static async deleteNotification(ids: string[]): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/notifications`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ids)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async markAsReaded(ids: string[]): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/notifications/mark-as-readed`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ids)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    static async markAsImportant(data: { id: string, isImportant: boolean }[]): Promise<void> {
+        const response = await fetch(`${this.BASE_URL}/notifications/mark-as-important`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+    }
+
+    // https://hub-api-test.laafi-concepts.com/notifications/stats
+    static async getNotificationStats(): Promise<INotificationStats> {
+        const response = await fetch(`${this.BASE_URL}/notifications/stats`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+        return response.json();
+    }
 
 }
 

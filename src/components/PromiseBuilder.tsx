@@ -33,6 +33,7 @@ class PromiseBuilder<T> extends React.Component<Props<T>, State<T>> {
     }
 
     wait() {
+        this.setState({ data: PromiseData.pending() })
         this.props.promise
             ?.then(result => this.setState({ data: PromiseData.resolve(result) }))
             .catch(err => this.setState({ data: PromiseData.reject(err) }));

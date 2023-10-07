@@ -13,8 +13,11 @@ class Utils {
         return new Promise(r => setTimeout(r, ms));
     }
 
-    static formatDate(date: Date) {
-        return `${this.addTrailingZero(date.getDate())}/${this.addTrailingZero(date.getMonth() + 1)}/${date.getFullYear()} ${this.addTrailingZero(date.getHours())}:${this.addTrailingZero(date.getMinutes())}`;
+    static formatDate(date: Date, options: { addSecond?: boolean } = {}) {
+        const result = `${this.addTrailingZero(date.getDate())}/${this.addTrailingZero(date.getMonth() + 1)}/${date.getFullYear()} ${this.addTrailingZero(date.getHours())}:${this.addTrailingZero(date.getMinutes())}`;
+        if (!options.addSecond)
+            return result;
+        return `${result}:${this.addTrailingZero(date.getSeconds())}`;
     }
 
     static formatTime(date: Date) {
@@ -110,7 +113,6 @@ class Utils {
             .build();
     }
 
-
     static getActivityDuration(activity: IActivity) {
 
         let remaining = activity.setupOption.endDate
@@ -133,6 +135,10 @@ class Utils {
         remaining -= m * 60;
 
         return `${d}j - ${this.addTrailingZero(h)}:${this.addTrailingZero(m)}:${this.addTrailingZero(remaining)}`;
+    }
+
+    static isNetworkError(err: any) {
+        return err instanceof TypeError && err.message == 'Failed to fetch';
     }
 
 }

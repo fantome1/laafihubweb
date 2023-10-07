@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select, SxProps, Theme } from "@mui/material";
+import { FormControl, FormControlPropsSizeOverrides, FormHelperText, InputLabel, MenuItem, Select, SxProps, Theme } from "@mui/material";
 // import { SelectInputProps } from "@mui/material";
 
 type Props = {
@@ -13,11 +13,12 @@ type Props = {
     variant?: 'standard' | 'outlined' | 'filled';
     sx?: SxProps<Theme>;
     disabled?: boolean;
+    size?: any;
 };
 
 function MaterialSelectHelper(props: Props) {
     return (
-        <FormControl fullWidth variant={props.variant} sx={props.sx} disabled={props.disabled}>
+        <FormControl fullWidth variant={props.variant} sx={props.sx} disabled={props.disabled} size={props.size}>
             <InputLabel id={props.labelId}>{props.label}</InputLabel>
             <Select
                 labelId={props.labelId}

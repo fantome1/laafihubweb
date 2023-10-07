@@ -424,7 +424,7 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
                         </Paper>
 
                         <div className="mt-2 h-[300px]">
-                            {/* FIXME show on all date */}
+                            {/* FIXME show set zoom to show all data */}
                             <NearMap zoom={3}>
                                 {data?.currentData.map(e => (<Marker key={e.userDeviceId} position={{ lat: e.coordinates.latitude, lng: e.coordinates.longitude }}><Popup>{e.userName} - {e.userDeviceId}</Popup></Marker>))}
                             </NearMap>
