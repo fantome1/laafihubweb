@@ -104,7 +104,7 @@ class NotificationFilterComponent extends React.PureComponent<Props, State> {
         const params = {
             types: types.length == 0 ? null : types.join(','),
             activityid: this.searchType == 'activity' ? this.reference : null,
-            infrastructureid: this.searchType == 'infrastructureId' ? this.reference : null,
+            infrastructureid: this.searchType == 'infrastructure' ? this.reference : null,
             deviceid: this.searchType == 'device' ? this.reference : null
         };
 
@@ -211,8 +211,8 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
                 const v2 = await Api.getInfrastructures();
                 return v2.infrastructures.map(v => ({ id: v.id, label: v.name, description: v.status }));
             case 'device':
-                const v3  = await Api.getDevices();
-                return v3.items.map(v => ({ id: v.id, label: v.id, description: v.model }));
+                const v3  = await Api.getDevicesStats();
+                return v3.devicies.map(v => ({ id: v.id, label: v.id, description: v.model }));
         }
         throw new Error();
     }
