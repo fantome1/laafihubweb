@@ -14,7 +14,6 @@ import LaafiMonitorDeviceDataPage from "./pages/LaafiMonitorDeviceDataPage";
 import AnotherLaafiMonitorPage from "./pages/AnotherLaafiMonitorPage";
 import AnotherLaafiMonitorDeviceDataPage from "./pages/AnotherLaafMonitorDeviceDataPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
-import { NotificationsPage2 } from "./pages/NotificationsPage2";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { RealtimeTestPage } from "./pages/RealtimeTestPage";
 import { ThemeProvider } from "@mui/material";
@@ -57,7 +56,6 @@ function App() {
             <Route path={routes.ANOTHER_LAAFI_MONITOR} element={<AnotherLaafiMonitorPage />} />
             <Route path={routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.route} element={<AnotherLaafiMonitorDeviceDataPage />} />
             <Route path={routes.NOTIFICATIONS} element={<NotificationsPage />} />
-            <Route path={routes.NOTIFICATIONS_2} element={<NotificationsPage2 />} />
             <Route path={routes.CREATE_ACTIVITY} element={<CreateActivityPage />} />
             <Route path={routes.MODIFY_ACTIVITY.route} element={<CreateActivityPage />} />
           </Route>
