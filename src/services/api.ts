@@ -1,3 +1,4 @@
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
 import { IActivity, IGetActivitiesResult } from "../models/activity_model";
 import { IDevice, IGetDeviceResult } from "../models/device_model";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
@@ -141,11 +142,16 @@ class Api {
         return response.json();  
     }
 
-    static async getDevices(options: { InfrastructureId?: string, NotEnrolled?: 'true', NotInActivity?: 'true' } = {}): Promise<IGetDeviceResult> {
+    static async getDevices(options: { InfrastructureId?: string, NotEnrolled?: 'true', NotInActivity?: 'true' } = {}, count: number = 10, page: number = 1): Promise<PaginatedFetchResult<IDevice>> {
+
+        const query = {
+            pageNumber: page + 1,
+            pageSize: count,
+            ...options
+        };
+
         const response = await fetch(
-            Utils.buildUrl(this.BASE_URL, '/devices', {
-                query: options
-            }), {
+            Utils.buildUrl(this.BASE_URL, '/devices', { query: query }), {
             headers: {
                 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
             }
@@ -153,7 +159,29 @@ class Api {
 
         if (!response.ok)
             throw ApiError.parse(response.status, await response.text());
-        return response.json();  
+
+        const totalCount = JSON.parse(response.headers.get('X-Pagination')!).TotalCount;
+
+        return {
+            page,
+            totalCount,
+            items: (await response.json()).devicies
+        };
+    }
+
+    static async getDevicesStats(options: { InfrastructureId?: string, NotEnrolled?: 'true', NotInActivity?: 'true' } = {}): Promise<IGetDeviceResult> {
+
+        const response = await fetch(
+            Utils.buildUrl(this.BASE_URL, '/devices', { query: options }), {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}`
+            }
+        });
+
+        if (!response.ok)
+            throw ApiError.parse(response.status, await response.text());
+
+        return response.json();
     }
 
     static async deleteDevice(id: string): Promise<void> {
@@ -521,7 +549,7 @@ class Api {
     // ###################################################################################################
     // ###################################################################################################
 
-    static async getNotifications(count: number, page: number, filter?: any): Promise<{ items: INotification[], page: number, totalCount: number }> {
+    static async getNotifications(count: number, page: number, filter?: any): Promise<PaginatedFetchResult<INotification>> {
 
         const query = {
             pageNumber: page + 1,

@@ -9,7 +9,7 @@ interface IDevice {
     name: string;
     online: boolean;
     parentModel: string;
-}
+};
 
 interface IGetDeviceResult {
     count: number;
@@ -19,6 +19,6 @@ interface IGetDeviceResult {
     totalEnrolled: { id: string, total: number }[];
     totalModel: { id: 'Central'|'Gateway'|'Monitor', total: number }[];
     totalSatus: { id: 'Disable'|'UnAssigned'|'Assigned', total: number }[];
-}
+};
 
 export type { IDevice, IGetDeviceResult };

@@ -211,7 +211,7 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
                 return v2.infrastructures.map(v => ({ id: v.id, label: v.name, description: v.status }));
             case 'device':
                 const v3  = await Api.getDevices();
-                return v3.devicies.map(v => ({ id: v.id, label: v.id, description: v.model }));
+                return v3.items.map(v => ({ id: v.id, label: v.id, description: v.model }));
         }
         throw new Error();
     }

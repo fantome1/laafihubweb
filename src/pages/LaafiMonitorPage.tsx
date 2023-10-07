@@ -1,5 +1,5 @@
 import React from "react";
-import { CircularProgress, Paper, Skeleton } from "@mui/material";
+import { CircularProgress, Paper, Skeleton, TablePagination } from "@mui/material";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
@@ -9,9 +9,11 @@ import { AddDeviceDialog } from "../components/dialogs/AddDeviceDialog";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
-import { IGetDeviceResult } from "../models/device_model";
+import { IDevice, IGetDeviceResult } from "../models/device_model";
 import { DialogService } from "../components/dialogs/DialogsComponent";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
+import { PaginationBloc } from "../bloc/pagination_bloc";
+import { ColoredPaginatedTable } from "../components/ColoredPaginatedTable";
 
 type Props = {
     navigate: (route: string) => void
@@ -24,6 +26,12 @@ type State = {
 };
 
 class LaafiMonitorPage extends React.Component<Props, State> {
+
+    private paginatedBloc: PaginationBloc<IDevice, any> = new PaginationBloc(
+        12,
+        null,
+        (count, page, params) => Api.getDevices({}, count, page)
+    );
 
     constructor(props: Props) {
         super(props);
@@ -39,10 +47,16 @@ class LaafiMonitorPage extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
+        // this.paginatedBloc.listen(this.listen);
+        this.paginatedBloc.next();
         this.setState({
-            devicesPromise: Api.getDevices(),
+            devicesPromise: Api.getDevicesStats(),
             deviceGroups: Api.getDevicesGroups({ PageSize: 10 })
         });
+    }
+
+    componentWillUnmount(): void {
+        this.paginatedBloc.dispose(); 
     }
 
     async showAddDeviceDialog() {
@@ -54,7 +68,8 @@ class LaafiMonitorPage extends React.Component<Props, State> {
             this.setState({ addDeviceCompleter: null });
 
             if (result == true) {
-                this.setState({ devicesPromise: Api.getDevices() });
+                this.setState({ devicesPromise: Api.getDevicesStats() });
+                this.paginatedBloc.reset();
                 DialogService.showSnackbar({ severity: 'success', message: 'Device successfully added' });
             }
         } catch(err) {
@@ -89,7 +104,8 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteDevice(id)
             .then(() => {
-                this.setState({ devicesPromise: Api.getDevices() });
+                this.setState({ devicesPromise: Api.getDevicesStats() });
+                this.paginatedBloc.reload();
                 DialogService.showSnackbar({ severity: 'success', message: 'Device successfully deleted' });
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression du device' });
@@ -216,32 +232,22 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                 <div className="flex space-x-4 mt-4">
                     {/* table */}
                     <div className="grow">
-                        <PromiseBuilder
-                            promise={state.devicesPromise}
-                            dataBuilder={data => (
-                                <table className="styled-table">
-                                    <thead>
-                                        <tr>{['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Activity ID', 'Last connexion date', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.devicies.map(value => (
-                                            <tr onClick={() => this.onTapRow(value)} key={value.id} className="cursor-pointer">
-                                                <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
-                                                <td>{value.id}</td>
-                                                <td>{value.name}</td>
-                                                <td>{value.parentModel}</td>
-                                                <td>{value.model}</td>
-                                                <td>{value.infrastructureName}</td>
-                                                <td>{value.activityId}</td>
-                                                <td>{value.lastConnexion}</td>
-                                                <td><span onClick={e => this.onDeleteDevice(e, value.id)} className="material-symbols-outlined text-red-500">delete</span></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                        <ColoredPaginatedTable
+                            bloc={this.paginatedBloc}
+                            headers={['', 'Device ID', 'Device Name', 'Connection type', 'Model', 'Infrastructure name', 'Activity ID', 'Last connexion date', '']}
+                            rowBuilder={value => (
+                                <tr onClick={() => this.onTapRow(value)} key={value.id} className="cursor-pointer">
+                                    <td><div className="flex justify-center"><div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: value.online ? '#69ADA7' : '#D80303' }}></div></div></td>
+                                    <td>{value.id}</td>
+                                    <td>{value.name}</td>
+                                    <td>{value.parentModel}</td>
+                                    <td>{value.model}</td>
+                                    <td>{value.infrastructureName}</td>
+                                    <td>{value.activityId}</td>
+                                    <td>{value.lastConnexion}</td>
+                                    <td><span onClick={e => this.onDeleteDevice(e, value.id)} className="material-symbols-outlined text-red-500">delete</span></td>
+                                </tr>
                             )}
-                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={6} />)}
-                            errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                         />
                     </div>
 

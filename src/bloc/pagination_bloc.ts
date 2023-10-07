@@ -1,5 +1,6 @@
 
 type Listener<T> = (value: PaginationBlocData<T>) => void;
+type PaginatedFetchResult<T> = { items: T[], page: number, totalCount: number };
 
 enum PaginationBlocEventType {
     loading,
@@ -11,12 +12,20 @@ class PaginationBlocData<T> {
 
     constructor(
         public type: PaginationBlocEventType,
-        public data?: { items: T[], page: number, totalCount: number },
+        public data?: PaginatedFetchResult<T>,
         public error?: any
     ) {}
 
     get hasData() {
         return this.type == PaginationBlocEventType.data;
+    }
+
+    get hasError() {
+        return this.type == PaginationBlocEventType.error;
+    }
+
+    get inLoading() {
+        return this.type == PaginationBlocEventType.loading;
     }
 
 }
@@ -109,8 +118,11 @@ class PaginationBloc<T, P> {
 
 }
 
+export type { PaginatedFetchResult };
+
 export {
     PaginationBlocEventType,
     PaginationBlocData,
     PaginationBloc
 };
+

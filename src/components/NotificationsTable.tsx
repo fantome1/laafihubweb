@@ -81,8 +81,6 @@ class NotificationsTable extends React.Component<NotificationsTableProps, Notifi
   };
 
   handleChangePage(event: unknown, newPage: number) {
-    // bloc
-    // console.log(newPage);
     this.props.bloc.changePage(newPage);
   };
 

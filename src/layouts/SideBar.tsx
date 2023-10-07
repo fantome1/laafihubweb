@@ -19,9 +19,6 @@ const middle = [
         route: routes.LAAFI_MONITOR, // routes.LAAFI_MONITOR_DEVICE_DATA
         icon: 'devices_other'
     }, {
-        route: '/a',
-        icon: 'backpack'
-    }, {
         route: routes.ANOTHER_LAAFI_MONITOR,
         icon: 'finance'
     }, {

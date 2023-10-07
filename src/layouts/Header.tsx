@@ -47,8 +47,6 @@ function OrganizationProfile() {
         }
     };
 
-
-
     const open = Boolean(anchor);
 
     return (

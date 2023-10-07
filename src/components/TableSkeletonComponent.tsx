@@ -1,5 +1,6 @@
 import { Skeleton } from "@mui/material";
 
+// FIXME delete ???
 function TableSkeletonComponent({ count, columnCount }: { count: number, columnCount: number }) {
     return (
         <table className="styled-table">
