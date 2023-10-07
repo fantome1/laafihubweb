@@ -50,7 +50,7 @@ class OrganizationPage extends React.Component<Props, State> {
         this.setState({
             infrastructuresPromise: Api.getInfrastructures(),
             usersPromise: Api.getUsers(),
-            devicesPromise: Api.getDevices(),
+            devicesPromise: Api.getDevicesStats(),
             activitesPromise: Api.getActivities()
         });
     }

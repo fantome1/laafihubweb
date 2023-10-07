@@ -37,7 +37,7 @@ class RegisterDevicesGroupDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ devicesPromise: Api.getDevices() });
+        this.setState({ devicesPromise: Api.getDevicesStats() });
     }
 
     onSubmit() {

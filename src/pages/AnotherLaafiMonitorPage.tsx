@@ -36,7 +36,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
     componentDidMount(): void {
         this.setState({
             promise: Api.getActivities({ PageSize: 50 }), // FIXME fix this
-            devicesPromise: Api.getDevices()
+            devicesPromise: Api.getDevicesStats()
         });
     }
 

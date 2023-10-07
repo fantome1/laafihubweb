@@ -40,7 +40,7 @@ class EnrollUserDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ promise: Api.getDevices({ InfrastructureId: this.props.user.infrastructureId, NotInActivity: 'true' }) });
+        this.setState({ promise: Api.getDevicesStats({ InfrastructureId: this.props.user.infrastructureId, NotInActivity: 'true' }) });
     }
 
     onSubmit() {

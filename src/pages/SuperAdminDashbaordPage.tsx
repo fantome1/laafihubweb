@@ -68,7 +68,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({
             promise: Api.getInfrastructure(this.props.params.id),
             usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
-            devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+            devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }),
             activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
         });
     }
@@ -83,7 +83,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         if (result == true) {
             this.setState({
                 usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
-                devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id })
+                devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id })
             });
 
             DialogService.showSnackbar({ severity: 'success', message: 'Enrôlement effectué avec succès' });
@@ -157,7 +157,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         Api.deleteDeviceFromInfrastructure(this.props.params.id, deviceId)
             .then(() => {
-                this.setState({ devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }) });
+                this.setState({ devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }) });
                 DialogService.showSnackbar({ severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' });
             }).catch(err => {
                 console.log('err', err);
@@ -178,7 +178,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         Api.deleteActivity(activityId)
             .then(() => {
                 this.setState({
-                    devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+                    devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }),
                     activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
                 });
 

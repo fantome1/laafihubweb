@@ -54,7 +54,7 @@ class EnrollItemsDialog extends React.Component<Props, State> {
 
     fetchDevices() {
         this.setState({ devicesPromise: PromiseData.pending() });
-        Api.getDevices({ NotEnrolled: 'true' })
+        Api.getDevicesStats({ NotEnrolled: 'true' })
             .then(data => this.setState({ devicesPromise: PromiseData.resolve(data) }))
             .catch(err => this.setState({ devicesPromise: PromiseData.reject(err) }));
     }

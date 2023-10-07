@@ -100,8 +100,9 @@ class NotificationFilterComponent extends React.PureComponent<Props, State> {
     onSearch() {
 
         const types = Object.entries(this.state.types).filter(v => v[1]).map(v => v[0]);
+
         const params = {
-            types,
+            types: types.length == 0 ? null : types.join(','),
             activityId: this.searchType == 'activity' ? this.reference : null,
             infrastructureId: this.searchType == 'infrastructureId' ? this.reference : null,
             deviceId: this.searchType == 'device' ? this.reference : null
@@ -128,7 +129,7 @@ class NotificationFilterComponent extends React.PureComponent<Props, State> {
                         onReferenceChanged={value => this.reference = value}
                     />
 
-                    {(this.props.bloc.hasParams && data.hasData) && (<p className="text-xl"><span className="font-medium">{data.data?.items.length ?? 0}</span> results</p>)}
+                    {(this.props.bloc.hasParams && data.hasData) && (<p className="text-xl"><span className="font-medium">{data.data?.totalCount ?? 0}</span> results</p>)}
                 </div>
 
                 <div>
