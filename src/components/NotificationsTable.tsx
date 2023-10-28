@@ -7,6 +7,7 @@ import { INotification } from '../models/notification_model';
 import { DialogService } from './dialogs/DialogsComponent';
 import { PaginationBloc, PaginationBlocData, PaginationBlocEventType } from '../bloc/pagination_bloc';
 import { Api } from '../services/api';
+import { notificationCounterBloc } from '../services/notification_counter_bloc';
 
 type NotificationsTableProps = {
   bloc: PaginationBloc<INotification, void>;
@@ -35,14 +36,43 @@ class NotificationsTable extends React.Component<NotificationsTableProps, Notifi
     this.listen = this.listen.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onMarkAsImportant = this.onMarkAsImportant.bind(this);
+    this.listenNotificationCount = this.listenNotificationCount.bind(this);
   }
 
   componentDidMount(): void {
     this.props.bloc.listen(this.listen);
+    notificationCounterBloc.listen(this.listenNotificationCount);
+  }
+
+  componentWillUnmount(): void {
+    notificationCounterBloc.removeListener(this.listenNotificationCount);
   }
 
   listen(data: PaginationBlocData<INotification>) {
     this.setState({ data });
+  }
+
+  listenNotificationCount(_: number, value?: INotification) {
+    if (!value)
+      return;
+    notificationCounterBloc.reset();
+
+    const data = this.state.data;
+
+    if (data.hasData && data.data?.page == 0) {
+      var newData = [value, ...data.data.items];
+      if (newData.length > this.props.bloc.count)
+        newData.pop();
+
+      this.setState({
+        data: new PaginationBlocData(
+          PaginationBlocEventType.data, {
+            page: 0,
+            totalCount: newData.length,
+            items: newData
+        })
+      });
+    }
   }
 
   handleSelectAllClick(event: React.ChangeEvent<HTMLInputElement>) {
@@ -362,60 +392,87 @@ type NotificationAlertTypeComponentProps = {
   withIcon?: boolean;
 }
 
+
+function getNotificationTypeColor(type: string) {
+  switch(type) {
+    case 'TemperatureMin':
+      return '#FF4747';
+    case 'TemperatureMax':
+      return '#FF4747';
+    case 'HumidityMin':
+      return '#2196F3';
+    case 'HumidityMax':
+      return '#2196F3';
+    case 'SunExposure':
+      return '#ED9B22';
+    case 'BatteryLevel':
+      return '#673AB7';
+    case 'UserDisconnected':
+      return '#9E9E9E';
+    case 'BluetoothLinkLost':
+      return '#795548';
+  }
+}
+
+function getNotificationTypeIcon(type: string) {
+  switch(type) {
+    case 'TemperatureMin':
+      return 'thermostat';
+    case 'TemperatureMax':
+      return 'thermostat';
+    case 'HumidityMin':
+      return 'humidity_percentage';
+    case 'HumidityMax':
+      return 'humidity_percentage';
+    case 'SunExposure':
+      return 'brightness_alert';
+    case 'BatteryLevel':
+      return 'battery_alert';
+    case 'UserDisconnected':
+      return 'signal_cellular_off';
+    case 'BluetoothLinkLost':
+      return 'bluetooth_disabled';
+  }
+}
+
 function NotificationAlertTypeComponent(props: NotificationAlertTypeComponentProps) {
 
-  let color;
+  let color = getNotificationTypeColor(props.alertType);
   let backgroundColor;
   let label;
-  let icon;
+  let icon = getNotificationTypeIcon(props.alertType);
 
   switch(props.alertType) {
     case 'TemperatureMin':
-      color = '#FF4747';
       backgroundColor = '#FFF0F0';
-      icon = 'thermostat';
       label = 'Temp Min';
     break;
     case 'TemperatureMax':
-      color = '#FF4747';
       backgroundColor = '#FFF0F0';
-      icon = 'thermostat';
       label = 'Temp Max';
     break;
     case 'HumidityMin':
-      color = '#2196F3'
       backgroundColor = '#E3F2FD';
-      icon = 'humidity_percentage';
       label = 'Hum Min';
     break;
     case 'HumidityMax':
-      color = '#2196F3'
       backgroundColor = '#E3F2FD';
-      icon = 'humidity_percentage';
       label = 'Hum Max';
     break;
     case 'SunExposure':
-      color = '#ED9B22';
       backgroundColor = '#FFF6E8';
-      icon = 'brightness_alert';
       label = 'Sun Expo';
     break;
     case 'BatteryLevel':
-      color = '#673AB7';
       backgroundColor = '#EDE7F6';
-      icon = 'battery_alert';
       label = 'Batt level';
     break;
     case 'UserDisconnected':
-      color = '#9E9E9E';
       backgroundColor = '#FAFAFA';
-      icon = 'signal_cellular_off';
       label = 'Disconnect';
     break;
     case 'BluetoothLinkLost':
-      color = '#795548';
       backgroundColor = '#EFEBE9';
-      icon = 'bluetooth_disabled';
       label = 'BT Link';
     break;
   }
@@ -428,10 +485,9 @@ function NotificationAlertTypeComponent(props: NotificationAlertTypeComponentPro
   return (
     <div className='inline-flex space-x-2'>
       {card}
-
       <span className="material-symbols-rounded" style={{ color }}>{icon}</span>
     </div>
   );
 }
 
-export { NotificationsTable, NotificationAlertTypeComponent };
+export { NotificationsTable, NotificationAlertTypeComponent, getNotificationTypeColor, getNotificationTypeIcon };

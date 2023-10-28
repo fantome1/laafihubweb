@@ -3,8 +3,9 @@ import { LoadingButton } from "@mui/lab";
 import { Alert, Avatar, Button,  Checkbox,  CircularProgress,  Dialog, DialogActions, DialogContent, DialogTitle, ListItem, ListItemAvatar, ListItemButton, ListItemText, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
-import { IGetDeviceResult } from "../../models/device_model";
 import { PromiseBuilder } from "../PromiseBuilder";
+import { IDevice } from "../../models/device_model";
+import { PaginatedFetchResult } from "../../bloc/pagination_bloc";
 
 type Props = {
     id?: string;
@@ -16,7 +17,7 @@ type State = {
     isLoading: boolean;
     error: any;
     groupName: string;
-    devicesPromise: Promise<IGetDeviceResult>|null;
+    devicesPromise: Promise<PaginatedFetchResult<IDevice>>|null;
 };
 
 class RegisterDevicesGroupDialog extends React.Component<Props, State> {
@@ -37,7 +38,7 @@ class RegisterDevicesGroupDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ devicesPromise: Api.getDevicesStats() });
+        this.setState({ devicesPromise: Api.getDevices() });
     }
 
     onSubmit() {
@@ -145,8 +146,8 @@ class RegisterDevicesGroupDialog extends React.Component<Props, State> {
         );        
     }
 
-    deviceComponentBuilder(data: IGetDeviceResult, model: 'Central'|'Gateway'|'Monitor') {
-        return data.devicies.filter(d => d.model == model).map(value => {
+    deviceComponentBuilder(data: PaginatedFetchResult<IDevice>, model: 'Central'|'Gateway'|'Monitor') {
+        return data.items.filter(d => d.model == model).map(value => {
             const labelId = `checkbox-list-secondary-label-${value.id}`;
             return (
                 <ListItem

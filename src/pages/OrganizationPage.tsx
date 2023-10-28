@@ -6,15 +6,16 @@ import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Api } from "../services/api";
 import { Completer } from "../services/completer";
-import { IGetInfrastructureResult, IInfrastructure } from "../models/infrastructure_model";
+import { IInfrastructure, IInfrastructureStats } from "../models/infrastructure_model";
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
-import { IGetDeviceResult } from "../models/device_model";
-import { IGetActivitiesResult } from "../models/activity_model";
 import { BubleMap } from "../components/BubleMap";
-import { IGetUsersResult } from "../models/user_model";
 import { DialogService } from "../components/dialogs/DialogsComponent";
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
+import { IDeviceStats } from "../models/device_model";
+import { IActivityStats } from "../models/activity_model";
+import { IUserStats } from "../models/user_model";
 
 type Props = {
     navigate: (url: string) => void;
@@ -23,10 +24,11 @@ type Props = {
 type State = {
     createDialogCompleter: Completer<boolean>|null;
     infrastructureId: string|null;
-    infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
-    usersPromise: Promise<IGetUsersResult>|null;
-    devicesPromise: Promise<IGetDeviceResult>|null;
-    activitesPromise: Promise<IGetActivitiesResult>|null;
+    infrastructuresPromise: Promise<PaginatedFetchResult<IInfrastructure>>|null;
+    infrastructuresStatsPromise: Promise<IInfrastructureStats>|null;
+    usersStatsPromise: Promise<IUserStats>|null;
+    devicesStatsPromise: Promise<IDeviceStats>|null;
+    activitiesStatsPromise: Promise<IActivityStats>|null;
 };
 
 class OrganizationPage extends React.Component<Props, State> {
@@ -38,9 +40,10 @@ class OrganizationPage extends React.Component<Props, State> {
             createDialogCompleter: null,
             infrastructureId: null,
             infrastructuresPromise: null,
-            usersPromise: null,
-            devicesPromise: null,
-            activitesPromise: null
+            infrastructuresStatsPromise: null,
+            usersStatsPromise: null,
+            devicesStatsPromise: null,
+            activitiesStatsPromise: null
         };
 
         this.showCreateInfrastructureDialog = this.showCreateInfrastructureDialog.bind(this);
@@ -49,9 +52,10 @@ class OrganizationPage extends React.Component<Props, State> {
     componentDidMount(): void {
         this.setState({
             infrastructuresPromise: Api.getInfrastructures(),
-            usersPromise: Api.getUsers(),
-            devicesPromise: Api.getDevicesStats(),
-            activitesPromise: Api.getActivities()
+            infrastructuresStatsPromise: Api.getInfrastructureStats(),
+            usersStatsPromise: Api.getUsersStats(),
+            devicesStatsPromise: Api.getDevicesStats(),
+            activitiesStatsPromise: Api.getActivitiesStats()
         });
     }
 
@@ -64,7 +68,7 @@ class OrganizationPage extends React.Component<Props, State> {
             this.setState({ createDialogCompleter: null, infrastructureId: null });
 
             if (result == true) {
-                this.setState({ infrastructuresPromise: Api.getInfrastructures() });
+                this.setState({ infrastructuresPromise: Api.getInfrastructures(), infrastructuresStatsPromise: Api.getInfrastructureStats() });
                 DialogService.showSnackbar({ severity: 'success', message: infrastructureId ? 'Les informations de l\'infrastructure ont été modifié avec succès' : 'Infrastructure ajouté avec succès' });
             }
         } catch(err) {
@@ -85,7 +89,7 @@ class OrganizationPage extends React.Component<Props, State> {
 
         Api.deleteInfrastructure(value.id)
             .then(() => {
-                this.setState({ infrastructuresPromise: Api.getInfrastructures() });
+                this.setState({ infrastructuresPromise: Api.getInfrastructures(), infrastructuresStatsPromise: Api.getInfrastructureStats() });
                 DialogService.showSnackbar({ severity: 'success', message: 'Infrastructure supprimé avec succès' });
             }).catch(err => {
                 console.log('err', err);
@@ -102,16 +106,16 @@ class OrganizationPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 <div className="flex space-x-4 mt-12">
                     <div style={{ flex: '1 1 0' }}>
                         <OrganizationFirstCardGroup
                             showCreateInfrastructureDialog={() => this.showCreateInfrastructureDialog()}
-                            infrastructuresPromise={state.infrastructuresPromise}
-                            usersPromise={state.usersPromise}
-                            devicesPromise={state.devicesPromise}
-                            activitesPromise={state.activitesPromise}
+                            infrastructuresStatsPromise={state.infrastructuresStatsPromise}
+                            usersStatsPromise={state.usersStatsPromise}
+                            devicesStatsPromise={state.devicesStatsPromise}
+                            activitiesStatsPromise={state.activitiesStatsPromise}
                         />
                     </div>
 
@@ -119,7 +123,7 @@ class OrganizationPage extends React.Component<Props, State> {
                         <BubleMap>
                             {<PromiseBuilder
                                 promise={state.infrastructuresPromise}
-                                dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
+                                dataBuilder={data => (data.items.map((value, index) => <CircleMarker key={index}
                                     center={[value.coordinates.latitude, value.coordinates.longitude]}
                                     pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -144,7 +148,7 @@ class OrganizationPage extends React.Component<Props, State> {
                                     <tr>{['', 'Infrastructures Name', 'Type', 'Activites', 'Devices', 'Agents', 'Date of creation', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                 </thead>
                                 <tbody>
-                                    {data.infrastructures.map(value => (
+                                    {data.items.map(value => (
                                         <tr key={value.id} onClick={() => this.onTapInfrastructure(value)} className="cursor-pointer">
                                             <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: getInfrastructuresStatusColor(value) }}></div></div></td>
                                             <td>{value.name}</td>

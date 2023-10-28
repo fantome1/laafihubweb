@@ -5,7 +5,7 @@ import { Api } from "../../services/api";
 import { PromiseBuilder } from "../PromiseBuilder";
 import { TableSkeletonComponent } from "../TableSkeletonComponent";
 import { DialogService } from "./DialogsComponent";
-import { IDevice, IGetDeviceResult } from "../../models/device_model";
+import { IDevice } from "../../models/device_model";
 import { NavigateFunction } from "react-router-dom";
 import { routes } from "../../constants/routes";
 import { WithRouter } from "../WithRouterHook";

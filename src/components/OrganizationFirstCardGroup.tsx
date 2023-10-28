@@ -2,18 +2,18 @@ import { Paper, Skeleton } from "@mui/material";
 import { LaafiMonitorDeviceUsageChart } from "./charts/Charts";
 import { ActivityChart } from "./charts/ActivityChart";
 import { PromiseBuilder } from "./PromiseBuilder";
-import { IGetInfrastructureResult } from "../models/infrastructure_model";
-import { IGetDeviceResult } from "../models/device_model";
-import { IGetActivitiesResult } from "../models/activity_model";
-import { IGetUsersResult } from "../models/user_model";
+import { IDeviceStats } from "../models/device_model";
+import {  IUserStats } from "../models/user_model";
 import { Utils } from "../services/utils";
+import { IInfrastructureStats } from "../models/infrastructure_model";
+import { IActivityStats } from "../models/activity_model";
 
 type Props = {
     showCreateInfrastructureDialog: () => void;
-    infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
-    usersPromise: Promise<IGetUsersResult>|null;
-    devicesPromise: Promise<IGetDeviceResult>|null;
-    activitesPromise: Promise<IGetActivitiesResult>|null;
+    infrastructuresStatsPromise: Promise<IInfrastructureStats>|null;
+    usersStatsPromise: Promise<IUserStats>|null;
+    devicesStatsPromise: Promise<IDeviceStats>|null;
+    activitiesStatsPromise: Promise<IActivityStats>|null;
 }
 
 function OrganizationFirstCardGroup(props: Props) {
@@ -37,8 +37,8 @@ function OrganizationFirstCardGroup(props: Props) {
                                     <div className="flex items-center">
                                         <div className="w-[14px] h-[14px] bg-[#999999] mr-2"></div>
                                         <PromiseBuilder
-                                            promise={props.infrastructuresPromise}
-                                            dataBuilder={data => (<p className="text-sm text-[#a2a2a2]">{data.infrastructures.length > 0 ?  `Last update ${Utils.timeAgo(new Date(data.infrastructures[0].creationDate!))}` : ''}</p>)}
+                                            promise={props.infrastructuresStatsPromise}
+                                            dataBuilder={data => (<p className="text-sm text-[#a2a2a2]">{data.lastUpdateDate.length > 0 ?  `Last update ${Utils.timeAgo(new Date(data.lastUpdateDate!))}` : ''}</p>)}
                                             loadingBuilder={() => (<Skeleton className="text-sm w-[56px]" />)}
                                             errorBuilder={(err) => (<span></span>)}
                                         />
@@ -49,7 +49,7 @@ function OrganizationFirstCardGroup(props: Props) {
                     </div>
                     <div className="flex items-end py-4">
                         <PromiseBuilder
-                            promise={props.infrastructuresPromise}
+                            promise={props.infrastructuresStatsPromise}
                             dataBuilder={data => (<p className="text-3xl text-[#3C4858]">{data.total.toString().padStart(3, '0')}</p>)}
                             loadingBuilder={() => (<Skeleton className="text-3xl w-[56px]" />)}
                             errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
@@ -70,7 +70,7 @@ function OrganizationFirstCardGroup(props: Props) {
 
                     <div className="flex flex-col divide-y mt-2">
                         {<PromiseBuilder
-                            promise={props.usersPromise}
+                            promise={props.usersStatsPromise}
                             dataBuilder={data => (data.roles.map((e, index) => (
                                 <div key={index} className="flex flex-col justify-center my-2">
                                     <p className="text-left text-sm text-[#999999] mt-2">{e.name}</p>
@@ -92,20 +92,20 @@ function OrganizationFirstCardGroup(props: Props) {
                             <p className="text-lg text-[#999999] mb-2">Devices usage</p>
 
                             {/* <DeviceUsageChart /> */}
-                            <LaafiMonitorDeviceUsageChart promise={props.devicesPromise} />
+                            <LaafiMonitorDeviceUsageChart promise={props.devicesStatsPromise} />
                         </div>
                         {/* activities */}
                         <div className="bg-white rounded-md p-2 grow-[5]">
                             <p className="text-lg text-[#999999] mb-2">Activities</p>
 
-                            <ActivityChart promise={props.activitesPromise} />
+                            <ActivityChart promise={props.activitiesStatsPromise} />
                         </div>
                     </div>
 
                     {/* (minotor + centrals + gateways) card */}
                     <div className="flex divide-x h-[90px] bg-white rounded-md">
                         {<PromiseBuilder
-                            promise={props.devicesPromise}
+                            promise={props.devicesStatsPromise}
                             dataBuilder={data => (data.totalModel.map((e, index) => (
                                 <div key={index} className="flex flex-col justify-around my-2 mx-2 grow">
                                     <p className="text-left text-sm text-[#999999] ml-2">{e.id}</p>

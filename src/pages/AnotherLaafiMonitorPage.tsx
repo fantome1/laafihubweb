@@ -2,24 +2,26 @@ import React from "react";
 import { Paper, Skeleton } from "@mui/material";
 import { ActivitesConnectionStatusChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
-import { IActivity, IGetActivitiesResult } from "../models/activity_model";
+import { IActivity, IActivityStats } from "../models/activity_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { Utils } from "../services/utils";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { ActivityList } from "../components/ActivityList";
-import { IGetDeviceResult } from "../models/device_model";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { DialogService } from "../components/dialogs/DialogsComponent";
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
+import { IDeviceStats } from "../models/device_model";
 
 type Props = {
     navigate: (route: string) => void;
 }
 
 type State = {
-    promise: Promise<IGetActivitiesResult>|null;
-    devicesPromise: Promise<IGetDeviceResult>|null;
+    promise: Promise<PaginatedFetchResult<IActivity>>|null;
+    statsPromise: Promise<IActivityStats>|null;
+    devicesStatsPromise: Promise<IDeviceStats>|null;
 }
 
 class AnotherLaafiMonitorPage extends React.Component<Props, State> {
@@ -29,14 +31,16 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         this.state = {
             promise: null,
-            devicesPromise: null,
+            statsPromise: null,
+            devicesStatsPromise: null,
         };
     }
 
     componentDidMount(): void {
         this.setState({
             promise: Api.getActivities({ PageSize: 50 }), // FIXME fix this
-            devicesPromise: Api.getDevicesStats()
+            statsPromise: Api.getActivitiesStats(),
+            devicesStatsPromise: Api.getDevicesStats()
         });
     }
 
@@ -57,7 +61,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteActivity(value.id)
             .then(() => {
-                this.setState({ promise: Api.getActivities() });
+                this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() });
                 DialogService.showSnackbar({ severity: 'success', message: 'Activité supprimé avec succès' })
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' });
@@ -74,7 +78,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const started = value.status == 'Active';
         Api.changeActivityState(value.id, started ? 'stop' : 'start')
             .then(() => {
-                this.setState({ promise: Api.getActivities() });
+                this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() });
                 DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
             })
@@ -91,7 +95,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const isFavorite = value.isFavorite;
         Api.changeActivityFavoriteStatus(value.id, !isFavorite)
             .then(() => {
-                this.setState({ promise: Api.getActivities() });
+                this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() });
                 DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'success', message: !isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
             })
@@ -106,7 +110,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -142,7 +146,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                             </div>
 
                             <PromiseBuilder
-                                promise={state.promise}
+                                promise={state.statsPromise}
                                 dataBuilder={(data) => (<p className="text-4xl text-[#3C4858] text-right">{Utils.getActivedActivityCount(data).toString().padStart(2, '0')}/{data.count.toString().padStart(2, '0')}</p>)}
                                 loadingBuilder={() => (<Skeleton className="text-4xl" width={120} />)}
                                 errorBuilder={err => (<span></span>)}
@@ -155,7 +159,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
                             <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">
                                 <PromiseBuilder
-                                    promise={state.devicesPromise}
+                                    promise={state.devicesStatsPromise}
                                     dataBuilder={data => data.totalConnexionType.map((value, index) => (
                                         <div key={index} className={`grow ${index == 0 ? '' : 'pl-4'}`}>
                                             <p className="text-sm text-[#999999]">{value.id}</p>
@@ -189,7 +193,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                         <tr>{['ID', 'Name', 'Type', 'Date of Start', 'Date of End', 'Infrastructure', 'Status',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.activities.map(data => (
+                                        {data.items.map(data => (
                                             <tr key={data.id} className="cursor-pointer" onClick={() => this.onTapRow(data)}>
                                                 <td>
                                                     <div className="flex items-center px-2">
@@ -235,8 +239,8 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                                     <ActivityList
                                         label='Favorite Activities'
                                         columnCount={1}
-                                        data={data.activities.filter(v => v.isFavorite).map(v => ({ activity: v, showExtraData: true }))}
-                                        onReload={() => this.setState({ promise: Api.getActivities(), })}
+                                        data={data.items.filter(v => v.isFavorite).map(v => ({ activity: v, showExtraData: true }))}
+                                        onReload={() => this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() })}
                                     />
                                 </div>
                             )}

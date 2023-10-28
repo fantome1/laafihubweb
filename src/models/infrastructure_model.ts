@@ -15,11 +15,10 @@ interface IInfrastructure {
     totalAgents?: number;
 }
 
-
-interface IGetInfrastructureResult {
+interface IInfrastructureStats {
     total: number;
     activeCount: number;
-    infrastructures: IInfrastructure[];
+    lastUpdateDate: string;
 }
 
-export type { IInfrastructure, IGetInfrastructureResult };
+export type { IInfrastructure, IInfrastructureStats };

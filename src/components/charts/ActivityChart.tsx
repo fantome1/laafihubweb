@@ -6,7 +6,7 @@ import {
   } from 'chart.js';
 import React from 'react';
 import { Chart } from 'react-chartjs-2';
-import { IGetActivitiesResult } from '../../models/activity_model';
+import { IActivityStats } from '../../models/activity_model';
 import { months } from '../../constants/mouths';
 
 ChartJS.register(
@@ -17,7 +17,7 @@ ChartJS.register(
 
 
 type Props = {
-    promise: Promise<IGetActivitiesResult>|null;
+    promise: Promise<IActivityStats>|null;
 };
 
 type State = {
@@ -60,7 +60,7 @@ class ActivityChart extends React.Component<Props, State> {
         }
     }
 
-    update(promise: Promise<IGetActivitiesResult>|null) {
+    update(promise: Promise<IActivityStats>|null) {
         if (promise == null)
             return;            
         promise.then(value => {

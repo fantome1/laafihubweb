@@ -1,6 +1,6 @@
 import moment from "moment";
 import * as signalR from '@microsoft/signalr';
-import { IActivity, IGetActivitiesResult } from "../models/activity_model";
+import { IActivity, IActivityStats } from "../models/activity_model";
 import { IUser } from "../models/user_model";
 import { AuthService } from "./auth_service";
 
@@ -68,7 +68,7 @@ class Utils {
     }
 
 
-    static getActivedActivityCount(data: IGetActivitiesResult): number {
+    static getActivedActivityCount(data: IActivityStats): number {
         const result = data.totalStatus.find(v => v.id == 'Actived');
         return result?.total ?? 0
     }

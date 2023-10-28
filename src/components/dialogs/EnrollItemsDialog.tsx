@@ -1,13 +1,13 @@
 import React from "react";
 import { LoadingButton } from "@mui/lab";
-import { Alert, Avatar, Button,  Checkbox,  CircularProgress,  Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, ListItem, ListItemAvatar, ListItemButton, ListItemText, OutlinedInput, } from "@mui/material";
+import { Alert, Avatar, Button,  Checkbox,  CircularProgress,  Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, ListItem, ListItemAvatar, ListItemButton, ListItemText, OutlinedInput } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
-import { IGetDeviceResult } from "../../models/device_model";
-import { IGetUsersResult } from "../../models/user_model";
 import { PromiseData } from "../../models/pomise_data";
 import { PromiseDataBuilder } from "../PromiseBuilder";
-import { Utils } from "../../services/utils";
+import { IUser } from "../../models/user_model";
+import { IDevice } from "../../models/device_model";
+import { PaginatedFetchResult } from "../../bloc/pagination_bloc";
 
 type Props = {
     infrastructureId: string;
@@ -19,8 +19,8 @@ type State = {
     selectedDevicesId: Set<string>;
     isLoading: boolean;
     error: any;
-    usersPromise: PromiseData<IGetUsersResult>|null;
-    devicesPromise: PromiseData<IGetDeviceResult>|null;
+    usersPromise: PromiseData<PaginatedFetchResult<IUser>>|null;
+    devicesPromise: PromiseData<PaginatedFetchResult<IDevice>>|null;
 };
 
 class EnrollItemsDialog extends React.Component<Props, State> {
@@ -54,7 +54,7 @@ class EnrollItemsDialog extends React.Component<Props, State> {
 
     fetchDevices() {
         this.setState({ devicesPromise: PromiseData.pending() });
-        Api.getDevicesStats({ NotEnrolled: 'true' })
+        Api.getDevices({ NotEnrolled: 'true' })
             .then(data => this.setState({ devicesPromise: PromiseData.resolve(data) }))
             .catch(err => this.setState({ devicesPromise: PromiseData.reject(err) }));
     }
@@ -129,7 +129,7 @@ class EnrollItemsDialog extends React.Component<Props, State> {
                         <div className="w-full border border-gray-300 rounded overflow-y-auto">
                             <PromiseDataBuilder
                                 data={usersPromise}
-                                dataBuilder={data => data.users.map(value => {
+                                dataBuilder={data => data.items.map(value => {
                                     const labelId = `checkbox-list-secondary-label-${value.id}`;
                                     return (
                                         <ListItem
@@ -153,7 +153,7 @@ class EnrollItemsDialog extends React.Component<Props, State> {
                         <div className="w-full border border-gray-300 rounded overflow-y-auto">
                             <PromiseDataBuilder
                                 data={devicesPromise}
-                                dataBuilder={data => data.devicies.map(value => {
+                                dataBuilder={data => data.items.map(value => {
                                     const labelId = `checkbox-list-secondary-label-${value.id}`;
                                     return (
                                         <ListItem

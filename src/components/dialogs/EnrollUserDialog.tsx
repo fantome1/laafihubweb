@@ -2,12 +2,13 @@ import React from "react";
 import { Avatar, Button,  Checkbox,  CircularProgress,  Dialog, DialogActions, DialogContent, DialogTitle, ListItem, ListItemAvatar, ListItemButton, ListItemText, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
-import { IGetDeviceResult } from "../../models/device_model";
 import { PromiseBuilder } from "../PromiseBuilder";
 import { IActivity } from "../../models/activity_model";
 import { LoadingButton } from "@mui/lab";
 import { DialogService } from "./DialogsComponent";
 import { IUser } from "../../models/user_model";
+import { IDevice } from "../../models/device_model";
+import { PaginatedFetchResult } from "../../bloc/pagination_bloc";
 
 type Props = {
     user: IUser;
@@ -17,7 +18,7 @@ type Props = {
 type State = {
     activity: IActivity|null;
     selected: Set<string>;
-    promise: Promise<IGetDeviceResult>|null;
+    promise: Promise<PaginatedFetchResult<IDevice>>|null;
     isLoading: boolean;
     error: any;
 };
@@ -40,7 +41,7 @@ class EnrollUserDialog extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ promise: Api.getDevicesStats({ InfrastructureId: this.props.user.infrastructureId, NotInActivity: 'true' }) });
+        this.setState({ promise: Api.getDevices({ InfrastructureId: this.props.user.infrastructureId, NotInActivity: 'true' }) });
     }
 
     onSubmit() {
@@ -107,7 +108,7 @@ class EnrollUserDialog extends React.Component<Props, State> {
                         <div className="w-full border border-gray-300 rounded overflow-y-auto">
                             <PromiseBuilder
                                 promise={promise}
-                                dataBuilder={data => data.devicies.map(value => {
+                                dataBuilder={data => data.items.map(value => {
                                     const labelId = `checkbox-list-secondary-label-${value.id}`;
                                     return (
                                         <ListItem

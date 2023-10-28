@@ -11,12 +11,13 @@ import { PromiseSelect } from "../components/form/PromiseSelect";
 import { IInfrastructure } from "../models/infrastructure_model";
 import { Api } from "../services/api";
 import { Utils } from "../services/utils";
-import { IGetUsersResult } from "../models/user_model";
+import {  IUser } from "../models/user_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Completer } from "../services/completer";
 import { SelectedUsersDevicesDialog } from "../components/dialogs/SelectedUserDevicesDialog";
 import { routes } from "../constants/routes";
 import moment from "moment";
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
 
 type Props = {
     navigate: NavigateFunction;
@@ -36,7 +37,7 @@ type State = {
 
 async function getInfrastructures() {
     const data = await Api.getInfrastructures();
-    return data.infrastructures;
+    return data.items;
 }
 
 function getStepperLabel(isEdit: boolean) {
@@ -595,11 +596,11 @@ type SelectUsersAndDevicesStepProps = {
 };
 
 type SelectUsersAndDevicesStepState = {
-    usersPromise: Promise<IGetUsersResult>|null;
+    usersPromise: Promise<PaginatedFetchResult<IUser>>|null;
     selectedUsersId: Set<string>;
     devices: Record<string, string[]>;
     devicesDialogData: { completer: Completer<string[]|null>, infrastructureId: string, selected: string[] }|null;
-}
+};
 
 class SelectUsersAndDevicesStep extends React.Component<SelectUsersAndDevicesStepProps, SelectUsersAndDevicesStepState> {
 
@@ -673,7 +674,7 @@ class SelectUsersAndDevicesStep extends React.Component<SelectUsersAndDevicesSte
                     <div className="w-full border border-gray-300 rounded overflow-y-auto">
                         <PromiseBuilder
                             promise={this.state.usersPromise}
-                            dataBuilder={data => data.users.map(value => {
+                            dataBuilder={data => data.items.map(value => {
                                 const labelId = `user-checkbox-${value.id}`;
                                 return (
                                     <ListItem

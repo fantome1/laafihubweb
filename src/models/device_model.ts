@@ -11,9 +11,8 @@ interface IDevice {
     parentModel: string;
 };
 
-interface IGetDeviceResult {
+interface IDeviceStats {
     count: number;
-    devicies: IDevice[];
     totalConnected: { id: string, total: number }[];
     totalConnexionType: { id: string, total: number }[];
     totalEnrolled: { id: string, total: number }[];
@@ -21,4 +20,4 @@ interface IGetDeviceResult {
     totalSatus: { id: 'Disable'|'UnAssigned'|'Assigned', total: number }[];
 };
 
-export type { IDevice, IGetDeviceResult };
+export type { IDevice, IDeviceStats };

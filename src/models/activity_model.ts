@@ -16,12 +16,11 @@ interface IActivity {
     totalUsers: number;
 }
 
-interface IGetActivitiesResult {
+interface IActivityStats {
     count: number;
-    activities: IActivity[];
     totalByMonth: { id: string, total: number }[],
     totalStatus: { id: 'Expired'|'Actived'|'Stopped', total: number }[],
     totalType: { id: string, total: number }[]
 }
 
-export type { IActivity, IGetActivitiesResult }
+export type { IActivity, IActivityStats };

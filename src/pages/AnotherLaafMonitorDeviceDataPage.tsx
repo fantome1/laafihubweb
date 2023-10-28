@@ -1,5 +1,4 @@
 import React from "react";
-import * as signalR from '@microsoft/signalr';
 import { FormControl, MenuItem, Paper, Select } from "@mui/material";
 import { GroupedBarChart, GroupedBarChart2, CountPieChart, TemperatureCurveChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
@@ -12,6 +11,7 @@ import { IReceiveActivityItem } from "../models/receive_activity_data";
 import { RealtimeActivityBloc } from "../services/realtime_activity_bloc";
 import { Marker, Popup } from "react-leaflet";
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from "../constants/temperature";
+import { signalRHelper } from "../services/signal_r_helper";
 
 type Props = {
     params: { id: string };
@@ -34,7 +34,6 @@ type State = {
 
 class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
 
-    private connection = Utils.signalRConnectionBuilder();
     private bloc: RealtimeActivityBloc|null;
 
     constructor(props: Props) {
@@ -52,19 +51,16 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        if (this.connection.state != signalR.HubConnectionState.Disconnected)
-            return;
-
-        this.connection.start()
+        signalRHelper.start()
             .then(async () => {
-                const activity = await this.connection.invoke('SubscribeToGetActivityData', this.props.params.id);
+                const activity = await signalRHelper.connection.invoke('SubscribeToGetActivityData', this.props.params.id);
 
                 this.setState({ activity });
 
                 this.bloc = new RealtimeActivityBloc();
                 this.bloc.listen(data => this.setState({ data }))
 
-                this.connection.on('ReceiveActivityData', this.listen);
+                signalRHelper.connection.on('ReceiveActivityData', this.listen);
 
                 // setInterval(() => {
                 //     this.listen({
@@ -132,6 +128,7 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
     }
 
     componentWillUnmount(): void {
+        signalRHelper.connection.off('ReceiveActivityData');
         this.bloc?.dispose();
     }
 

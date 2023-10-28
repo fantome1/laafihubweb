@@ -4,11 +4,12 @@ import { Completer } from "../services/completer";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
-import { IUser } from "../models/user_model";
+import { IUser, IUserStats } from "../models/user_model";
 import EditUserComponent from "../components/EditUser";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { DialogService } from "../components/dialogs/DialogsComponent";
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
 
 type Props = {
 
@@ -16,7 +17,8 @@ type Props = {
 
 type State = {
     addUserDialogCompleter: Completer<boolean>|null;
-    usersPromise?: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
+    usersPromise?: Promise<PaginatedFetchResult<IUser>>|null;
+    usersStatsPromise?: Promise<IUserStats>|null;
     selectedUser: IUser|null; // for edit user
 }
 
@@ -28,6 +30,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         this.state = {
             addUserDialogCompleter: null,
             usersPromise: null,
+            usersStatsPromise: null,
             selectedUser: null
         };
 
@@ -35,7 +38,11 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setState({ usersPromise: Api.getUsers() });
+        this.update();
+    }
+
+    update() {
+        this.setState({ usersPromise: Api.getUsers(), usersStatsPromise: Api.getUsersStats() });
     }
 
     async showAddUserDialog() {
@@ -46,7 +53,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         this.setState({ addUserDialogCompleter: null });
 
         if (result == true) {
-            this.setState({ usersPromise: Api.getUsers() });
+            this.update();
             DialogService.showSnackbar({ severity: 'success', message: 'Utilisateur ajouté avec succès' });
         }
     }
@@ -64,7 +71,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
 
         Api.deleteUser(user.id)
             .then(() => {
-                this.setState({ usersPromise: Api.getUsers() });
+                this.update();
                 DialogService.showSnackbar({ severity: 'success', message: 'Utilisateur supprimé avec succès' })
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur' });
@@ -76,7 +83,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         const state = this.state;    
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -98,7 +105,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                         </div>
                         <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">
                             <PromiseBuilder
-                                promise={state.usersPromise}
+                                promise={state.usersStatsPromise}
                                 dataBuilder={data => data.roles.map((role, index) => (
                                     <div key={index} className={`${index == 0 ? '' : 'pl-4'}`}>
                                         <p className="text-sm text-[#999999]">{role.name}</p>
@@ -130,7 +137,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                                         <tr>{['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.users.map(user => (
+                                        {data.items.map(user => (
                                             <tr key={user.id} className="cursor-pointer" onClick={() => this.setState({ selectedUser: user })}>
                                                 <td>{user.id}</td>
                                                 <td>{user.userName}</td>

@@ -1,15 +1,14 @@
 import React from "react";
-import { CircularProgress, Paper, Skeleton, TablePagination } from "@mui/material";
+import { CircularProgress, Paper, Skeleton } from "@mui/material";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { PromiseBuilder } from "../components/PromiseBuilder";
-import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { Completer } from "../services/completer";
 import { AddDeviceDialog } from "../components/dialogs/AddDeviceDialog";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
-import { IDevice, IGetDeviceResult } from "../models/device_model";
+import { IDevice, IDeviceStats } from "../models/device_model";
 import { DialogService } from "../components/dialogs/DialogsComponent";
 import { IGetDevicesGroupResult } from "../models/devices_group_model";
 import { PaginationBloc } from "../bloc/pagination_bloc";
@@ -21,7 +20,7 @@ type Props = {
 
 type State = {
     addDeviceCompleter: Completer<boolean>|null;
-    devicesPromise: Promise<IGetDeviceResult>|null;
+    devicesStatsPromise: Promise<IDeviceStats>|null;
     deviceGroups: Promise<IGetDevicesGroupResult>|null;
 };
 
@@ -38,7 +37,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
         this.state = {
             addDeviceCompleter: null,
-            devicesPromise: null,
+            devicesStatsPromise: null,
             deviceGroups: null
         };
 
@@ -50,7 +49,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
         // this.paginatedBloc.listen(this.listen);
         this.paginatedBloc.next();
         this.setState({
-            devicesPromise: Api.getDevicesStats(),
+            devicesStatsPromise: Api.getDevicesStats(),
             deviceGroups: Api.getDevicesGroups({ PageSize: 10 })
         });
     }
@@ -68,7 +67,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
             this.setState({ addDeviceCompleter: null });
 
             if (result == true) {
-                this.setState({ devicesPromise: Api.getDevicesStats() });
+                this.setState({ devicesStatsPromise: Api.getDevicesStats() });
                 this.paginatedBloc.reset();
                 DialogService.showSnackbar({ severity: 'success', message: 'Device successfully added' });
             }
@@ -104,7 +103,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteDevice(id)
             .then(() => {
-                this.setState({ devicesPromise: Api.getDevicesStats() });
+                this.setState({ devicesStatsPromise: Api.getDevicesStats() });
                 this.paginatedBloc.reload();
                 DialogService.showSnackbar({ severity: 'success', message: 'Device successfully deleted' });
             }).catch(err => {
@@ -135,7 +134,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -159,7 +158,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                         </div>
                         <div className="flex items-end py-4">
                             <PromiseBuilder
-                                promise={state.devicesPromise}
+                                promise={state.devicesStatsPromise}
                                 dataBuilder={data => (<p className="text-4xl text-[#3C4858]">{data.count.toString().padStart(3, '0')}</p>)}
                                 loadingBuilder={() => (<Skeleton className="text-4xl" width={72} />)}
                                 errorBuilder={() => (<div className="text-red-500">Une erreur s'est produite</div>)}
@@ -178,7 +177,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
                             {/* <p className="text-4xl text-[#3C4858] text-right">020</p> */}
                             <PromiseBuilder
-                                promise={state.devicesPromise}
+                                promise={state.devicesStatsPromise}
                                 dataBuilder={data => (
                                     <div className="flex">
                                         {data.totalConnected.map((value, index) => (
@@ -200,7 +199,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
 
                             <div className="flex divide-x divide-gray-400 space-x-4 items-end py-4">
                                 <PromiseBuilder
-                                    promise={state.devicesPromise}
+                                    promise={state.devicesStatsPromise}
                                     dataBuilder={data => data.totalConnexionType.map((value, index) => (
                                         <div key={index} className={`grow ${index == 0 ? '' : 'pl-4'}`}>
                                             <p className="text-sm text-[#999999]">{value.id}</p>
@@ -257,12 +256,12 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                         <div className="bg-white rounded-lg">
                             <div className="p-2">
                                 <p className="text-lg text-[#999999] mb-2">Devices usage</p>
-                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceUsageChart promise={state.devicesPromise} /></div>
+                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceUsageChart promise={state.devicesStatsPromise} /></div>
                             </div>
 
                             <div className="p-2 border-t">
                                 <p className="text-lg text-[#999999] mb-2">Total Connected</p>
-                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
+                                <div className=" w-[60%]" style={{ margin: '0 auto' }}><LaafiMonitorDeviceStatusChart promise={state.devicesStatsPromise} /></div>
                             </div>
                         </div>
 

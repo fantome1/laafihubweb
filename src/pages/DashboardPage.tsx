@@ -5,47 +5,63 @@ import { InfrastructureCard } from "../components/InfrastructureCard";
 import { BubleMap } from "../components/BubleMap";
 import { ActivityList } from "../components/ActivityList";
 import { LaafiMonitorDeviceStatusChart, LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
-import { IGetActivitiesResult } from "../models/activity_model";
-import { IGetDeviceResult } from "../models/device_model";
+import { IActivity } from "../models/activity_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
-import { IUser } from "../models/user_model";
+import { IUser, IUserStats } from "../models/user_model";
 import { Api } from "../services/api";
-import { IGetInfrastructureResult } from "../models/infrastructure_model";
+import { IInfrastructure, IInfrastructureStats } from "../models/infrastructure_model";
 import { CircleMarker, Popup } from "react-leaflet";
 import { NavigateFunction } from "react-router-dom";
 import { WithRouter } from "../components/WithRouterHook";
+import { INotificationStats, getNotificationCountFromStats } from "../models/notification_stats";
+import { Completer } from "../services/completer";
+import { IDeviceStats } from "../models/device_model";
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
 
 type Props = {
     navigate: NavigateFunction;
-}
+};
 
 type State = {
-    devicesPromise: Promise<IGetDeviceResult>|null;
-    activitiesPromise: Promise<IGetActivitiesResult>|null;
-    usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
-    infrastructuresPromise: Promise<IGetInfrastructureResult>|null;
-}
+    alertPromise: Promise<INotificationStats>|null;
+    // devicesPromise: Promise<PaginatedFetchResult<IDevice>>|null;
+    deviceStatsPromise: Promise<IDeviceStats>|null;
+    activitiesPromise: Promise<PaginatedFetchResult<IActivity>>|null;
+    usersPromise: Promise<PaginatedFetchResult<IUser>>|null;
+    usersStatsPromise: Promise<IUserStats>|null;
+    infrastructurePromise: Promise<PaginatedFetchResult<IInfrastructure>>|null;
+    infrastructureStatsPromise: Promise<IInfrastructureStats>|null;
+};
 
 class DashboardPage extends React.Component<Props, State> {
+
+    public completer = new Completer<void>();
 
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            devicesPromise: null,
+            alertPromise: null,
+            // devicesPromise: null,
+            deviceStatsPromise: null,
             activitiesPromise: null,
             usersPromise: null,
-            infrastructuresPromise: null
+            usersStatsPromise: null,
+            infrastructurePromise: null,
+            infrastructureStatsPromise: null
         };
-
     }
 
     componentDidMount(): void {
         this.setState({
-            devicesPromise: Api.getDevicesStats(),
+            alertPromise: Api.getNotificationStats(),
+            // devicesPromise: Api.getDevices(),
+            deviceStatsPromise: Api.getDevicesStats(),
             activitiesPromise: Api.getActivities({ PageSize: 4 }),
             usersPromise: Api.getUsers(),
-            infrastructuresPromise: Api.getInfrastructures()
+            usersStatsPromise: Api.getUsersStats(),
+            infrastructurePromise: Api.getInfrastructures(),
+            infrastructureStatsPromise: Api.getInfrastructureStats()
         });
     }
 
@@ -54,12 +70,12 @@ class DashboardPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] p-8 h-[1440px]">
+            <div className="bg-[#E5E5E5] p-8 min-h-[1440px]">
 
                 {/* FIXME scroll */}
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 overflow-x-auto fixed-flex-items" style={{ width: 'calc(100vw - 116px)' }}>
 
-                    <EntityCountCard
+                    {/* <EntityCountCard
                         width={280}
                         icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">notifications</span>}
                         label="Alerts"
@@ -69,10 +85,32 @@ class DashboardPage extends React.Component<Props, State> {
                             { label: 'Humidity', count: '020' },
                             { label: 'UX Exposure', count: '020' },
                         ]}
+                    /> */}
+
+                    <PromiseBuilder
+                        promise={this.state.alertPromise}
+                        dataBuilder={data => (
+                            <EntityCountCard
+                                width={460}
+                                icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">notifications</span>}
+                                // elevation={0}
+                                label="Alerts"
+                                count={getNotificationCountFromStats(data).toString().padStart(3, '0')}
+                                items={[
+                                    { label: 'Temperatures', count: data.temperatures.toString().padStart(3, '0') },
+                                    { label: 'Humidity', count: data.humidities.toString().padStart(3, '0') },
+                                    { label: 'UV Exposure', count: data.uvExposure.toString().padStart(3, '0') },
+                                    { label: 'Battery Level', count: data.batteryLevels.toString().padStart(3, '0') },
+                                    { label: 'Disconnect issues', count: data.diconnectIssues.toString().padStart(3, '0') },
+                                ]}
+                            />
+                        )}
+                        loadingBuilder={() => (<Skeleton variant='rounded' width={460} height={140} />)}
+                        errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                     />
 
                     <PromiseBuilder
-                        promise={state.devicesPromise}
+                        promise={state.deviceStatsPromise}
                         dataBuilder={data => (
                             <EntityCountCard
                                 width={280}
@@ -87,7 +125,7 @@ class DashboardPage extends React.Component<Props, State> {
                     />
 
                     <PromiseBuilder
-                        promise={state.usersPromise}
+                        promise={state.usersStatsPromise}
                         dataBuilder={data => (
                             <EntityCountCard
                                 width={320}
@@ -102,7 +140,7 @@ class DashboardPage extends React.Component<Props, State> {
                     />
 
                     <PromiseBuilder
-                        promise={state.infrastructuresPromise}
+                        promise={state.infrastructureStatsPromise}
                         dataBuilder={data => (
                             <EntityCountCard
                                 width={280}
@@ -120,8 +158,8 @@ class DashboardPage extends React.Component<Props, State> {
                 <div className="flex space-x-4 mt-12">
                     <div style={{ flex: '1 1 0', minHeight: '328px' }}>
                         <PromiseBuilder
-                            promise={state.infrastructuresPromise}
-                            dataBuilder={data => (<InfrastructureCard data={data.infrastructures} />)}
+                            promise={state.infrastructurePromise}
+                            dataBuilder={data => (<InfrastructureCard data={data.items} />)}
                             loadingBuilder={() => (<Skeleton variant="rounded" height="328px" />)}
                             errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                         />
@@ -130,8 +168,8 @@ class DashboardPage extends React.Component<Props, State> {
                     <div style={{ flex: '1 1 0' }}>
                         <BubleMap>
                             {<PromiseBuilder
-                                promise={state.infrastructuresPromise}
-                                dataBuilder={data => (data.infrastructures.map((value, index) => <CircleMarker key={index}
+                                promise={state.infrastructurePromise}
+                                dataBuilder={data => (data.items.map((value, index) => <CircleMarker key={index}
                                     center={[value.coordinates.latitude, value.coordinates.longitude]}
                                     pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -157,7 +195,7 @@ class DashboardPage extends React.Component<Props, State> {
                                         label='Activities list'
                                         columnCount={2}
                                         showMoreBtn
-                                        data={data.activities.map(v => ({ activity: v, showExtraData: true }))}
+                                        data={data.items.map(v => ({ activity: v, showExtraData: true }))}
                                         onReload={() => this.setState({ activitiesPromise: Api.getActivities({ PageSize: 4 }) })}
                                     />
                                 </div>
@@ -177,14 +215,14 @@ class DashboardPage extends React.Component<Props, State> {
                                 <div className="w-[50%] flex flex-col justify-between">
                                     <p className="text-xl text-[#3C4858]">Total Connected</p>
                                     <div className="flex justify-center items-center">
-                                        <div className="w-[80%] border-r"> <LaafiMonitorDeviceStatusChart promise={state.devicesPromise} /></div>
+                                        <div className="w-[80%] border-r"> <LaafiMonitorDeviceStatusChart promise={state.deviceStatsPromise} /></div>
                                     </div>
                                 </div>
 
                                 <div className="w-[50%] w-[50%] flex flex-col justify-between">
                                     <p className="text-xl text-[]">Devices usage</p>
                                     <div className="flex justify-center items-center">
-                                        <div className="w-[80%]"><LaafiMonitorDeviceUsageChart promise={state.devicesPromise} /></div>
+                                        <div className="w-[80%]"><LaafiMonitorDeviceUsageChart promise={state.deviceStatsPromise} /></div>
                                     </div>
                                 </div>
                             </div>

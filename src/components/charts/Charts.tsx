@@ -15,7 +15,7 @@ import {
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { IGetDeviceResult } from '../../models/device_model';
+import { IDeviceStats, IGetDeviceResult } from '../../models/device_model';
 import { IGetActivitiesResult } from '../../models/activity_model';
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from '../../constants/temperature';
 import { Utils } from '../../services/utils';
@@ -37,7 +37,7 @@ ChartJS.register(
 );
 
 type LaafiMonitorDeviceUsageChartProps = {
-    promise: Promise<IGetDeviceResult>|null;
+    promise: Promise<IDeviceStats>|null;
 };
 
 type LaafiMonitorDeviceUsageChartState = {
@@ -164,7 +164,7 @@ class DeviceUsageChart3 extends React.Component {
 }
 
 type LaafiMonitorDeviceStatusChartProps = {
-    promise: Promise<IGetDeviceResult>|null;
+    promise: Promise<IDeviceStats>|null;
 };
 
 type LaafiMonitorDeviceStatusChartState = {

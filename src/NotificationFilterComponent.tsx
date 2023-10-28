@@ -1,5 +1,5 @@
 import React from "react";
-import { Autocomplete, Button, Checkbox, FormControlLabel, ListItem, ListItemButton, ListItemText, TextField } from "@mui/material";
+import { Autocomplete, Button, Checkbox, FormControlLabel, ListItem, ListItemText, TextField } from "@mui/material";
 import { MaterialSelectHelper } from "./components/form/MaterialSelectHelper";
 import { NotificationAlertTypeComponent } from "./components/NotificationsTable";
 import { INotification } from "./models/notification_model";
@@ -203,16 +203,17 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
     }
 
     static async fetchData(search: string, type: string) {
+        var isEmpty = search.trim() == '';
         switch(type) {
             case 'activity':
-                const v = await Api.getActivities();
-                return v.activities.map(v => ({ id: v.id, label: v.name, description: v.status }));
+                const v = await (isEmpty ? Api.getActivities({PageSize: 20 }) : Api.searchActivities(search));
+                return v.items.map(v => ({ id: v.id, label: v.name, description: v.status }));
             case 'infrastructure':
-                const v2 = await Api.getInfrastructures();
-                return v2.infrastructures.map(v => ({ id: v.id, label: v.name, description: v.status }));
+                const v2 = await (isEmpty ? Api.getInfrastructures() : Api.searchInfrastructures(search));
+                return v2.items.map(v => ({ id: v.id, label: v.name, description: v.status }));
             case 'device':
-                const v3  = await Api.getDevicesStats();
-                return v3.devicies.map(v => ({ id: v.id, label: v.id, description: v.model }));
+                const v3  = await (isEmpty ? Api.getDevices() : Api.searchDevices({ searchTerm: search }));
+                return v3.items.map(v => ({ id: v.id, label: v.id, description: v.model }));
         }
         throw new Error();
     }

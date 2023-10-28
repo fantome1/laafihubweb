@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Marker } from "react-leaflet";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Completer } from "../../services/completer";
 import { INotification } from "../../models/notification_model";
 import { NearMap } from "../NearMap";
 import { Utils } from "../../services/utils";
-import { NotificationAlertTypeComponent } from "../NotificationsTable";
+import { NotificationAlertTypeComponent, getNotificationTypeColor, getNotificationTypeIcon } from "../NotificationsTable";
 import { Api } from "../../services/api";
+import { DialogService } from "./DialogsComponent";
+import { notificationCounterBloc } from "../../services/notification_counter_bloc";
 
 type Props = {
     notification: INotification;
@@ -110,6 +112,59 @@ class ViewNotificationDetailsDialog extends React.PureComponent<Props, State> {
 
 }
 
+type NotificationAlertProps = {
+    value: INotification;
+    completer: Completer<void>;
+}
+
+function NotificationAlert(props: NotificationAlertProps) {
+
+    var color = getNotificationTypeColor(props.value.type);
+    var icon = getNotificationTypeIcon(props.value.type);
+
+    useEffect(() => {
+        setTimeout(() => props.completer.complete(), 6000);
+    }, []);
+
+    function onclick() {
+        props.completer.complete()
+        DialogService.showNotificationDetails(props.value, () => Promise.resolve());
+        notificationCounterBloc.decrement();
+    }
+
+    return (
+        <Paper
+            onClick={onclick}
+            sx={{
+                width: '360px',
+                padding: '16px 0',
+                backgroundColor: 'rgb(255, 220, 190)',
+                borderLeft: `6px solid ${color}`,
+                cursor: 'pointer'
+            }}
+        >
+            <div className="flex">
+                <div className="px-2">
+                    <span className="material-symbols-rounded" style={{ color }}>{icon}</span>
+                </div>
+                <div className="grow mr-4">
+                    <div className="flex justify-between">
+                        <p className="font-medium">{getEventType(props.value).replace('event', 'alert')}</p>
+                        <NotificationAlertTypeComponent alertType={props.value.type} />
+                    </div>
+
+                    <div className="mt-4"><RecordedValueComponent value={props.value} textSize='text-sm' marginBotton="0" /></div>
+
+                    <div className="flex justify-end"><Button size='small' onClick={(e) => {
+                        e.stopPropagation();
+                        props.completer.complete()
+                    }}>Close</Button></div>
+                </div>
+            </div>
+        </Paper>
+    );
+}
+
 function getEventType(value: INotification) {
     switch(value.type) {
         case 'TemperatureMin':
@@ -130,22 +185,24 @@ function getEventType(value: INotification) {
 }
 
 
-function RecordedValueComponent({ value }: { value: INotification }) {
+function RecordedValueComponent({ value, textSize, marginBotton }: { value: INotification, textSize?: string, marginBotton?: string }) {
+    textSize = textSize ?? 'text-2xl';
+    marginBotton = marginBotton ?? 'mb-4';
     switch(value.type) {
         case 'TemperatureMin':
         case 'TemperatureMax':
-            return (<p className="text-2xl text-[#3c4858] mb-4">Recorded value: <span className="font-bold">{value.value}° C</span></p>);
+            return (<p className={`${textSize} text-[#3c4858] ${marginBotton}`}>Recorded value: <span className="font-bold">{value.value}° C</span></p>);
         case 'HumidityMin':
         case 'HumidityMax':
-            return (<p className="text-2xl text-[#3c4858] mb-4">Registered value: <span className="font-bold">{value.value}% RH</span></p>);
+            return (<p className={`${textSize} text-[#3c4858] ${marginBotton}`}>Registered value: <span className="font-bold">{value.value}% RH</span></p>);
         case 'SunExposure':
-            return (<p className="text-2xl text-[#3c4858] mb-4">Exposure limit reached</p>);
+            return (<p className={`${textSize} text-[#3c4858] ${marginBotton}`}>Exposure limit reached</p>);
         case 'BatteryLevel':
-            return (<p className="text-2xl text-[#3c4858] mb-4">Default limit low <span className="font-bold">“Replace Battery”</span></p>);
+            return (<p className={`${textSize} text-[#3c4858] ${marginBotton}`}>Default limit low <span className="font-bold">“Replace Battery”</span></p>);
         case 'UserDisconnected':
-            return (<p className="text-2xl text-[#3c4858] mb-4">Connection to server lost</p>);
+            return (<p className={`${textSize} text-[#3c4858] ${marginBotton}`}>Connection to server lost</p>);
         case 'BluetoothLinkLost':
-            return (<p className="text-2xl text-[#3c4858] mb-4">Bluetooth link lost</p>);
+            return (<p className={`${textSize} text-[#3c4858] ${marginBotton}`}>Bluetooth link lost</p>);
     }
 }
 
@@ -203,4 +260,4 @@ function EventTypeAdditionalDataComponent({ value }: { value: INotification }) {
     }
 }
 
-export { ViewNotificationDetailsDialog };
+export { ViewNotificationDetailsDialog, NotificationAlert };

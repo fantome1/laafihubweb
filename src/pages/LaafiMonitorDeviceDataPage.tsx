@@ -1,17 +1,15 @@
 import React from "react";
-import * as signalR from '@microsoft/signalr';
 import { Box, Button, Paper, Tab, Tabs } from "@mui/material";
 import { TemperaturePieChart, TemperatureLineChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
 import { IReceiveDeviceData } from "../models/receive_device_data";
-import { Api } from "../services/api";
 import { BatteryIcon } from "../components/BatteryIcon";
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from "../constants/temperature";
 import { Marker, Popup } from "react-leaflet";
 import { NavigateFunction } from "react-router-dom";
 import { routes } from "../constants/routes";
-import { Utils } from "../services/utils";
+import { signalRHelper } from "../services/signal_r_helper";
 
 type Props = {
     navigate: NavigateFunction;
@@ -28,8 +26,6 @@ type State = {
 
 class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
 
-    private connection = Utils.signalRConnectionBuilder();
-
     constructor(props: Props) {
         super(props);
 
@@ -45,14 +41,10 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
     }
 
     componentDidMount(): void {
-        if (this.connection.state != signalR.HubConnectionState.Disconnected)
-            return;
-
-        this.connection.start()
+        signalRHelper.start()
             .then(() => {
-                this.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
-
-                this.connection.on('ReceiveDeviceData', this.listen);
+                signalRHelper.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
+                signalRHelper.connection.on('ReceiveDeviceData', this.listen);
             }).catch(err => {
                 console.log(err);
                 // this.setState({ error: true });
@@ -65,8 +57,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
     }
 
     componentWillUnmount(): void {
-        // FIXME close connection
-        // this.connection.stop()
+        signalRHelper.connection.off('ReceiveDeviceData', this.listen);
     }
 
     listen(data: IReceiveDeviceData) {
@@ -105,7 +96,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
         const position = data == null ? null : { lat: data?.dataSent?.data?.coordinates?.latitude, lng: data?.dataSent?.data?.coordinates?.longitude };
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 {/* First Row */}
                 <div className="flex space-x-2 mt-12">

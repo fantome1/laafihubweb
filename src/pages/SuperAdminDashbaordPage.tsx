@@ -5,9 +5,8 @@ import { IInfrastructure } from "../models/infrastructure_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { WithRouter } from "../components/WithRouterHook";
 import { Api } from "../services/api";
-import { IUser } from "../models/user_model";
+import { IUser, IUserStats } from "../models/user_model";
 import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
-import { IGetDeviceResult } from "../models/device_model";
 import { Completer } from "../services/completer";
 import { EnrollItemsDialog } from "../components/dialogs/EnrollItemsDialog";
 import { NavigateFunction } from "react-router-dom";
@@ -15,11 +14,13 @@ import { routes } from "../constants/routes";
 import { CreateInfrastructureDialog } from "../components/dialogs/CreateInfrastructureDialog";
 import { Marker, Popup } from "react-leaflet";
 import CrudMenu from "../components/CrudMenu";
-import { IActivity, IGetActivitiesResult } from "../models/activity_model";
+import { IActivity, IActivityStats } from "../models/activity_model";
 import { CreateUserDialog } from "../components/dialogs/CreateUserDialog";
 import { LaafiMonitorDeviceUsageChart } from "../components/charts/Charts";
 import { ActivityChart } from "../components/charts/ActivityChart";
 import { DialogService } from "../components/dialogs/DialogsComponent";
+import { PaginatedFetchResult } from "../bloc/pagination_bloc";
+import { IDevice, IDeviceStats } from "../models/device_model";
 
 type Props = {
     params: { id: string },
@@ -28,9 +29,12 @@ type Props = {
 
 type State = {
     promise: Promise<IInfrastructure>|null;
-    usersPromise: Promise<{ count: number, users: IUser[], roles: { name: string, total: number }[] }>|null;
-    devicesPromise: Promise<IGetDeviceResult>|null;
-    activitesPromise: Promise<IGetActivitiesResult>|null;
+    usersPromise: Promise<PaginatedFetchResult<IUser>>|null;
+    usersStatsPromise: Promise<IUserStats>|null;
+    devicesPromise: Promise<PaginatedFetchResult<IDevice>>|null;
+    devicesStatsPromise: Promise<IDeviceStats>|null;
+    activitiesPromise: Promise<PaginatedFetchResult<IActivity>>|null;
+    activitiesStatsPromise: Promise<IActivityStats>|null; 
     enrollItemsCompleter: Completer<boolean>|null;
     updateDialogCompleter: Completer<boolean>|null;
     userContextMenu: { top: number, left: number, userId: string }|null;
@@ -47,8 +51,11 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.state = {
             promise: null,
             usersPromise: null,
+            usersStatsPromise: null,
             devicesPromise: null,
-            activitesPromise: null,
+            devicesStatsPromise: null,
+            activitiesPromise: null,
+            activitiesStatsPromise: null,
             enrollItemsCompleter: null,
             updateDialogCompleter: null,
             userContextMenu: null,
@@ -68,8 +75,11 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         this.setState({
             promise: Api.getInfrastructure(this.props.params.id),
             usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
-            devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }),
-            activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
+            usersStatsPromise: Api.getUsersStats({ InfrastructureId: this.props.params.id }),
+            devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+            devicesStatsPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }),
+            activitiesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }),
+            activitiesStatsPromise: Api.getActivitiesStats({ InfrastructureId: this.props.params.id })
         });
     }
 
@@ -83,7 +93,9 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         if (result == true) {
             this.setState({
                 usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }),
-                devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id })
+                usersStatsPromise: Api.getUsersStats({ InfrastructureId: this.props.params.id }),
+                devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+                devicesStatsPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id })
             });
 
             DialogService.showSnackbar({ severity: 'success', message: 'Enrôlement effectué avec succès' });
@@ -117,7 +129,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             this.setState({ updateUserDialog: null });
 
             if (result == true) {
-                this.setState({ usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }) });
+                this.setState({ usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }), usersStatsPromise: Api.getUsersStats({ InfrastructureId: this.props.params.id }) });
                 DialogService.showSnackbar( { severity: 'success', message: 'Les informations de l\'utilisateur ont été modifié avec succès' })
             }
         } catch(err) {
@@ -138,7 +150,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         Api.deleteUserFromInfrastructure(this.props.params.id, userId)
             .then(() => {
-                this.setState({ usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }) });
+                this.setState({ usersPromise: Api.getUsers({ InfrastructureId: this.props.params.id }), usersStatsPromise: Api.getUsersStats({ InfrastructureId: this.props.params.id }) });
                 DialogService.showSnackbar({ severity: 'success', message: 'Utilisateur supprimé de l\'infrastructure avec succès' });
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'utilisateur de l\'infrastructure' });
@@ -157,7 +169,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         Api.deleteDeviceFromInfrastructure(this.props.params.id, deviceId)
             .then(() => {
-                this.setState({ devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }) });
+                this.setState({ devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }), devicesStatsPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }) });
                 DialogService.showSnackbar({ severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' });
             }).catch(err => {
                 console.log('err', err);
@@ -178,8 +190,10 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         Api.deleteActivity(activityId)
             .then(() => {
                 this.setState({
-                    devicesPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }),
-                    activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id })
+                    devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }),
+                    devicesStatsPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }),
+                    activitiesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }),
+                    activitiesStatsPromise: Api.getActivitiesStats({ InfrastructureId: this.props.params.id })
                 });
 
                 DialogService.showSnackbar({ severity: 'success', message: 'Activité supprimé avec succès' })
@@ -245,7 +259,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 const started = this.state.activityContextMenu!.status == 'Active';
                 Api.changeActivityState(this.state.activityContextMenu!.activityId, started ? 'stop' : 'start')
                     .then(() => {
-                        this.setState({ activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }) });
+                        this.setState({ activitiesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }), activitiesStatsPromise: Api.getActivitiesStats({ InfrastructureId: this.props.params.id }) });
                         DialogService.closeLoadingDialog();
                         DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
                     })
@@ -259,7 +273,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 const isFavorite = this.state.activityContextMenu!.isFavorite;
                 Api.changeActivityFavoriteStatus(this.state.activityContextMenu!.activityId, !isFavorite)
                     .then(() => {
-                        this.setState({ activitesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }) });
+                        this.setState({ activitiesPromise: Api.getActivities({ InfrastructureId: this.props.params.id }), activitiesStatsPromise: Api.getActivitiesStats({ InfrastructureId: this.props.params.id }) });
                         DialogService.closeLoadingDialog();
                         DialogService.showSnackbar({ severity: 'success', message: isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
                     })
@@ -275,10 +289,10 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
     render() {
 
-        const { promise, usersPromise, devicesPromise, activitesPromise, enrollItemsCompleter, updateDialogCompleter, updateUserDialog, userContextMenu, deviceContextMenu, activityContextMenu } = this.state;
+        const { promise, usersPromise, usersStatsPromise, devicesPromise, devicesStatsPromise, activitiesPromise, activitiesStatsPromise, enrollItemsCompleter, updateDialogCompleter, updateUserDialog, userContextMenu, deviceContextMenu, activityContextMenu } = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 <div className="flex space-x-4 mt-12">
                     {/* Infrastruture name */}
@@ -361,7 +375,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
                             <div className="flex flex-col divide-y mt-2">
                                 {<PromiseBuilder
-                                    promise={usersPromise}
+                                    promise={usersStatsPromise}
                                     dataBuilder={data => (data.roles.map((e, index) => (
                                         <div key={index} className="flex flex-col justify-center my-2">
                                             <p className="text-left text-sm text-[#999999] mt-2">{e.name}</p>
@@ -383,20 +397,20 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                     <p className="text-lg text-[#999999] mb-2">Devices usage</p>
 
                                     {/* <DeviceUsageChart /> */}
-                                    <LaafiMonitorDeviceUsageChart promise={devicesPromise} />
+                                    <LaafiMonitorDeviceUsageChart promise={devicesStatsPromise} />
                                 </div>
                                 {/* activities */}
                                 <div className="bg-white rounded-md p-2 grow-[5]">
                                     <p className="text-lg text-[#999999] mb-2">Activities</p>
 
-                                    <ActivityChart promise={activitesPromise} />
+                                    <ActivityChart promise={activitiesStatsPromise} />
                                 </div>
                             </div>
 
                             {/* (minotor + centrals + gateways) card */}
                             <div className="flex divide-x h-[90px] bg-white rounded-md">
                                 {<PromiseBuilder
-                                    promise={devicesPromise}
+                                    promise={devicesStatsPromise}
                                     dataBuilder={data => (data.totalModel.map((e, index) => (
                                         <div key={index} className="flex flex-col justify-around my-2 mx-2 grow">
                                             <p className="text-left text-sm text-[#999999] ml-2">{e.id}</p>
@@ -437,7 +451,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                             <tr>{['User Name', 'Role'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                         </thead>
                                         <tbody>
-                                            {data.users.map(user => (
+                                            {data.items.map(user => (
                                                 <tr key={user.id} onContextMenu={(event) => this.onUserMenuContext(event, user.id)} style={{ cursor: 'context-menu' }}>
                                                     <td>
                                                         <div className="flex items-center">
@@ -458,14 +472,14 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
                     <div className="w-[33%]">
                         <PromiseBuilder
-                            promise={activitesPromise}
+                            promise={activitiesPromise}
                             dataBuilder={data => (
                                 <table className="styled-table">
                                     <thead>
                                         <tr>{['Activity ID', 'Name'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.activities.map(value => (
+                                        {data.items.map(value => (
                                             <tr key={value.id} onContextMenu={(event) => this.onActivityMenuContext(event, value)} onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(value.id))} className="cursor-pointer">
                                                 <td>
                                                     <div className="flex items-center">
@@ -493,7 +507,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                         <tr>{['Device ID', 'Model'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                     </thead>
                                     <tbody>
-                                        {data.devicies.map(value => (
+                                        {data.items.map(value => (
                                             <tr key={value.id} onContextMenu={(event) => this.onDeviceMenuContext(event, value.id)} onClick={() => this.props.navigate(routes.LAAFI_MONITOR_DEVICE_DATA.build(value.id))} className="cursor-pointer">
                                                 <td>
                                                     <div className="flex items-center">

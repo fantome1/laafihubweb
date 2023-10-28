@@ -1,7 +1,7 @@
 import React from "react";
 import { Alert, AlertColor, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import { Completer } from "../../services/completer";
-import { RegisterDevicesGroupDialog } from "./RegisterDevicesGroupDialog ";
+import { RegisterDevicesGroupDialog } from "./RegisterDevicesGroupDialog";
 import { ConfirmSuppressionDialog } from "./ConfirmSuppressionDialog";
 import { ViewDevicesGroupsDialog } from "./ViewDevicesGroupsDialog";
 import ViewDevicesGroupsItemsDialog from "./ViewDevicesGroupsItemsDialog";

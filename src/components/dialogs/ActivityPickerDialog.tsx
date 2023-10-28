@@ -3,7 +3,7 @@ import { Avatar, Button, CircularProgress,  Dialog, DialogActions, DialogContent
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
 import { PromiseBuilder } from "../PromiseBuilder";
-import { IActivity, IGetActivitiesResult } from "../../models/activity_model";
+import { IActivity } from "../../models/activity_model";
 
 type Props = {
     userId: string;
@@ -11,7 +11,7 @@ type Props = {
 };
 
 type State = {
-    promise: Promise<IGetActivitiesResult>|null;
+    promise: Promise<IActivity[]>|null;
 };
 
 class ActivityPickerDialog extends React.Component<Props, State> {
@@ -38,8 +38,8 @@ class ActivityPickerDialog extends React.Component<Props, State> {
                         promise={promise}
                         dataBuilder={data => (
                             <List sx={{ pt: 0 }}>
-                                {data.activities.map(value => (
-                                    <ListItem disableGutters key={value.id}>
+                                {data.map(value => (
+                                    <ListItem key={value.id} disableGutters>
                                         <ListItemButton onClick={() => this.props.completer.complete(value)}>
                                             <ListItemAvatar>
                                                 <Avatar><span className="material-symbols-rounded">finance</span></Avatar>

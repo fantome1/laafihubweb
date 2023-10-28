@@ -1,6 +1,5 @@
 import { Paper, Skeleton } from "@mui/material";
 import React from "react";
-import { BubleMap } from "../components/BubleMap";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { NotificationsTable } from "../components/NotificationsTable";
 import { PaginationBloc, PaginationBlocData, PaginationBlocEventType } from "../bloc/pagination_bloc";
@@ -11,6 +10,7 @@ import { INotificationStats, getNotificationCountFromStats } from "../models/not
 import { NotificationFilterComponent } from "../NotificationFilterComponent";
 import { NearMap } from "../components/NearMap";
 import { Marker } from "react-leaflet";
+import { notificationCounterBloc } from "../services/notification_counter_bloc";
 
 type Props = {
 
@@ -45,6 +45,7 @@ class NotificationsPage extends React.Component<Props, State> {
         this.bloc.listen(this.listen);
         this.bloc.next();
         this.setState({ stats: Api.getNotificationStats() });
+        notificationCounterBloc.reset();
     }
 
     componentWillUnmount(): void {
@@ -61,7 +62,7 @@ class NotificationsPage extends React.Component<Props, State> {
 
     render() {
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -116,7 +117,7 @@ class NotificationsPage extends React.Component<Props, State> {
                         {/* <BubleMap /> */}
 
                         <NearMap zoom={3}>
-                            {getCoordinates(this.state.data).map(c => <Marker position={c}></Marker>)}
+                            {getCoordinates(this.state.data).map(c => <Marker key={`${c.lat}-${c.lng}`} position={c}></Marker>)}
                         </NearMap>
                     </div>
                 </div>
