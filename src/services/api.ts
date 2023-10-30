@@ -33,7 +33,7 @@ class Api {
         const headers: Record<string, string> = { 'Authorization': `Bearer ${AuthService.getAuthData()?.accessToken}` };
         options.body && (headers['Content-Type'] = 'application/json')
 
-        const response = await fetch(Utils.buildUrl(this.BASE_URL, path, { query: options.body.query }), {
+        const response = await fetch(Utils.buildUrl(this.BASE_URL, path, { query: options.query }), {
             method,
             headers,
             body: options.body ? JSON.stringify(options.body) : null

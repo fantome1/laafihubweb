@@ -38,7 +38,7 @@ function OrganizationFirstCardGroup(props: Props) {
                                         <div className="w-[14px] h-[14px] bg-[#999999] mr-2"></div>
                                         <PromiseBuilder
                                             promise={props.infrastructuresStatsPromise}
-                                            dataBuilder={data => (<p className="text-sm text-[#a2a2a2]">{data.lastUpdateDate.length > 0 ?  `Last update ${Utils.timeAgo(new Date(data.lastUpdateDate!))}` : ''}</p>)}
+                                            dataBuilder={data => (<p className="text-sm text-[#a2a2a2]">{data.lastUpdateDate ?  `Last update ${Utils.timeAgo(new Date(data.lastUpdateDate!))}` : ''}</p>)}
                                             loadingBuilder={() => (<Skeleton className="text-sm w-[56px]" />)}
                                             errorBuilder={(err) => (<span></span>)}
                                         />
