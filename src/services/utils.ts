@@ -141,6 +141,34 @@ class Utils {
         return err instanceof TypeError && err.message == 'Failed to fetch';
     }
 
+
+    static generatePassword() {
+        const values = [
+            ...(Array.from({ length: 4 }, (_) => String.fromCharCode(this.random(97, 122 + 1)))),
+            ...(Array.from({ length: 4 }, (_) => String.fromCharCode(this.random(65, 90 + 1)))),
+            this.random(1, 1000),
+            (['!', '@', '#', '$', '&', '?', '-', '_'][Math.floor(Math.random() * 8)])
+        ];
+
+        return values.sort((_, __) => Math.random() >= 0.5 ? 1 : -1).join('');
+    }
+
+    static validatePasword(password: string) {
+        if (password.length < 8)
+            return 'Votre mot de passe doit contenir au minimum 8 caractères';
+        return null;
+    }
+
+    /**
+     * [min, max[
+     * @param min 
+     * @param max 
+     * @returns 
+     */
+    static random(min: number, max: number) {
+        return min + Math.floor(Math.random() * (max - min));
+    }
+
 }
 
 export { Utils };

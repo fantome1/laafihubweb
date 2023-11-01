@@ -12,6 +12,7 @@ import { IUser } from "../../models/user_model";
 import { ActivityPickerDialog } from "./ActivityPickerDialog";
 import { INotification } from "../../models/notification_model";
 import { ViewNotificationDetailsDialog } from "./ViewNotificationDialog";
+import { ResetPasswordDialog } from "./ResetPasswordDialog";
 
 class DialogService {
 
@@ -22,7 +23,10 @@ class DialogService {
     static showEnrollUser: (user: IUser) => Promise<boolean>;
     static showActivityPicker: (userId: string) => Promise<IActivity|null>;
     static showNotificationDetails: (notification: INotification, onMarkAsImportant: (event: React.MouseEvent<unknown>, ids: string[]) => Promise<void>) => Promise<void>;
-    static showSnackbar: (data: { severity: AlertColor, message: string }) => void;
+    static showChangePassword: (userId: string) => Promise<boolean|null>|null;
+
+    static showSnackbar: (data: { severity: AlertColor, message: string, action?: any }) => void;
+    static closeSnackbar: () => void;
     static showLoadingDialog: () => void;
     static closeLoadingDialog: () => void;
 
@@ -41,11 +45,15 @@ type State = {
     enrollUser: { user: IUser, completer: Completer<boolean> }|null;
     activityPicker: { userId: string, completer: Completer<IActivity|null> }|null;
     notificationDetails: { notification: INotification, onMarkAsImportant: (event: React.MouseEvent<unknown>, ids: string[]) => Promise<void>, completer: Completer<void> }|null;
-    snackbarData: { severity: AlertColor, message: string }|null;
+    changePassword: { userId: string, completer: Completer<boolean|null> }|null;
+
+    snackbarData: { severity: AlertColor, message: string, action?: any }|null;
     loadingCompleter: Completer<void>|null;
 };
 
 class DialogsComponent extends React.PureComponent<Props, State> {
+
+    private snackbarLastSeverity?: AlertColor;
 
     constructor(props: Props) {
         super(props);
@@ -58,6 +66,7 @@ class DialogsComponent extends React.PureComponent<Props, State> {
             enrollUser: null,
             activityPicker: null,
             notificationDetails: null,
+            changePassword: null,
             snackbarData: null,
             loadingCompleter: null
         };
@@ -73,9 +82,10 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         DialogService.showEnrollUser = this.showEnrollUser.bind(this);
         DialogService.showActivityPicker = this.showActivityPicker.bind(this);
         DialogService.showNotificationDetails = this.showNotificationDetails.bind(this);
+        DialogService.showChangePassword = this.showChangePassword.bind(this);
 
         DialogService.showSnackbar = this.showSnackbar.bind(this);
-
+        DialogService.closeSnackbar = this.closeSnackbar.bind(this);
         DialogService.showLoadingDialog = this.showLoadingDialog.bind(this);
         DialogService.closeLoadingDialog = this.closeLoadingDialog.bind(this);
 
@@ -167,11 +177,22 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         return result;
     }
 
-    async showSnackbar(data: { severity: AlertColor, message: string }) {
+    async showChangePassword(userId: string) {
+        const completer = new Completer<boolean|null>();
+        this.setState({ changePassword: { userId, completer } });
+
+        const result = await completer.promise;
+        this.setState({ changePassword: null });
+
+        return result;
+    }
+
+    async showSnackbar(data: { severity: AlertColor, message: string, action?: any }) {
         if (this.state.snackbarData)
             this.setState({ snackbarData: null });
         await Utils.wait(100);
         this.setState({ snackbarData: data });
+        this.snackbarLastSeverity = data.severity;
     }
 
     async showLoadingDialog() {
@@ -182,6 +203,11 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         this.setState({ loadingCompleter: null });
 
         return result;
+    }
+
+    closeSnackbar() {
+        if (this.state.snackbarData)
+            this.setState({ snackbarData: null });
     }
 
     closeLoadingDialog() {
@@ -215,13 +241,15 @@ class DialogsComponent extends React.PureComponent<Props, State> {
 
                 {state.notificationDetails && (<ViewNotificationDetailsDialog {...state.notificationDetails} />)}
 
+                {state.changePassword && (<ResetPasswordDialog {...state.changePassword} />)}
+
                 <Snackbar
                     open={Boolean(state.snackbarData)}
                     autoHideDuration={4000}
                     onClose={this.handleCloseSnackbar}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
-                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity} variant="filled" sx={{ width: '100%' }}>{state.snackbarData?.message}</Alert>
+                    <Alert onClose={this.handleCloseSnackbar} severity={state.snackbarData?.severity ?? this.snackbarLastSeverity} variant="filled" sx={{ width: '100%' }} action={state.snackbarData?.action}>{state.snackbarData?.message}</Alert>
                 </Snackbar>
 
                 <Backdrop

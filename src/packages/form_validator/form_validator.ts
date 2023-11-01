@@ -47,6 +47,19 @@ class FormValidator {
             this.verifyAllFields(this.alreadySubmitted);
     }
 
+    changeValues(values: Record<string, any>, notify: boolean = true): void {
+        
+        for (const key in values) {
+            const field = this.data.fields[key];
+            if (!field)
+                throw Error(`field with key: ${key} not found`);
+            field.value = values[key];
+        }
+
+        if (notify)
+            this.verifyAllFields(this.alreadySubmitted);
+    }
+
     setError(fieldKey: string, errorMessage: string): void {
         const field = this.data.fields[fieldKey];
 

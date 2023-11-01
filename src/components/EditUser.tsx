@@ -1,5 +1,5 @@
 import React from "react";
-import { CircularProgress, FormHelperText, Paper, TextField } from "@mui/material";
+import { Button, CircularProgress, FormHelperText, Paper, TextField } from "@mui/material";
 import { FormValidator, FormValidatorData } from "../packages/form_validator/form_validator";
 import { IUser } from "../models/user_model";
 import { getRegisterUserValidator } from "../form_validator/register_user_validator";
@@ -302,6 +302,8 @@ class EditUserComponent extends React.Component<Props, State> {
                         helperText={countryField?.errorMessage}
                         disabled={disableField}
                     />
+
+                    {state.user && (<Button variant='outlined' onClick={() => DialogService.showChangePassword(this.props.user?.id!)}>Reset password</Button>)}
                 </div>
 
                 <div className="mt-8">

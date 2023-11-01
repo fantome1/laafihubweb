@@ -88,6 +88,10 @@ class Api {
         return this.request<void>('DELETE', `/users/${userId}`);
     }
 
+    static async resetPassword(userId: string, password: string) {
+        return this.request('POST', '/auth/changePassword', { query: { userid: userId }, body: { password } });
+    }
+
     // ###################################################################################################
     // ###################################################################################################
     // ########################################### DEVICES  ##############################################
