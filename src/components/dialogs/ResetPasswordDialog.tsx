@@ -160,7 +160,10 @@ function getValidator() {
             validator: (value, _) => {
                 if (value.trim() == '')
                     return null;
-                return Utils.validatePasword(value);
+                const result = Utils.isValidPassword(value);
+                if (result == true)
+                    return null;
+                return result;
             },
         }),
         'confirmPassword': new FormValidatorField('', {

@@ -55,10 +55,10 @@ function getRegisterUserValidator(user?: IUser) {
                     // Si c'est une chaine de caractere vide on laisse [requiredMessage] se charge de la validation
                     if (value.trim() == '')
                         return null;
-                    if (value.length < 8)
-                        return 'Le nombre de caractère du votre de passe doit etre supérieur ou égal à 8'
-
-                    return null;
+                    const result = Utils.isValidPassword(value);
+                    if (result == true)
+                        return null;
+                    return result;
                 },
             })})
         })

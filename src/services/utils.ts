@@ -153,12 +153,6 @@ class Utils {
         return values.sort((_, __) => Math.random() >= 0.5 ? 1 : -1).join('');
     }
 
-    static validatePasword(password: string) {
-        if (password.length < 8)
-            return 'Votre mot de passe doit contenir au minimum 8 caractères';
-        return null;
-    }
-
     /**
      * [min, max[
      * @param min 
@@ -167,6 +161,19 @@ class Utils {
      */
     static random(min: number, max: number) {
         return min + Math.floor(Math.random() * (max - min));
+    }
+
+
+    static isValidPassword(value: string) {
+        if (value.length < 8)
+            return 'Votre mot de passe doit contenir au minimum 8 caractères';
+        if (!(/[A-Z]/.test(value)))
+            return 'Votre mot de passe doit contenir au minimum une lettre majuscule';
+        if (!(/[0-9]/.test(value)))
+            return 'Votre mot de passe doit contenir au minimum un chiffre';
+        if (!(/[^a-zA-Z0-9]/.test(value)))
+            return 'Votre mot de passe doit contenir au minimum un caractère spécial';
+        return true;
     }
 
 }
