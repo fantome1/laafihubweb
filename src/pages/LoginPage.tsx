@@ -1,6 +1,6 @@
 import React from "react";
 import { AccountCircle, EmailOutlined, LockOutlined } from "@mui/icons-material";
-import { TextField, Box, Snackbar, Alert } from "@mui/material";
+import { TextField, Box } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { FormValidator, FormValidatorData } from "../packages/form_validator/form_validator";
 import { getLoginFormValidator } from "../form_validator/login_form_validator";
@@ -13,7 +13,6 @@ import { DialogService } from "../components/dialogs/DialogsComponent";
 // Laafi_DataBase
 // user@example.com
 // W!lly2023
-
 
 // FIXME make as constant everywhere
 const textFieldStyle = {
@@ -32,7 +31,7 @@ type Props = {
 
 type State = {
     formState: FormValidatorData;
-}
+};
 
 class LoginPage extends React.Component<Props, State> {
 
@@ -165,7 +164,7 @@ class LoginPage extends React.Component<Props, State> {
                             disabled={!this.state.formState.isValid}
                             sx={{ bgcolor: 'var(--primary)' }}
                         >
-                            <span className="px-4">Sign in</span>
+                            <span className="px-4 text-white">Sign in</span>
                         </LoadingButton>
                     </div>
 

@@ -7,7 +7,7 @@ type Props = {
     value?: any;
     // onChange?: SelectInputProps<any>['onChange'];
     onChange?: any;
-    otpions: { value: any, label: any }[];
+    options: { value: any, label: any }[];
     error?: boolean;
     helperText?: string|null;
     variant?: 'standard' | 'outlined' | 'filled';
@@ -27,7 +27,7 @@ function MaterialSelectHelper(props: Props) {
                 onChange={props.onChange}
                 error={props.error}
             >
-                {props.otpions.map((v, index) => (<MenuItem key={index} value={v.value}>{v.label}</MenuItem>))}
+                {props.options.map((v, index) => (<MenuItem key={index} value={v.value}>{v.label}</MenuItem>))}
             </Select>
             {props.helperText && <FormHelperText error={props.error}>{props.helperText}</FormHelperText>}
         </FormControl>

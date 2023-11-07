@@ -159,7 +159,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                             labelId='userRole'
                             value={roleField.value}
                             onChange={(e: any) => this.onChanged('role', e.target.value)}
-                            otpions={[
+                            options={[
                                 { value: 'Administrator', label: 'Administrator' },
                                 { value: 'Supervisor', label: 'Supervisor' },
                                 { value: 'Agent', label: 'Agent' },
@@ -220,7 +220,7 @@ class CreateUserDialog extends React.Component<Props, State> {
                             labelId="userGender"
                             value={genderField.value}
                             onChange={(e: any) => this.onChanged('gender', e.target.value)}
-                            otpions={[
+                            options={[
                                 { value: 1, label: 'Male' },
                                 { value: 2, label: 'Female' }
                             ]}

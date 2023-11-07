@@ -10,6 +10,8 @@ import { Marker, Popup } from "react-leaflet";
 import { NavigateFunction } from "react-router-dom";
 import { routes } from "../constants/routes";
 import { signalRHelper } from "../services/signal_r_helper";
+import { FakeData } from "../services/fake_data";
+import { SplineTemperatureChart } from "../components/charts/SplineTemperatureChart";
 
 type Props = {
     navigate: NavigateFunction;
@@ -41,14 +43,19 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
     }
 
     componentDidMount(): void {
-        signalRHelper.start()
-            .then(() => {
-                signalRHelper.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
-                signalRHelper.connection.on('ReceiveDeviceData', this.listen);
-            }).catch(err => {
-                console.log(err);
-                // this.setState({ error: true });
-            });
+
+        setInterval(() => {
+            this.listen(FakeData.getDeviceData() as any)
+        }, 3000);
+
+        // signalRHelper.start()
+        //     .then(() => {
+        //         signalRHelper.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
+        //         signalRHelper.connection.on('ReceiveDeviceData', this.listen);
+        //     }).catch(err => {
+        //         console.log(err);
+        //         // this.setState({ error: true });
+        //     });
 
         // Api.getDevice(this.props.params.id)
         //     .then(data => {
@@ -72,16 +79,6 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                 temperature: [...prevState.temperature, data.dataSent.data.temperature]
             };
         });
-
-        // setInterval(() => {
-        //     this.setState((prevState) => {
-        //         return {
-        //             data,
-        //             temperature: [...prevState.temperature, data.dataSent.data.temperature]
-        //         };
-        //     });
-        // }, 2000)
-
     }
 
     goToActivityPage() {
@@ -306,14 +303,15 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                             </div>
                         </div>
                         <div className="flex justify-end items-center mt-4">
-                            <Paper sx={{ width: '100%', height: '300px', padding: '20px', backgroundColor: '#223046' }}>
-                                <TemperatureLineChart
+                            <Paper sx={{ width: '100%', /*height: '300px',*/ padding: '20px' }} elevation={0}>
+                                <SplineTemperatureChart values={this.state.temperature ?? []} />
+                                {/* <TemperatureLineChart
                                     data={this.state.temperature ?? []}
                                     minTemp={data?.dataSent?.data?.characteristics?.minTemp}
                                     maxTemp={data?.dataSent?.data?.characteristics?.maxTemp}
                                     minTempTres={data?.dataSent?.data?.characteristics?.thresMinTemp}
                                     maxTempTres={data?.dataSent?.data?.characteristics?.thresMaxTemp}
-                                />
+                                /> */}
                             </Paper>
                         </div>
                     </Paper>
@@ -322,6 +320,11 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
             </div>
         );
     }
+
+
+    // getChart() {
+    //     return 
+    // }
 
 }
 

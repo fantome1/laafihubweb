@@ -522,7 +522,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
         }
 
         this.setState({ data: {
-            labels: values.map(v => v == null ? null : v.date.split(' ')[1].substring(0, 5)),
+            labels: values.map(v => v == null ? null : Utils.formatTime(new Date(v.date))),
             // labels: Array.from({ length: 100 }, _ => Math.trunc(Math.random() * 100)),
             datasets: [
                 {
@@ -851,10 +851,10 @@ class GroupedBarChart extends React.Component {
         datasets: [
             {
                 backgroundColor: '#69ADA7',
-                data: [640, 670, 40, 190]
+                data: [0, 0, 0, 0]
             }, {
                 backgroundColor: '#3C4858',
-                data: [400, 60, 280, 0]
+                data: [0, 0, 0, 0]
             }
         ]
     }
@@ -907,10 +907,10 @@ class GroupedBarChart2 extends React.Component {
         datasets: [
             {
                 backgroundColor: '#00A6F9',
-                data: [640, 670, 40, 190]
+                data: [0, 0, 0, 0]
             }, {
                 backgroundColor: '#192F5D',
-                data: [400, 60, 280, 620]
+                data: [0, 0, 0, 0]
             }
         ]
     }

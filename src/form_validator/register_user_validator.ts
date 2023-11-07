@@ -41,7 +41,6 @@ function getRegisterUserValidator(user?: IUser) {
                 requiredMessage: 'Veuillez renseigner une adresse'
             }),
             'email': new FormValidatorField(user?.email ?? '', {
-                requiredMessage: 'Veuillez renseigner une adresse email',
                 validator: (value, _) => {
                     // Si c'est une chaine de caractere vide on laisse [requiredMessage] se charge de la validation
                     if (value.trim() == '')

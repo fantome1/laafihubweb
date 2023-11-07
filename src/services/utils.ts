@@ -67,7 +67,6 @@ class Utils {
         return `${url}${path}${q}`;
     }
 
-
     static getActivedActivityCount(data: IActivityStats): number {
         const result = data.totalStatus.find(v => v.id == 'Actived');
         return result?.total ?? 0
@@ -141,7 +140,6 @@ class Utils {
         return err instanceof TypeError && err.message == 'Failed to fetch';
     }
 
-
     static generatePassword() {
         const values = [
             ...(Array.from({ length: 4 }, (_) => String.fromCharCode(this.random(97, 122 + 1)))),
@@ -162,7 +160,6 @@ class Utils {
     static random(min: number, max: number) {
         return min + Math.floor(Math.random() * (max - min));
     }
-
 
     static isValidPassword(value: string) {
         if (value.length < 8)

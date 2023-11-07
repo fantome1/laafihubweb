@@ -22,7 +22,7 @@ function CountrySelector(props: Props) {
             labelId="countrySelector"
             value={props.value ?? ''}
             onChange={(e: any) => props.onChange(COUNTRIES.find(c => e.target.value == c.value) ?? null)}
-            otpions={COUNTRIES.map((country, index) => ({
+            options={COUNTRIES.map((country, index) => ({
                 value: country.value,
                 label: <div className="flex items-center">
                     <img

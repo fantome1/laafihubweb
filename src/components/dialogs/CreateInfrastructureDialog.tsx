@@ -1,6 +1,6 @@
 import React from "react";
 import { LoadingButton } from "@mui/lab";
-import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, TextField } from "@mui/material";
+import { Alert, Autocomplete, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { MaterialSelectHelper } from "../form/MaterialSelectHelper";
 import { CountrySelector } from "../../packages/country_selector/CountrySelector";
@@ -63,6 +63,8 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
     }
 
     onChanged(key: string, value: any) {
+        console.log('cahnged', value);
+        
         this.state.validator?.changeValue(key, value);
     }
 
@@ -90,7 +92,7 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
 
         const data = {
             name: values.name,
-            type: values.type,
+            type: values.type.value,
             address: {
                 street: values.street,
                 city: values.city,
@@ -157,19 +159,32 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
                                 helperText={nameField.errorMessage}
                             />
 
-                            <MaterialSelectHelper
+                            <Autocomplete
+                                disablePortal
+                                fullWidth
+                                id='infrastructure-type-autocomplete'
+                                value={typeField.value == '' ? null : typeField.value}
+                                onChange={(_, value) => this.onChanged('type', value)}
+                                onInputChange={(_, value) => this.onChanged('type', value)}
+                                options={['Hospital', 'CSPS', 'Pharmacy']}
+                                renderInput={(params) => <TextField {...params} label="Type" />}
+                            />
+
+                            {/* <MaterialSelectHelper
                                 label='Type'
                                 labelId='infrastructureType'
                                 value={typeField.value}
                                 onChange={(e: any) => this.onChanged('type', e.target.value)}
-                                otpions={[
+                                options={[
                                     { value: 'Hospital', label: 'Hospital' },
                                     { value: 'CSPS', label: 'CSPS' },
                                     { value: 'Pharmacy', label: 'Pharmacy' }
                                 ]}
                                 error={Boolean(typeField.errorMessage)}
                                 helperText={typeField.errorMessage}
-                            />
+                            /> */}
+
+
                         </div>
 
                         <div className="pt-4">

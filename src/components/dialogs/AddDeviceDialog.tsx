@@ -41,8 +41,8 @@ class AddDeviceDialog extends React.Component<Props, State> {
         this.setState({ formState: data });
     }
 
-    onChanged(key: string, value: any) {
-        this.state.validator?.changeValue(key, value);
+    onChanged(key: string, value: string, oldValue: string) {
+        this.state.validator?.changeValue(key, value.length > oldValue.length ? formatMacAddress(value) : value);
     }
 
     onSubmit() {
@@ -86,8 +86,9 @@ class AddDeviceDialog extends React.Component<Props, State> {
                         <TextField
                             value={macField.value}
                             label='Device ID'
+                            placeholder="xx:xx:xx:xx:xx:xx"
                             fullWidth
-                            onChange={e => this.onChanged('mac', e.target.value)}
+                            onChange={e => this.onChanged('mac', e.target.value, macField.value)}
                             error={Boolean(macField.errorMessage)}
                             helperText={macField.errorMessage}
                         />
@@ -125,6 +126,17 @@ function getValidator() {
             })
         })
     );
+}
+
+function formatMacAddress(value: string) {
+    const length = value.length;
+    if (length >= 17)
+        return value;
+    let index = value.lastIndexOf(':') + 1;
+    const r = length - index;
+    if (r < 2)
+        return value;
+    return `${value}:`;
 }
 
 export { AddDeviceDialog };

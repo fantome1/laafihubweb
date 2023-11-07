@@ -252,7 +252,7 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
                     size='small'
                     sx={{ width: 120 }}
                     onChange={this.onTypeChanged}
-                    otpions={[
+                    options={[
                         { label: 'Activity', value: 'activity' },
                         { label: 'Infrastructure', value: 'infrastructure' },
                         { label: 'Device', value: 'device' }

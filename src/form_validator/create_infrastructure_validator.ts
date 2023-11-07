@@ -23,7 +23,7 @@ function getCreateInfrastrutureValidator(value?: IInfrastructure) {
             'name': new FormValidatorField(value?.name ?? '', {
                 requiredMessage: 'Veuillez renseigner un nom'
             }),
-            'type': new FormValidatorField(value?.type ?? '', {
+            'type': new FormValidatorField<string|null>(value?.type ?? null, {
                 requiredMessage: 'Veuillez choisir un type'
             }),
             'state': new FormValidatorField<{ title: string, value: string }|null>(COUNTRIES.find(c => c.title == countryName) ?? null, {

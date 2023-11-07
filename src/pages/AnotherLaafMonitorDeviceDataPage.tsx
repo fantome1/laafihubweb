@@ -242,11 +242,15 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
 
                     {/* Two Buttons */}
                     <div className="flex flex-col justify-between">
-                        <div className="flex justify-center items-center w-[120px] h-[46px] cursor-pointer" style={{ backgroundColor: '#E93975', borderRadius: '6px' }}>
-                            <p className="text-white text-center">Generate<br />Report</p>
+                        <div className="flex justify-center items-center w-[120px] h-[38px] cursor-pointer" style={{ backgroundColor: '#E93975', borderRadius: '6px' }}>
+                            <p className="text-white text-xs text-center">Generate<br />Report</p>
                         </div>
 
-                        <div onClick={() => this.props.navigate(routes.MODIFY_ACTIVITY.build(this.props.params.id))} className="flex justify-center items-center w-[120px] h-[68px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
+                        <div className="flex justify-center items-center w-[120px] h-[38px] cursor-pointer" style={{ backgroundColor: '#63A8A2', borderRadius: '6px' }}>
+                            <p className="text-white text-center">Enroll</p>
+                        </div>
+
+                        <div onClick={() => this.props.navigate(routes.MODIFY_ACTIVITY.build(this.props.params.id))} className="flex justify-center items-center w-[120px] h-[38px] cursor-pointer" style={{ background: 'linear-gradient(90deg, #26C6DA 0%, #00ACC1 100%), #24C5D9', borderRadius: '6px' }}>
                             <span className="material-symbols-outlined text-white">edit</span>
                             <p className="text-xl text-white pl-2">Edit</p>
                         </div>

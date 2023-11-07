@@ -45,7 +45,7 @@ interface IReceiveDeviceData {
                 id: string;
                 date: string;
                 deviceMac: string;
-                type: 'Humidity';
+                type: 'Temperature';
                 value: number;
             };
         };

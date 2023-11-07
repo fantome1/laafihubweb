@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from "react";
-import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { Button, Dialog, DialogContent, DialogTitle, Fab } from "@mui/material";
 import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import { Completer } from "../../services/completer";
 
@@ -25,6 +25,13 @@ class ChooseLocationDialog extends React.Component<Props, State> {
         };
 
         this.onChoose = this.onChoose.bind(this);
+        this.getCurrentLocation = this.getCurrentLocation.bind(this);
+    }
+
+    getCurrentLocation() {
+        navigator.geolocation.getCurrentPosition((data) => {
+            this.setState({ value: { latitude: data.coords.latitude, longitude: data.coords.longitude } });
+        });
     }
 
     onClose() {
@@ -70,7 +77,7 @@ class ChooseLocationDialog extends React.Component<Props, State> {
                     </div>
                 </DialogTitle>
                 <DialogContent>
-                    <div className="h-[480px]">
+                    <div className="relative h-[480px]">
                         <MapContainer center={{ lat: 12.35, lng: -1.516667 }} zoom={1} scrollWheelZoom={false} style={{ width: '100%', height: '100%' }}>
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -79,6 +86,12 @@ class ChooseLocationDialog extends React.Component<Props, State> {
                             <LocationFinder onClick={this.onChoose} />
                             {this.state.value && <Marker position={[this.state.value.latitude, this.state.value.longitude]} pathOptions={{ color: '#4CAF50' }} />}
                         </MapContainer>
+
+                        {window.navigator && (
+                            <div style={{ position: 'absolute', bottom: '48px', right: '24px' }}>
+                                <Fab color="primary" onClick={this.getCurrentLocation}><span class="material-symbols-outlined text-white">my_location</span></Fab>
+                            </div>
+                        )}
                     </div>
                 </DialogContent>
             </Dialog>
