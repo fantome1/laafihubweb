@@ -10,7 +10,7 @@ import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { IDevice, IDeviceStats } from "../models/device_model";
 import { DialogService } from "../components/dialogs/DialogsComponent";
-import { IGetDevicesGroupResult } from "../models/devices_group_model";
+import { IDevicesGroup } from "../models/devices_group_model";
 import { PaginationBloc } from "../bloc/pagination_bloc";
 import { ColoredPaginatedTable } from "../components/ColoredPaginatedTable";
 
@@ -21,7 +21,7 @@ type Props = {
 type State = {
     addDeviceCompleter: Completer<boolean>|null;
     devicesStatsPromise: Promise<IDeviceStats>|null;
-    deviceGroups: Promise<IGetDevicesGroupResult>|null;
+    deviceGroups: Promise<IDevicesGroup[]>|null;
 };
 
 class LaafiMonitorPage extends React.Component<Props, State> {
@@ -276,7 +276,7 @@ class LaafiMonitorPage extends React.Component<Props, State> {
                                 promise={state.deviceGroups}
                                 dataBuilder={data => (
                                     <div className="grid grid-cols-2 gap-2 rounded-md my-4 py-3">
-                                        {data.groups.map(group => (
+                                        {data.map(group => (
                                             <div key={group.devicesGroupId} className="flex bg-[#C4C4C4] h-[26px] rounded">
                                                 <div onClick={() => DialogService.showDevicesGroupsItems(group.devicesGroupId)} className="grow flex items-center cursor-pointer"><p className="pl-2 text-sm text-black">{group.name}</p></div>
                                                 <div onClick={() => this.onDeleteDevicesGroup(group.devicesGroupId)} className="flex justify-center items-center bg-[var(--primary)] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>

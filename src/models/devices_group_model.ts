@@ -6,9 +6,4 @@ interface IDevicesGroup {
     userId: string;
 }
 
-interface IGetDevicesGroupResult {
-    groups: IDevicesGroup[];
-    total: number;
-}
-
-export type { IDevicesGroup, IGetDevicesGroupResult };
+export type { IDevicesGroup };

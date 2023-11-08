@@ -50,7 +50,7 @@ interface IReceiveDeviceData {
             };
         };
         network: {
-            connectionType: 'mobile';
+            connectionType: 'mobile'|'wifi'|'ethernet';
             date: string;
             phoneBattery: number;
             signal: number;

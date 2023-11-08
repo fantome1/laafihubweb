@@ -1,7 +1,7 @@
 import { PaginatedFetchResult } from "../bloc/pagination_bloc";
 import { IActivity, IActivityStats } from "../models/activity_model";
 import { IDevice, IDeviceStats } from "../models/device_model";
-import { IGetDevicesGroupResult } from "../models/devices_group_model";
+import { IDevicesGroup } from "../models/devices_group_model";
 import { IInfrastructure, IInfrastructureStats } from "../models/infrastructure_model";
 import { INotification } from "../models/notification_model";
 import { INotificationStats } from "../models/notification_stats";
@@ -241,7 +241,7 @@ class Api {
     }
 
     static async getDevicesGroups(query?: { PageSize?: number }) {
-        return this.request<IGetDevicesGroupResult>('GET', '/devices-groups', { query });
+        return this.request<IDevicesGroup[]>('GET', '/devices-groups', { query, returnValue: true });
     }
 
     static async getDevicesGroupsItems(id: string) {
