@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/
 import { Completer } from "../../services/completer";
 import { Api } from "../../services/api";
 import { PromiseBuilder } from "../PromiseBuilder";
-import { IDevicesGroup, IGetDevicesGroupResult } from "../../models/devices_group_model";
+import { IDevicesGroup } from "../../models/devices_group_model";
 import { TableSkeletonComponent } from "../TableSkeletonComponent";
 import { DialogService } from "./DialogsComponent";
 
@@ -12,7 +12,7 @@ type Props = {
 };
 
 type State = {
-    promise: Promise<IGetDevicesGroupResult>|null;
+    promise: Promise<IDevicesGroup[]>|null;
 };
 
 class ViewDevicesGroupsDialog extends React.Component<Props, State> {
@@ -76,7 +76,7 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
                                     <tr>{['ID', 'Name', 'Device count', 'Action'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
                                 </thead>
                                 <tbody>
-                                    {data.groups.map(value => (
+                                    {data.map(value => (
                                         <tr key={value.devicesGroupId} onClick={() => this.onTap(value)} className="cursor-pointer">
                                             <td>{value.devicesGroupId}</td>
                                             <td>{value.name}</td>
@@ -90,7 +90,6 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
                         loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={4} />)}
                         errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                     />
-                    
                 </DialogContent>
                 <DialogActions className="mb-2 mr-4">
                     <Button onClick={() => this.props.completer?.complete()} sx={{ width: 128 }}>Close</Button>
@@ -98,7 +97,6 @@ class ViewDevicesGroupsDialog extends React.Component<Props, State> {
             </Dialog>
         );        
     }
-
 }
 
 export { ViewDevicesGroupsDialog };
