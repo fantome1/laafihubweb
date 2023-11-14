@@ -44,7 +44,7 @@ class ViewDevicesGroupsItemsDialog extends React.Component<Props, State> {
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
-            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+            'Voulez-vous vraiment supprimer cet élément ?'
         );
 
         if (!result)

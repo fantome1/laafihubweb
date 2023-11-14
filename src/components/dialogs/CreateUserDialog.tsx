@@ -1,6 +1,6 @@
 import React from "react";
 import { LoadingButton } from "@mui/lab";
-import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, TextField } from "@mui/material";
+import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
 import { MaterialSelectHelper } from "../form/MaterialSelectHelper";
 import ReactPhoneInput2 from "react-phone-input-2";
@@ -11,6 +11,7 @@ import { getRegisterUserValidator } from "../../form_validator/register_user_val
 import { Api } from "../../services/api";
 
 import "react-phone-input-2/lib/material.css";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const PhoneInput = (ReactPhoneInput2 as any).default || ReactPhoneInput2;
 
@@ -23,6 +24,7 @@ type State = {
     validator: FormValidator|null; // Not [null] juste late
     formState: FormValidatorData|null;
     error: any;
+    showPassword: boolean;
 };
 
 // https://hub.laafi-concepts.com/home/dashboard
@@ -43,11 +45,15 @@ class CreateUserDialog extends React.Component<Props, State> {
             validator,
             formState: validator?.getData ?? null,
             error: null,
+            showPassword: false
         };
 
         this.listen = this.listen.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         validator?.listen(this.listen);
+
+        this.handleClickShowPassword = this.handleClickShowPassword.bind(this);
+        this.handleMouseDownPassword = this.handleMouseDownPassword.bind(this);
     }
 
     componentDidMount(): void {
@@ -109,6 +115,14 @@ class CreateUserDialog extends React.Component<Props, State> {
                 console.log('error', err);
                 this.setState({ error: err })
             });
+    }
+
+    handleClickShowPassword() {
+        this.setState(prevState => ({ showPassword: !prevState.showPassword }));
+    }
+
+    handleMouseDownPassword(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
     }
 
     render() {
@@ -271,12 +285,26 @@ class CreateUserDialog extends React.Component<Props, State> {
 
                         {!this.isModify && (<TextField
                             label="Password"
-                            type="password"
+                            type={this.state.showPassword ? 'text' : 'password'}
                             fullWidth
                             onChange={e => this.onChanged('password', e.target.value)}
                             disabled={this.isModify}
                             error={Boolean(passwordField.errorMessage)}
                             helperText={passwordField.errorMessage}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={this.handleClickShowPassword}
+                                            onMouseDown={this.handleMouseDownPassword}
+                                        >
+                                            {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                            
                         />)}
                     </div>
 

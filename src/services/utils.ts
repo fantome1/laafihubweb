@@ -63,7 +63,6 @@ class Utils {
         const q = !options.query || Object.keys(options.query).length == 0
           ? ''
           : `?${this.getQueryParams(options.query)}`;
-
         return `${url}${path}${q}`;
     }
 

@@ -61,7 +61,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
             userContextMenu: null,
             deviceContextMenu: null,
             activityContextMenu: null,
-            updateUserDialog: null,
+            updateUserDialog: null
         };
 
         this.onRollitems = this.onRollitems.bind(this);
@@ -142,7 +142,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
-            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+            'Voulez-vous vraiment supprimer cet élément ?'
         );
 
         if (!result)
@@ -161,7 +161,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
-            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+            'Voulez-vous vraiment supprimer cet élément ?'
         );
 
         if (!result)
@@ -172,7 +172,6 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                 this.setState({ devicesPromise: Api.getDevices({ InfrastructureId: this.props.params.id }), devicesStatsPromise: Api.getDevicesStats({ InfrastructureId: this.props.params.id }) });
                 DialogService.showSnackbar({ severity: 'success', message: 'Appareil supprimé de l\'infrastructure avec succès' });
             }).catch(err => {
-                console.log('err', err);
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'appareil de l\'infrastructure' });
             });
     }
@@ -181,7 +180,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
-            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+            'Voulez-vous vraiment supprimer cet élément ?'
         );
 
         if (!result)

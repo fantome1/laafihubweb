@@ -400,12 +400,12 @@ class InformationStep extends React.Component<InformationStepProps, InformationS
                         ampm={false}
                         format="DD/MM/YYYY HH:mm"
                         onChange={(value: any) => this.onChanged('endDate', value._d)}
+                        disabled={typeField.value == 0}
                         slotProps={{
                             textField: {
                                 error: Boolean(endDateField.errorMessage),
                                 helperText: endDateField.errorMessage,
-                                fullWidth: true,
-                                disabled: typeField.value == 0
+                                fullWidth: true
                             }
                         }}
                     />

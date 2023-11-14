@@ -245,7 +245,7 @@ class Api {
     }
 
     static async getDevicesGroupsItems(id: string) {
-        return this.request<IDevice[]>('GET', `/devices-groups/${id}/devices`);
+        return this.request<IDevice[]>('GET', `/devices-groups/${id}/devices`, { returnValue: true });
     }
 
     static async deleteDevicesGroups(id: string) {

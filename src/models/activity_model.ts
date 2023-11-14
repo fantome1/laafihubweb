@@ -18,9 +18,9 @@ interface IActivity {
 
 interface IActivityStats {
     count: number;
-    totalByMonth: { id: string, total: number }[],
-    totalStatus: { id: 'Expired'|'Actived'|'Stopped', total: number }[],
-    totalType: { id: string, total: number }[]
+    totalByMonth: { id: string, total: number }[];
+    totalStatus: { id: 'Expired'|'Actived'|'Stopped', total: number }[];
+    totalType: { id: string, total: number }[];
 }
 
 export type { IActivity, IActivityStats };

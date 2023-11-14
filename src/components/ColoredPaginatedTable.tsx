@@ -58,11 +58,13 @@ class ColoredPaginatedTable<T> extends React.PureComponent<Props<T>, State<T>> {
 
                         {data.hasError && (
                             <tr>
-                                <div className='flex flex-col items-center space-y-2'>
-                                    <span className="material-symbols-outlined text-[32px] text-[#D32F2F]">error</span>
-                                    <p className='text-[#D32F2F]'>{Utils.isNetworkError(this.state.data!.error) ? 'Aucune connexion internet, Réessayer plus tard' : 'Une erreur s\'est produite' }</p>
-                                    <Button onClick={() => bloc.reload()} startIcon={<span className="material-symbols-outlined text-[32px]">refresh</span>}>Réessayer</Button>
-                                </div>
+                                <td colSpan={headers.length}>
+                                    <span className='flex flex-col items-center space-y-2'>
+                                        <span className="material-symbols-outlined text-[32px] text-[#D32F2F]">error</span>
+                                        <p className='text-[#D32F2F]'>{Utils.isNetworkError(this.state.data!.error) ? 'Aucune connexion internet, Réessayer plus tard' : 'Une erreur s\'est produite' }</p>
+                                        <Button onClick={() => bloc.reload()} startIcon={<span className="material-symbols-outlined text-[32px]">refresh</span>}>Réessayer</Button>
+                                    </span>
+                                </td>
                             </tr>
                         )}
 

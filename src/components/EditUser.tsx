@@ -26,6 +26,7 @@ type State = {
     formState: FormValidatorData|null,
     isLoading: boolean;
     activitiesPromise: Promise<IActivity[]>|null;
+    showPassword: boolean;
 };
 
 class EditUserComponent extends React.Component<Props, State> {
@@ -38,7 +39,8 @@ class EditUserComponent extends React.Component<Props, State> {
             user: null,
             formState: null,
             isLoading: false,
-            activitiesPromise: null
+            activitiesPromise: null,
+            showPassword: false
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -155,7 +157,7 @@ class EditUserComponent extends React.Component<Props, State> {
         
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
-            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+            'Voulez-vous vraiment supprimer cet élément ?'
         );
 
         if (!result)
@@ -344,7 +346,6 @@ type EditButtonProps = {
 
 function EditButton(props: EditButtonProps) {
     const color  = props.disabled ? '#A2A2A2' : 'var(--primary)';
-
     return (
         <div onClick={props.disabled ? undefined : () => props.onClick()} className={`flex flex-col justify-center items-center w-[64px] h-[64px] text-[${color}] border border-[${color}] ${props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
             <span className="material-symbols-rounded text-[28px]">edit</span>

@@ -44,18 +44,18 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
 
     componentDidMount(): void {
 
-        setInterval(() => {
-            this.listen(FakeData.getDeviceData() as any)
-        }, 3000);
+        // setInterval(() => {
+        //     this.listen(FakeData.getDeviceData() as any)
+        // }, 3000);
 
-        // signalRHelper.start()
-        //     .then(() => {
-        //         signalRHelper.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
-        //         signalRHelper.connection.on('ReceiveDeviceData', this.listen);
-        //     }).catch(err => {
-        //         console.log(err);
-        //         // this.setState({ error: true });
-        //     });
+        signalRHelper.start()
+            .then(() => {
+                signalRHelper.connection.invoke('SubscribeToGetDeviceData', { DeviceId: this.props.params.id });
+                signalRHelper.connection.on('ReceiveDeviceData', this.listen);
+            }).catch(err => {
+                console.log(err);
+                // this.setState({ error: true });
+            });
 
         // Api.getDevice(this.props.params.id)
         //     .then(data => {

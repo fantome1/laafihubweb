@@ -16,7 +16,7 @@ import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { IDeviceStats, IGetDeviceResult } from '../../models/device_model';
-import { IGetActivitiesResult } from '../../models/activity_model';
+import { IActivityStats } from '../../models/activity_model';
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from '../../constants/temperature';
 import { Utils } from '../../services/utils';
 import annotationPlugin from 'chartjs-plugin-annotation';
@@ -61,11 +61,11 @@ class LaafiMonitorDeviceUsageChart extends React.Component<LaafiMonitorDeviceUsa
 
         this.state = {
             data: {
-                labels: ['UnAssigned'],
+                labels: [],
                 datasets: [
                     {
-                      data: [1],
-                      backgroundColor: ['#A2A2A2'],
+                      data: [],
+                      backgroundColor: [],
                     }
                 ]
             }
@@ -187,11 +187,11 @@ class LaafiMonitorDeviceStatusChart extends React.Component<LaafiMonitorDeviceSt
 
         this.state = {
             data: {
-                labels: ['UnAssigned'],
+                labels: [],
                 datasets: [
                     {
-                      data: [1],
-                      backgroundColor: ['#A2A2A2'],
+                      data: [],
+                      backgroundColor: [],
                     }
                 ]
             }
@@ -602,7 +602,7 @@ class TemperatureLineChart extends React.Component<TemperatureLineChartProps, Te
 }
 
 type ActivitesConnectionStatusChartProps = {
-    promise: Promise<IGetActivitiesResult>|null;
+    promise: Promise<IActivityStats>|null;
 };
 
 type ActivitesConnectionStatusChartState = {
@@ -625,11 +625,11 @@ class ActivitesConnectionStatusChart extends React.Component<ActivitesConnection
 
         this.state = {
             data: {
-                labels: ['Expired'],
+                labels: [],
                 datasets: [
                     {
-                      data: [1],
-                      backgroundColor: ['#A2A2A2'],
+                      data: [],
+                      backgroundColor: [],
                     }
                 ]
             }
@@ -640,15 +640,13 @@ class ActivitesConnectionStatusChart extends React.Component<ActivitesConnection
         this.update(this.props.promise);
     }
 
-    
-
     componentDidUpdate(prevProps: Readonly<ActivitesConnectionStatusChartProps>, prevState: Readonly<ActivitesConnectionStatusChartState>, snapshot?: any): void {
         if (prevProps.promise != this.props.promise) {
             this.update(this.props.promise);
         }
     }
 
-    update(promise: Promise<IGetActivitiesResult>|null) {
+    update(promise: Promise<IActivityStats>|null) {
         if (promise == null)
             return;            
         promise.then(value => {

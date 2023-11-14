@@ -161,7 +161,7 @@ class NotificationsTable extends React.Component<NotificationsTableProps, Notifi
 
     const result = await DialogService.showDeleteConfirmation(
       'Cette action est irréversible',
-      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+      'Voulez-vous vraiment supprimer cet élément ?'
     );
 
     if (!result)

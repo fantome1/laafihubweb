@@ -53,7 +53,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         const result = await DialogService.showDeleteConfirmation(
             'Cette action est irréversible',
-            'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore officiis ipsam incidunt ratione nam'
+            'Voulez-vous vraiment supprimer cet élément ?'
         );
 
         if (!result)
@@ -61,7 +61,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteActivity(value.id)
             .then(() => {
-                this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() });
+                this.setState({ promise: Api.getActivities({ PageSize: 50 }), statsPromise: Api.getActivitiesStats() });
                 DialogService.showSnackbar({ severity: 'success', message: 'Activité supprimé avec succès' })
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' });
@@ -78,7 +78,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const started = value.status == 'Active';
         Api.changeActivityState(value.id, started ? 'stop' : 'start')
             .then(() => {
-                this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() });
+                this.setState({ promise: Api.getActivities({ PageSize: 50 }), statsPromise: Api.getActivitiesStats() });
                 DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
             })
@@ -228,7 +228,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                         {/* Pie chart */}
                         <div className="bg-white rounded-lg p-2">
                             <p className="text-lg text-[#999999] mb-2">Connection status</p>
-                            <div className=" w-[70%]" style={{ margin: '0 auto' }}><ActivitesConnectionStatusChart promise={state.promise} /></div>
+                            <div className=" w-[70%]" style={{ margin: '0 auto' }}><ActivitesConnectionStatusChart promise={state.statsPromise} /></div>
                         </div>
 
                         {/* Group */}
