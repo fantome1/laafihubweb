@@ -40,6 +40,11 @@ class SplineTemperatureChart extends React.Component<Props, State> {
 
     private chartInstance?: ChartComponent|null;
 
+    minTemp = [
+        // { x: Number.NEGATIVE_INFINITY, y: 3 },
+        // { x: Number.POSITIVE_INFINITY, y: 3 }
+    ]
+
     constructor(props: Props) {
         super(props);
 
@@ -66,7 +71,7 @@ class SplineTemperatureChart extends React.Component<Props, State> {
                 <style>{SAMPLE_CSS}</style>
                 <div className="control-section">
                     <ChartComponent
-                        id='charts'
+                        id='device-temperature-chart'
                         style={{ textAlign: 'center' }}
                         ref={chart => this.chartInstance = chart}
                         primaryXAxis={{ valueType: 'Category', interval: 1, majorGridLines: { width: 0 } }}
@@ -76,9 +81,9 @@ class SplineTemperatureChart extends React.Component<Props, State> {
                         tooltip={{ enable: true }}
                         title="Temperature"
                         width="100%"
-                        // load={this.load.bind(this)}
-                        // loaded={this.onChartLoad.bind(this)}
-                        // animationComplete={this.animationComplete.bind(this)}
+                        load={this.load.bind(this)}
+                        loaded={this.onChartLoad.bind(this)}
+                        animationComplete={this.animationComplete.bind(this)}
                     >
                         <Inject services={[SplineSeries, Legend, Category, Tooltip, ChartAnnotation, Highlight]} />
                         {/* <AnnotationsDirective>
@@ -88,7 +93,11 @@ class SplineTemperatureChart extends React.Component<Props, State> {
                             </AnnotationDirective>
                         </AnnotationsDirective> */}
                         <SeriesCollectionDirective>
+                            <SeriesDirective dataSource={this.minTemp} xName="x" yName="y" name="Min temperature" type="Spline" marker={{ visible: true, width: 10, height: 10 }} />
+                            <SeriesDirective dataSource={this.minTemp} xName="x" yName="y" name="Tres. Min temperature" type="Spline" marker={{ visible: true, width: 10, height: 10 }} />
                             <SeriesDirective dataSource={data} xName="x" yName="y" name="Temperature" type="Spline" marker={{ visible: true, width: 10, height: 10 }} />
+                            <SeriesDirective dataSource={this.minTemp} xName="x" yName="y" name="Tres. Max temperature" type="Spline" marker={{ visible: true, width: 10, height: 10 }} />
+                            <SeriesDirective dataSource={this.minTemp} xName="x" yName="y" name="Max temperature" type="Spline" marker={{ visible: true, width: 10, height: 10 }} />
                         </SeriesCollectionDirective>
                     </ChartComponent>
                 </div>
@@ -97,7 +106,7 @@ class SplineTemperatureChart extends React.Component<Props, State> {
     }
 
     public onChartLoad(args: ILoadedEventArgs): void {
-        let chart = document.getElementById('charts');
+        let chart = document.getElementById('device-temperature-chart');
         chart!.setAttribute('title', '');
     };
 
@@ -114,5 +123,7 @@ class SplineTemperatureChart extends React.Component<Props, State> {
     };
 
 }
+
+
 
 export { SplineTemperatureChart };

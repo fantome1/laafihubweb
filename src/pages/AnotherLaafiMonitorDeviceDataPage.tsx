@@ -1,5 +1,6 @@
 import React from "react";
 import { FormControl, MenuItem, Paper, Select } from "@mui/material";
+import { Marker, Popup } from "react-leaflet";
 import { GroupedBarChart, GroupedBarChart2, CountPieChart, TemperatureCurveChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
@@ -9,9 +10,10 @@ import { routes } from "../constants/routes";
 import { IActivity } from "../models/activity_model";
 import { IReceiveActivityItem } from "../models/receive_activity_data";
 import { RealtimeActivityBloc } from "../services/realtime_activity_bloc";
-import { Marker, Popup } from "react-leaflet";
 import { MAX_TEMPERATURE, MIN_TEMPERATURE } from "../constants/temperature";
 import { signalRHelper } from "../services/signal_r_helper";
+import { DialogService } from "../components/dialogs/DialogsComponent";
+import { Api } from "../services/api";
 
 type Props = {
     params: { id: string };
@@ -48,13 +50,13 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
         };
 
         this.listen = this.listen.bind(this);
+        this.changeActivityState = this.changeActivityState.bind(this);
     }
 
     componentDidMount(): void {
         signalRHelper.start()
             .then(async () => {
                 const activity = await signalRHelper.connection.invoke('SubscribeToGetActivityData', this.props.params.id);
-
                 this.setState({ activity });
 
                 this.bloc = new RealtimeActivityBloc();
@@ -136,12 +138,39 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
         this.bloc?.onNewData(data);
     }
 
+    async changeActivityState() {
+        const activity = this.state.activity;
+        if (activity == null)
+            return;
+
+        DialogService.showLoadingDialog();
+
+        if (activity.status == 'Expired')
+            return;
+
+        const started = activity.status == 'Active';
+        Api.changeActivityState(activity.id, started ? 'stop' : 'start')
+            .then(() => {
+                this.update();
+                DialogService.closeLoadingDialog();
+                DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
+            }).catch(err => {
+                DialogService.closeLoadingDialog();
+                DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite' })
+            });
+    }
+
+    update() {
+        this.setState({ activity: null });
+        Api.getActivity(this.props.params.id)
+            .then(activity => this.setState({ activity }))
+            .catch(err => {});
+    }
+
     render() {
 
         const { activity, data, graphType } = this.state;
-
         const isTemp = graphType == 'temperature';
-
         const stats = isTemp ? data?.temperatureStats : data?.humidityStats;
 
         // console.log(data?.temperatures);
@@ -169,11 +198,9 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
                             </div>
                         </div>
                         <div className="flex justify-between py-4">
-                            <p className="text-xl text-[#999999]">Activies ID: <span className="text-[#3C4858]">{this.props.params.id}</span></p>
+                            <p className="text-xl text-[#999999]">Activity ID: <span className="text-[#3C4858]">{this.props.params.id}</span></p>
                             <div className="flex">
-                                {/* FIXME me */}
-                                <p className="text-[#309E3A] cursor-pointer"><span className="material-symbols-rounded">play_circle</span></p>
-                                {/* <p className="text-[#D80303] cursor-pointer"><span className="material-symbols-rounded">stop_circle</span></p> */}
+                                {activity && (<span onClick={this.changeActivityState} className={`material-symbols-rounded text-[20px] ${activity.status == 'Expired' ? 'text-[#999999]' : activity.status == 'Active' ? 'text-[#D80303]' : 'text-[#7EC381]'} cursor-pointer`}>{activity.status == 'Active' ? 'stop_circle' : 'play_circle'}</span>)}
                             </div>
                         </div>
                     </div>

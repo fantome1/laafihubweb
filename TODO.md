@@ -15,6 +15,5 @@
 * Activites de l'utilisateur des supprimer un utilisateur
 * Notification pagination set height
 
-
 # LATER
 * notification alert animation

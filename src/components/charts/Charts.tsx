@@ -755,8 +755,6 @@ class TemperatureCurveChart extends React.Component<TemperatureCurveChartProps, 
         for (let i=0; i<rCount; ++i)
             values.push(null);
 
-        console.log(values);
-
         const data = {
             labels: values.map(v => v == null ? '' : v.date == null ? 'current' : Utils.formatTime(v.date)),
             datasets: [

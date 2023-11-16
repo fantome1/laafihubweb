@@ -10,7 +10,7 @@ import { routes } from "../constants/routes";
 import { ActivityList } from "../components/ActivityList";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { DialogService } from "../components/dialogs/DialogsComponent";
-import { PaginatedFetchResult, PaginationBloc, PaginationBlocData } from "../bloc/pagination_bloc";
+import { PaginationBloc, PaginationBlocData } from "../bloc/pagination_bloc";
 import { IDeviceStats } from "../models/device_model";
 import { ColoredPaginatedTable } from "../components/ColoredPaginatedTable";
 

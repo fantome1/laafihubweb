@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Paper, Tab, Tabs } from "@mui/material";
-import { TemperaturePieChart, TemperatureLineChart } from "../components/charts/Charts";
+import { TemperaturePieChart } from "../components/charts/Charts";
 import { NearMap } from "../components/NearMap";
 import { WithRouter } from "../components/WithRouterHook";
 import { IReceiveDeviceData } from "../models/receive_device_data";
@@ -12,6 +12,9 @@ import { routes } from "../constants/routes";
 import { signalRHelper } from "../services/signal_r_helper";
 import { FakeData } from "../services/fake_data";
 import { SplineTemperatureChart } from "../components/charts/SplineTemperatureChart";
+import { StepAreaExposureChart } from "../components/charts/StepAreaExposureChart";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 type Props = {
     navigate: NavigateFunction;
@@ -131,61 +134,10 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-center">
-                            <p className="text-sm text-[#A2A2A2]">Device ID</p>
+                        <div className="flex flex-col justify-between items-end py-2">
+                            <p className="text-sm text-[#A2A2A2]">Device ID: <span className="text-[#3C4858] font-medium">{this.props.params.id}</span></p>
 
-                            <div className="flex flex-col justify-around h-full">
-                                {/* item 1 */}
-                                <div className="flex items-center space-x-2">
-                                    <div><img src="/icons/laafi_monitor/wlan_repeater.svg" alt="" /></div>
-
-                                    <div className="flex justify-between w-[160px] border border-[#999999] rounded-md px-2 py-[2px]">
-                                        <div className="flex">
-                                            <div><img src="/icons/laafi_monitor/wifi.svg" alt="" /></div>
-                                        </div>
-
-                                        <div className="flex items-center">
-                                            <div><img src='/icons/laafi_monitor/battery.svg' alt="" /></div>
-                                            <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* End item */}
-                                {/* item 2 */}
-                                <div className="flex items-center space-x-2">
-                                    <div><img src="/icons/laafi_monitor/wifi_router.svg" alt="" /></div>
-
-                                    <div className="flex justify-between w-[160px] border border-[#999999] rounded-md px-2 py-[2px]">
-                                        <div className="flex">
-                                            <div><img src="/icons/laafi_monitor/wifi.svg" alt="" /></div>
-                                            <div><img src="/icons/laafi_monitor/wired_network_connection.svg" alt="" /></div>
-                                        </div>
-
-                                        <div className="flex items-center">
-                                            <div><img src="/icons/laafi_monitor/battery.svg" alt="" /></div>
-                                            <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* End item */}
-                                {/* item 2 */}
-                                <div className="flex items-center space-x-2">
-                                    <div><img src="/icons/laafi_monitor/android.svg" alt="" /></div>
-
-                                    <div className="flex justify-between w-[160px] border border-[#999999] rounded-md px-2 py-[2px]">
-                                        <div className="flex">
-                                            <div><img src="/icons/laafi_monitor/signal_cellular.svg" alt="" /></div>
-                                            <div><img src="/icons/laafi_monitor/wifi.svg" alt="" /></div>
-                                        </div>
-
-                                        <div className="flex items-center">
-                                            <div><img src="/icons/laafi_monitor/battery.svg" alt="" /></div>
-                                            <p className="text-sm font-medium text-[#AAAAAA]">75%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* End item */}
-                            </div>
+                            {data && (<ConnectivityCard data={{ deviceType: data.dataSent.network.deviceType, connectionType: data.dataSent.network.connectionType, batteryPercent: data.dataSent.network.phoneBattery }} />)}
                         </div>
                     </div>
 
@@ -288,7 +240,41 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                     {/* first chart */}
                     <Paper sx={{ backgroundColor: '#D7EDF0', width: '100%', height: '100%', padding: '12px 16px' }}>
                         <div className="flex justify-between items-center">
-                            <p className="text-[#3C4858] font-medium">Data history</p>
+                            <LocalizationProvider dateAdapter={AdapterMoment}>
+                                <Paper>
+                                    <div className="flex items-center space-x-2 py-2 px-4">
+                                        <p className="text-[#3C4858] font-medium">Load history</p>
+
+                                        <DateTimePicker
+                                            label="Start period"
+                                            ampm={false}
+                                            format="DD/MM/YYYY HH:mm"
+                                            // onChange={(value: any) => this.onChanged('startDate', value._d)}
+                                            slotProps={{
+                                                textField: {
+                                                    size: "small"
+                                                }
+                                            }}
+                                        />
+
+                                        <DateTimePicker
+                                            label="End period"
+                                            ampm={false}
+                                            format="DD/MM/YYYY HH:mm"
+                                            // onChange={(value: any) => this.onChanged('startDate', value._d)}
+                                            slotProps={{
+                                                textField: {
+                                                    size: "small"
+                                                }
+                                            }}
+                                        />
+
+                                        <Button variant="contained">
+                                            <span className="material-symbols-outlined text-white">refresh</span>
+                                        </Button>
+                                    </div>
+                                </Paper>
+                            </LocalizationProvider>
                             <div>
                                 <Box>
                                     <Tabs
@@ -297,12 +283,11 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                                     >
                                         <Tab label='Temperature' />
                                         <Tab label='Humidity' />
-                                        <Tab label='Exposure' />
                                     </Tabs>
                                 </Box>
                             </div>
                         </div>
-                        <div className="flex justify-end items-center mt-4">
+                        <div className="flex flex-col space-y-4 mt-4">
                             <Paper sx={{ width: '100%', /*height: '300px',*/ padding: '20px' }} elevation={0}>
                                 <SplineTemperatureChart values={this.state.temperature ?? []} />
                                 {/* <TemperatureLineChart
@@ -313,6 +298,10 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                                     maxTempTres={data?.dataSent?.data?.characteristics?.thresMaxTemp}
                                 /> */}
                             </Paper>
+
+                            <Paper sx={{ width: '100%', /*height: '300px',*/ padding: '20px' }} elevation={0}>
+                                <StepAreaExposureChart values={this.state.temperature ?? []} />
+                            </Paper>
                         </div>
                     </Paper>
 
@@ -321,11 +310,50 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
         );
     }
 
+}
 
-    // getChart() {
-    //     return 
-    // }
+function ConnectivityCard({ data }: { data: { deviceType: 'appMobile'|'gateway'|'central', connectionType: 'mobile'|'wifi'|'ethernet', batteryPercent: number } }) {
+    
+    let connectionIcon;
+    let deviceIcon;
 
+    switch(data.deviceType) {
+        case 'appMobile':
+            deviceIcon = (<span className="material-symbols-outlined">phone_iphone</span>)
+            break;
+        case 'gateway':
+            deviceIcon = (<span className="material-symbols-outlined">router</span>)
+            break;
+        case 'central':
+            deviceIcon = (<span className="material-symbols-outlined">nest_wifi_router</span>)
+            break;
+    }
+
+    switch(data.connectionType) {
+        case 'mobile':
+            connectionIcon = (<span className="material-symbols-outlined text-[18px]">signal_cellular_alt</span>);
+            break;
+        case 'wifi':
+            connectionIcon = (<span className="material-symbols-outlined text-[18px]">wifi</span>);
+            break;
+        case 'ethernet':
+            connectionIcon = (<span className="material-symbols-outlined text-[18px]">settings_ethernet</span>);
+            break;
+    }
+
+    return (
+        <div className="flex items-center space-x-2 text-[#AAAAAA]">
+            {deviceIcon}
+
+            <div className="flex justify-between items-center w-[80px] border border-[#999999] rounded-md px-2 py-[4px]">
+                <div className="flex">{connectionIcon}</div>
+                <div className="flex items-center">
+                    <span className="material-symbols-outlined text-[18px]">battery_full</span>
+                    <p className="font-medium text-xs">{data.batteryPercent}%</p>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default WithRouter(LaafiMonitorDeviceDataPage);

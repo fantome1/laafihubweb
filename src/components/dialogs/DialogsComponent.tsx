@@ -4,7 +4,7 @@ import { Completer } from "../../services/completer";
 import { RegisterDevicesGroupDialog } from "./RegisterDevicesGroupDialog";
 import { ConfirmSuppressionDialog } from "./ConfirmSuppressionDialog";
 import { ViewDevicesGroupsDialog } from "./ViewDevicesGroupsDialog";
-import ViewDevicesGroupsItemsDialog from "./ViewDevicesGroupsItemsDialog";
+import ViewDevicesGroupsItemsDialog from "./ViewActivityDevicesDialog";
 import { Utils } from "../../services/utils";
 import { EnrollUserDialog } from "./EnrollUserDialog";
 import { IActivity } from "../../models/activity_model";
@@ -13,6 +13,7 @@ import { ActivityPickerDialog } from "./ActivityPickerDialog";
 import { INotification } from "../../models/notification_model";
 import { ViewNotificationDetailsDialog } from "./ViewNotificationDialog";
 import { ResetPasswordDialog } from "./ResetPasswordDialog";
+import ViewActivityDevicesDialog from "./ViewActivityDevicesDialog";
 
 class DialogService {
 
@@ -24,6 +25,7 @@ class DialogService {
     static showActivityPicker: (userId: string) => Promise<IActivity|null>;
     static showNotificationDetails: (notification: INotification, onMarkAsImportant: (event: React.MouseEvent<unknown>, ids: string[]) => Promise<void>) => Promise<void>;
     static showChangePassword: (userId: string) => Promise<boolean|null>|null;
+    static showActivityDevices: (activity: string, userId: string) => Promise<void>;
 
     static showSnackbar: (data: { severity: AlertColor, message: string, action?: any }) => void;
     static closeSnackbar: () => void;
@@ -46,6 +48,7 @@ type State = {
     activityPicker: { userId: string, completer: Completer<IActivity|null> }|null;
     notificationDetails: { notification: INotification, onMarkAsImportant: (event: React.MouseEvent<unknown>, ids: string[]) => Promise<void>, completer: Completer<void> }|null;
     changePassword: { userId: string, completer: Completer<boolean|null> }|null;
+    activityDevices: { activityId: string, userId: string, completer: Completer<void> }|null;
 
     snackbarData: { severity: AlertColor, message: string, action?: any }|null;
     loadingCompleter: Completer<void>|null;
@@ -66,6 +69,7 @@ class DialogsComponent extends React.PureComponent<Props, State> {
             enrollUser: null,
             activityPicker: null,
             notificationDetails: null,
+            activityDevices: null,
             changePassword: null,
             snackbarData: null,
             loadingCompleter: null
@@ -82,6 +86,7 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         DialogService.showEnrollUser = this.showEnrollUser.bind(this);
         DialogService.showActivityPicker = this.showActivityPicker.bind(this);
         DialogService.showNotificationDetails = this.showNotificationDetails.bind(this);
+        DialogService.showActivityDevices = this.showActivityDevices.bind(this);
         DialogService.showChangePassword = this.showChangePassword.bind(this);
 
         DialogService.showSnackbar = this.showSnackbar.bind(this);
@@ -177,6 +182,16 @@ class DialogsComponent extends React.PureComponent<Props, State> {
         return result;
     }
 
+    async showActivityDevices(activityId: string, userId: string) {
+        const completer = new Completer<void>();
+        this.setState({ activityDevices: { activityId, userId, completer } });
+
+        const result = await completer.promise;
+        this.setState({ activityDevices: null });
+
+        return result;
+    }
+
     async showChangePassword(userId: string) {
         const completer = new Completer<boolean|null>();
         this.setState({ changePassword: { userId, completer } });
@@ -228,20 +243,14 @@ class DialogsComponent extends React.PureComponent<Props, State> {
             <>
 
                 {state.deleteConfirmation && <ConfirmSuppressionDialog completer={state.deleteConfirmation.completer} title={state.deleteConfirmation.title} description={state.deleteConfirmation.description}/>}
-
                 {state.registerDevicesGroup && (<RegisterDevicesGroupDialog completer={state.registerDevicesGroup.completer} id={state.registerDevicesGroup.id} />)}
-
                 {state.devicesGroups && (<ViewDevicesGroupsDialog completer={state.devicesGroups} />)}
-
                 {state.deviceGroupsItems && (<ViewDevicesGroupsItemsDialog completer={state.deviceGroupsItems.completer} id={state.deviceGroupsItems.id} />)}
-
                 {state.enrollUser && (<EnrollUserDialog completer={state.enrollUser.completer} user={state.enrollUser.user} />)}
-
                 {state.activityPicker && (<ActivityPickerDialog completer={state.activityPicker.completer} userId={state.activityPicker.userId} />)}
-
                 {state.notificationDetails && (<ViewNotificationDetailsDialog {...state.notificationDetails} />)}
-
                 {state.changePassword && (<ResetPasswordDialog {...state.changePassword} />)}
+                {state.activityDevices && (<ViewActivityDevicesDialog completer={state.activityDevices.completer} activityId={state.activityDevices.activityId} userId={state.activityDevices.userId} />)}
 
                 <Snackbar
                     open={Boolean(state.snackbarData)}

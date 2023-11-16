@@ -384,12 +384,12 @@ class InformationStep extends React.Component<InformationStepProps, InformationS
                         ampm={false}
                         format="DD/MM/YYYY HH:mm"
                         onChange={(value: any) => this.onChanged('startDate', value._d)}
+                        disabled={this.props.isEdit}
                         slotProps={{
                             textField: {
                                 error: Boolean(startDateField.errorMessage),
                                 helperText: startDateField.errorMessage,
-                                fullWidth: true,
-                                disabled: this.props.isEdit
+                                fullWidth: true
                             }
                         }}
                     />
@@ -418,12 +418,12 @@ class InformationStep extends React.Component<InformationStepProps, InformationS
                         ampm={false}
                         format="DD/MM/YYYY HH:mm"
                         onChange={(value: any) => this.onChanged('reminderDate', value._d)}
+                        disabled={this.props.isEdit}
                         slotProps={{
                             textField: {
                                 error: Boolean(remindAtField.errorMessage),
                                 helperText: remindAtField.errorMessage,
-                                fullWidth: true,
-                                disabled: this.props.isEdit
+                                fullWidth: true
                             }
                         }}
                     />

@@ -12,7 +12,7 @@ import { SuperAdminUsersPage } from "./pages/SuperAdminUsersPage";
 import LaafiMonitorPage from "./pages/LaafiMonitorPage";
 import LaafiMonitorDeviceDataPage from "./pages/LaafiMonitorDeviceDataPage";
 import AnotherLaafiMonitorPage from "./pages/AnotherLaafiMonitorPage";
-import AnotherLaafiMonitorDeviceDataPage from "./pages/AnotherLaafMonitorDeviceDataPage";
+import AnotherLaafiMonitorDeviceDataPage from "./pages/AnotherLaafiMonitorDeviceDataPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { RealtimeTestPage } from "./pages/RealtimeTestPage";
@@ -60,8 +60,6 @@ class HandlerAlertNotification extends React.PureComponent<HandlerAlertNotificat
   }
 
   componentDidMount(): void {
-    console.log('initState');
-
     signalRHelper.start()
       .then(() => {
         console.log('connected');

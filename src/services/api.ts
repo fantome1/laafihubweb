@@ -238,6 +238,15 @@ class Api {
         return this.request<void>('DELETE', `/activities/${actvityId}/users/${userId}`);
     }
 
+    static async getActivityDevices(activityId: string, userId: string) {
+        return this.request<IDevice[]>('GET', `/devices/${activityId}/${userId}`, { returnValue: true });
+    }
+
+    // HttpDelete : https://hub-api-test.laafi-concepts.com/activities/{activityid}/devices/{deviceid}
+    static async deleteDevicesFromActivity(activityId: string, deviceId: string) {
+        return this.request<void>('DELETE', `/activities/${activityId}/devices/${deviceId}`);
+    }
+
     // ###################################################################################################
     // ###################################################################################################
     // #################################### GET DEVICE GROUP  ############################################

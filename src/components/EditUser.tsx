@@ -317,7 +317,7 @@ class EditUserComponent extends React.Component<Props, State> {
                             <div className="grid grid-cols-2 gap-2 border-2 rounded-md my-4 py-3 px-2">
                                 {data.map(activity => (
                                     <div key={activity.id} className="flex bg-[var(--primary)] min-h-[26px] rounded">
-                                        <div onClick={() => this.props.navigate(routes.ANOTHER_LAAFI_MONITOR_DEVICE_DATA.build(activity.id))} className="grow flex items-center cursor-pointer"><p className="pl-2 text-xs text-white font-medium">{activity.name}</p></div>
+                                        <div onClick={() => DialogService.showActivityDevices(activity.id, this.props.user!.id)} className="grow flex items-center cursor-pointer"><p className="pl-2 text-xs text-white font-medium">{activity.name}</p></div>
                                         <div onClick={() => this.onDeleteUserFromActivity(activity.id)} className="flex justify-center items-center bg-[#3C4858] w-[26px] h-full cursor-pointer" style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}><span className="material-symbols-rounded text-[20px] text-white">delete_forever</span></div>
                                     </div>
                                 ))}

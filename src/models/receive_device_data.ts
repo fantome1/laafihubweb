@@ -51,6 +51,7 @@ interface IReceiveDeviceData {
         };
         network: {
             connectionType: 'mobile'|'wifi'|'ethernet';
+            deviceType: 'appMobile'|'gateway'|'central';
             date: string;
             phoneBattery: number;
             signal: number;
