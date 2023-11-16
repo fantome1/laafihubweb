@@ -4,44 +4,60 @@ import { ActivitesConnectionStatusChart } from "../components/charts/Charts";
 import { Api } from "../services/api";
 import { IActivity, IActivityStats } from "../models/activity_model";
 import { PromiseBuilder } from "../components/PromiseBuilder";
-import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { Utils } from "../services/utils";
 import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { ActivityList } from "../components/ActivityList";
 import { UserCountSkeleton } from "../components/Skeletons";
 import { DialogService } from "../components/dialogs/DialogsComponent";
-import { PaginatedFetchResult } from "../bloc/pagination_bloc";
+import { PaginatedFetchResult, PaginationBloc, PaginationBlocData } from "../bloc/pagination_bloc";
 import { IDeviceStats } from "../models/device_model";
+import { ColoredPaginatedTable } from "../components/ColoredPaginatedTable";
 
 type Props = {
     navigate: (route: string) => void;
 }
 
 type State = {
-    promise: Promise<PaginatedFetchResult<IActivity>>|null;
     statsPromise: Promise<IActivityStats>|null;
     devicesStatsPromise: Promise<IDeviceStats>|null;
+    paginatedData: PaginationBlocData<IActivity>|null;
 }
 
 class AnotherLaafiMonitorPage extends React.Component<Props, State> {
+
+    private paginatedBloc: PaginationBloc<IActivity, any> = new PaginationBloc(
+        1,
+        null,
+        (count, page, params) => Api.getActivities({}, count, page)
+    );
 
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            promise: null,
             statsPromise: null,
             devicesStatsPromise: null,
+            paginatedData: null
         };
+
+        this.paginatedBloc.listen(this.listen.bind(this));
     }
 
     componentDidMount(): void {
         this.setState({
-            promise: Api.getActivities({ PageSize: 50 }), // FIXME fix this
             statsPromise: Api.getActivitiesStats(),
             devicesStatsPromise: Api.getDevicesStats()
         });
+    }
+
+    update(reset: boolean = false) {
+        reset ? this.paginatedBloc.reset() : this.paginatedBloc.reload();
+        this.setState({ statsPromise: Api.getActivitiesStats() });
+    }
+
+    listen(data: PaginationBlocData<IActivity>) {
+        this.setState({ paginatedData: data });
     }
 
     onTapRow(activity: { id: string }) {
@@ -61,7 +77,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
 
         Api.deleteActivity(value.id)
             .then(() => {
-                this.setState({ promise: Api.getActivities({ PageSize: 50 }), statsPromise: Api.getActivitiesStats() });
+                this.update();
                 DialogService.showSnackbar({ severity: 'success', message: 'Activité supprimé avec succès' })
             }).catch(err => {
                 DialogService.showSnackbar({ severity: 'error', message: 'Une erreur s\'est produite lors de la suppression de l\'activité' });
@@ -78,7 +94,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const started = value.status == 'Active';
         Api.changeActivityState(value.id, started ? 'stop' : 'start')
             .then(() => {
-                this.setState({ promise: Api.getActivities({ PageSize: 50 }), statsPromise: Api.getActivitiesStats() });
+                this.update();
                 DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'success', message: started ? 'L\'activité a bien été arrêtée' : 'L\'activité a démarré avec succès' })
             })
@@ -95,7 +111,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const isFavorite = value.isFavorite;
         Api.changeActivityFavoriteStatus(value.id, !isFavorite)
             .then(() => {
-                this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() });
+                this.update();
                 DialogService.closeLoadingDialog();
                 DialogService.showSnackbar({ severity: 'success', message: !isFavorite ? 'L\'activité a bien été défini comme favoris' : 'L\'activité a bien été supprimé des favoris' })
             })
@@ -110,7 +126,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -185,44 +201,34 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                 <div className="flex space-x-4 mt-4">
                     {/* table */}
                     <div className="grow">
-                        <PromiseBuilder
-                            promise={state.promise}
-                            dataBuilder={(data) => (
-                                <table className="styled-table">
-                                    <thead>
-                                        <tr>{['ID', 'Name', 'Type', 'Date of Start', 'Date of End', 'Infrastructure', 'Status',].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.items.map(data => (
-                                            <tr key={data.id} className="cursor-pointer" onClick={() => this.onTapRow(data)}>
-                                                <td>
-                                                    <div className="flex items-center px-2">
-                                                        <div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: data.status == 'Expired' ? '#999999' : data.status == 'Active' ? '#7EC381' : '#D80303' }}></div>
-                                                        <p className="pl-1">{data.id}</p>
-                                                    </div>
-                                                </td>
-                                                <td>{data.name}</td>
-                                                <td>{data.type}</td>
-                                                <td>{Utils.formatDate(new Date(data.startedDate))}</td>
-                                                <td>{data.endDate == null ? 'N/A' : Utils.formatDate(new Date(data.endDate))}</td>
-                                                <td>{data.infrastructureName}</td>
-                                                <td>
-                                                    <div className="flex justify-center items-center space-x-1">
-                                                        <span onClick={e => this.changeActivityState(e, data)} className={`material-symbols-rounded text-[20px] ${data.status == 'Expired' ? 'text-[#999999]' : data.status == 'Active' ? 'text-[#D80303]' : 'text-[#7EC381]'} cursor-pointer`}>{data.status == 'Active' ? 'stop_circle' : 'play_circle'}</span>
-                                                        <span onClick={e => this.setActivityFavoriteStatus(e, data)} className={`material-symbols-rounded text-[20px] ${data.isFavorite ? 'text-[#FDD835]' : 'text-[#999999]'} cursor-pointer`}>star</span>
-                                                        <span onClick={e => this.onDelete(e, data)} className="material-symbols-rounded text-[20px] text-[#D80303] cursor-pointer">delete</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                        <ColoredPaginatedTable
+                            bloc={this.paginatedBloc}
+                            headers={['ID', 'Name', 'Type', 'Date of Start', 'Date of End', 'Infrastructure', 'Status']}
+                            rowBuilder={data => (
+                                <tr key={data.id} className="cursor-pointer" onClick={() => this.onTapRow(data)}>
+                                    <td>
+                                        <div className="flex items-center px-2">
+                                            <div className='w-[12px] h-[12px] rounded-full' style={{ backgroundColor: data.status == 'Expired' ? '#999999' : data.status == 'Active' ? '#7EC381' : '#D80303' }}></div>
+                                            <p className="pl-1">{data.id}</p>
+                                        </div>
+                                    </td>
+                                    <td>{data.name}</td>
+                                    <td>{data.type}</td>
+                                    <td>{Utils.formatDate(new Date(data.startedDate))}</td>
+                                    <td>{data.endDate == null ? 'N/A' : Utils.formatDate(new Date(data.endDate))}</td>
+                                    <td>{data.infrastructureName}</td>
+                                    <td>
+                                        <div className="flex justify-center items-center space-x-1">
+                                            <span onClick={e => this.changeActivityState(e, data)} className={`material-symbols-rounded text-[20px] ${data.status == 'Expired' ? 'text-[#999999]' : data.status == 'Active' ? 'text-[#D80303]' : 'text-[#7EC381]'} cursor-pointer`}>{data.status == 'Active' ? 'stop_circle' : 'play_circle'}</span>
+                                            <span onClick={e => this.setActivityFavoriteStatus(e, data)} className={`material-symbols-rounded text-[20px] ${data.isFavorite ? 'text-[#FDD835]' : 'text-[#999999]'} cursor-pointer`}>star</span>
+                                            <span onClick={e => this.onDelete(e, data)} className="material-symbols-rounded text-[20px] text-[#D80303] cursor-pointer">delete</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             )}
-                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={7} />)}
-                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
-                    
+
                     {/* Pie charts and group */}
                     <div className="w-[380px]">
                         {/* Pie chart */}
@@ -232,27 +238,35 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                         </div>
 
                         {/* Group */}
-                        <PromiseBuilder
-                            promise={state.promise}
-                            dataBuilder={(data) => (
-                                <div className='bg-white rounded-lg mt-2 pb-4'>
-                                    <ActivityList
-                                        label='Favorite Activities'
-                                        columnCount={1}
-                                        data={data.items.filter(v => v.isFavorite).map(v => ({ activity: v, showExtraData: true }))}
-                                        onReload={() => this.setState({ promise: Api.getActivities(), statsPromise: Api.getActivitiesStats() })}
-                                    />
-                                </div>
-                            )}
-                            loadingBuilder={() => (<Skeleton className="mt-4" variant='rounded' width='100%' height='480px' />)}
-                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
-                        />
+                        {this.favoritesActivitiesComponent()}
                     </div>
                 </div>
 
             </div>
         );
     }
+
+    favoritesActivitiesComponent() {
+        const data = this.state.paginatedData;
+
+        if (data == null || data?.inLoading)
+            return (<Skeleton className="mt-4" variant='rounded' width='100%' height='480px' />);
+        if (data?.hasError)
+            return (<div>Une erreur s'est produite</div>);
+
+        return (
+            <div className='bg-white rounded-lg mt-2 pb-4'>
+                <ActivityList
+                    label='Favorite Activities'
+                    columnCount={1}
+                    data={data.data!.items.filter(v => v.isFavorite).map(v => ({ activity: v, showExtraData: true }))}
+                    onReload={() => this.update()}
+                />
+            </div>
+        );
+    }
+
+
 }
 
 export default WithRouter(AnotherLaafiMonitorPage);

@@ -206,7 +206,7 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
         var isEmpty = search.trim() == '';
         switch(type) {
             case 'activity':
-                const v = await (isEmpty ? Api.getActivities({PageSize: 20 }) : Api.searchActivities(search));
+                const v = await (isEmpty ? Api.getActivities({}, 20) : Api.searchActivities(search));
                 return v.items.map(v => ({ id: v.id, label: v.name, description: v.status }));
             case 'infrastructure':
                 const v2 = await (isEmpty ? Api.getInfrastructures() : Api.searchInfrastructures(search));

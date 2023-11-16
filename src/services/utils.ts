@@ -108,6 +108,7 @@ class Utils {
     static signalRConnectionBuilder() {
         return new signalR.HubConnectionBuilder()
             .withUrl('https://hub-api-test.laafi-concepts.com/auth/connect', { accessTokenFactory: () => AuthService.getAuthData()?.accessToken ?? '' })
+            .withAutomaticReconnect()
             .build();
     }
 
@@ -170,6 +171,12 @@ class Utils {
         if (!(/[^a-zA-Z0-9]/.test(value)))
             return 'Votre mot de passe doit contenir au minimum un caractère spécial';
         return true;
+    }
+
+    static getMaxHeight() {
+        const body = document.body;
+        const html = document.documentElement;
+        return Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
     }
 
 }

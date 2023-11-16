@@ -1,3 +1,4 @@
+# Completed
 * Email non obligatoire
 * Sign in en blanc
 * Localisation de l'utilisateur
@@ -8,6 +9,12 @@
 * Fixed chart with default data
 * Show/hide password
 
+# TODO
+* Activites device
+* Enroll button
 * Activites de l'utilisateur des supprimer un utilisateur
+* Notification pagination set height
 
+
+# LATER
 * notification alert animation

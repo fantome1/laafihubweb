@@ -7,9 +7,9 @@ import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser, IUserStats } from "../models/user_model";
 import EditUserComponent from "../components/EditUser";
 import { UserCountSkeleton } from "../components/Skeletons";
-import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { DialogService } from "../components/dialogs/DialogsComponent";
-import { PaginatedFetchResult } from "../bloc/pagination_bloc";
+import { PaginatedFetchResult, PaginationBloc } from "../bloc/pagination_bloc";
+import { ColoredPaginatedTable } from "../components/ColoredPaginatedTable";
 
 type Props = {
 
@@ -17,19 +17,23 @@ type Props = {
 
 type State = {
     addUserDialogCompleter: Completer<boolean>|null;
-    usersPromise?: Promise<PaginatedFetchResult<IUser>>|null;
     usersStatsPromise?: Promise<IUserStats>|null;
     selectedUser: IUser|null; // for edit user
 }
 
 class SuperAdminUsersPage extends React.Component<Props, State> {
 
+    private paginatedBloc: PaginationBloc<IUser, any> = new PaginationBloc(
+        12,
+        null,
+        (count, page, params) => Api.getUsers({}, count, page)
+    );
+
     constructor(props: Props) {
         super(props);
 
         this.state = {
             addUserDialogCompleter: null,
-            usersPromise: null,
             usersStatsPromise: null,
             selectedUser: null
         };
@@ -38,11 +42,12 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.update();
+        this.setState({ usersStatsPromise: Api.getUsersStats() });
     }
 
-    update() {
-        this.setState({ usersPromise: Api.getUsers(), usersStatsPromise: Api.getUsersStats() });
+    update(reset: boolean = false) {
+        reset ? this.paginatedBloc.reset() : this.paginatedBloc.reload();
+        this.setState({ usersStatsPromise: Api.getUsersStats() });
     }
 
     async showAddUserDialog() {
@@ -53,7 +58,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         this.setState({ addUserDialogCompleter: null });
 
         if (result == true) {
-            this.update();
+            this.update(true);
             DialogService.showSnackbar({ severity: 'success', message: 'Utilisateur ajouté avec succès' });
         }
     }
@@ -83,7 +88,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         const state = this.state;    
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -129,29 +134,19 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
 
                     {/* user card */}
                     <div className="w-[70%]">
-                        <PromiseBuilder
-                            promise={state.usersPromise}
-                            dataBuilder={(data) => (
-                                <table className="styled-table">
-                                    <thead>
-                                        <tr>{['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.items.map(user => (
-                                            <tr key={user.id} className="cursor-pointer" onClick={() => this.setState({ selectedUser: user })}>
-                                                <td>{user.id}</td>
-                                                <td>{user.userName}</td>
-                                                <td>{user.role}</td>
-                                                <td>{user.infrastructureId}</td>
-                                                <td>{user.activities}</td>
-                                                <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span onClick={(e) => this.onDeleteUser(e, user)} className="material-symbols-rounded text-red-500 cursor-pointer">delete</span></div></div></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                        <ColoredPaginatedTable
+                            bloc={this.paginatedBloc}
+                            headers={['User ID', 'User Name', 'Role', 'Infrastructure', 'Activities', '']}
+                            rowBuilder={user => (
+                                <tr key={user.id} className="cursor-pointer" onClick={() => this.setState({ selectedUser: user })}>
+                                    <td>{user.id}</td>
+                                    <td>{user.userName}</td>
+                                    <td>{user.role}</td>
+                                    <td>{user.infrastructureId}</td>
+                                    <td>{user.activities}</td>
+                                    <td><div className="flex justify-center"><div className={`flex justify-center items-center w-[26px] rounded text-white text-xs font-medium`}><span onClick={(e) => this.onDeleteUser(e, user)} className="material-symbols-rounded text-red-500 cursor-pointer">delete</span></div></div></td>
+                                </tr>
                             )}
-                            loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
-                            errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
 

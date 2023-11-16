@@ -2,7 +2,6 @@ import React from "react";
 import { CircleMarker, Popup } from "react-leaflet";
 import { OrganizationFirstCardGroup } from "../components/OrganizationFirstCardGroup";
 import { Utils } from "../services/utils";
-import { TableSkeletonComponent } from "../components/TableSkeletonComponent";
 import { PromiseBuilder } from "../components/PromiseBuilder";
 import { Api } from "../services/api";
 import { Completer } from "../services/completer";
@@ -12,10 +11,11 @@ import { WithRouter } from "../components/WithRouterHook";
 import { routes } from "../constants/routes";
 import { BubleMap } from "../components/BubleMap";
 import { DialogService } from "../components/dialogs/DialogsComponent";
-import { PaginatedFetchResult } from "../bloc/pagination_bloc";
+import { PaginationBloc, PaginationBlocData } from "../bloc/pagination_bloc";
 import { IDeviceStats } from "../models/device_model";
 import { IActivityStats } from "../models/activity_model";
 import { IUserStats } from "../models/user_model";
+import { ColoredPaginatedTable } from "../components/ColoredPaginatedTable";
 
 type Props = {
     navigate: (url: string) => void;
@@ -24,14 +24,23 @@ type Props = {
 type State = {
     createDialogCompleter: Completer<boolean>|null;
     infrastructureId: string|null;
-    infrastructuresPromise: Promise<PaginatedFetchResult<IInfrastructure>>|null;
     infrastructuresStatsPromise: Promise<IInfrastructureStats>|null;
     usersStatsPromise: Promise<IUserStats>|null;
     devicesStatsPromise: Promise<IDeviceStats>|null;
     activitiesStatsPromise: Promise<IActivityStats>|null;
+    paginatedData: PaginationBlocData<IInfrastructure>|null;
 };
 
 class OrganizationPage extends React.Component<Props, State> {
+
+    private paginatedBloc: PaginationBloc<IInfrastructure, any> = new PaginationBloc(
+        1,
+        null,
+        (count, page, params) => {
+            console.log(page);
+            return Api.getInfrastructures(count, page)
+        }
+    );
 
     constructor(props: Props) {
         super(props);  
@@ -39,24 +48,33 @@ class OrganizationPage extends React.Component<Props, State> {
         this.state = {
             createDialogCompleter: null,
             infrastructureId: null,
-            infrastructuresPromise: null,
             infrastructuresStatsPromise: null,
             usersStatsPromise: null,
             devicesStatsPromise: null,
-            activitiesStatsPromise: null
+            activitiesStatsPromise: null,
+            paginatedData: null
         };
 
         this.showCreateInfrastructureDialog = this.showCreateInfrastructureDialog.bind(this);
+        this.paginatedBloc.listen(this.listen.bind(this));
     }
 
     componentDidMount(): void {
         this.setState({
-            infrastructuresPromise: Api.getInfrastructures(),
             infrastructuresStatsPromise: Api.getInfrastructureStats(),
             usersStatsPromise: Api.getUsersStats(),
             devicesStatsPromise: Api.getDevicesStats(),
             activitiesStatsPromise: Api.getActivitiesStats()
         });
+    }
+
+    update(reset: boolean = false) {
+        reset ? this.paginatedBloc.reset() : this.paginatedBloc.reload();
+        this.setState({ infrastructuresStatsPromise: Api.getInfrastructureStats() });
+    }
+
+    listen(data: PaginationBlocData<IInfrastructure>) {
+        this.setState({ paginatedData: data });
     }
 
     async showCreateInfrastructureDialog(infrastructureId: string|null = null) {
@@ -68,7 +86,7 @@ class OrganizationPage extends React.Component<Props, State> {
             this.setState({ createDialogCompleter: null, infrastructureId: null });
 
             if (result == true) {
-                this.setState({ infrastructuresPromise: Api.getInfrastructures(), infrastructuresStatsPromise: Api.getInfrastructureStats() });
+                this.update(!infrastructureId);
                 DialogService.showSnackbar({ severity: 'success', message: infrastructureId ? 'Les informations de l\'infrastructure ont été modifié avec succès' : 'Infrastructure ajouté avec succès' });
             }
         } catch(err) {
@@ -89,7 +107,7 @@ class OrganizationPage extends React.Component<Props, State> {
 
         Api.deleteInfrastructure(value.id)
             .then(() => {
-                this.setState({ infrastructuresPromise: Api.getInfrastructures(), infrastructuresStatsPromise: Api.getInfrastructureStats() });
+                this.update();
                 DialogService.showSnackbar({ severity: 'success', message: 'Infrastructure supprimé avec succès' });
             }).catch(err => {
                 console.log('err', err);
@@ -106,7 +124,7 @@ class OrganizationPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2">
 
                 <div className="flex space-x-4 mt-12">
                     <div style={{ flex: '1 1 0' }}>
@@ -121,61 +139,46 @@ class OrganizationPage extends React.Component<Props, State> {
 
                     <div style={{ flex: '1 1 0' }}>
                         <BubleMap>
-                            {<PromiseBuilder
-                                promise={state.infrastructuresPromise}
-                                dataBuilder={data => (data.items.map((value, index) => <CircleMarker key={index}
-                                    center={[value.coordinates.latitude, value.coordinates.longitude]}
-                                    pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-ignore
-                                    radius={4}>
-                                        <Popup>{value.name}</Popup>
-                                    </CircleMarker>
-                                ))}
-                                loadingBuilder={() => null}
-                                errorBuilder={(_) => null}
-                            />}
+                            {state.paginatedData?.hasData && (state.paginatedData.data!.items.map((value, index) => <CircleMarker key={index}
+                                center={[value.coordinates.latitude, value.coordinates.longitude]}
+                                pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                radius={4}>
+                                    <Popup>{value.name}</Popup>
+                                </CircleMarker>
+                            ))}
                         </BubleMap>
                     </div>
                 </div>
 
                 <div className="mt-4">
-                    <PromiseBuilder
-                        promise={state.infrastructuresPromise}
-                        dataBuilder={data => (
-                            <table className="styled-table">
-                                <thead>
-                                    <tr>{['', 'Infrastructures Name', 'Type', 'Activites', 'Devices', 'Agents', 'Date of creation', ''].map((e, index) => (<th key={index}>{e}</th>))}</tr>
-                                </thead>
-                                <tbody>
-                                    {data.items.map(value => (
-                                        <tr key={value.id} onClick={() => this.onTapInfrastructure(value)} className="cursor-pointer">
-                                            <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: getInfrastructuresStatusColor(value) }}></div></div></td>
-                                            <td>{value.name}</td>
-                                            <td>{value.type}</td>
-                                            <td>{value.totalActivities}</td>
-                                            <td>{value.totalDevicies}</td>
-                                            <td>{value.totalAgents}</td>
-                                            <td>{Utils.formatDate(new Date(value.creationDate!))}</td>
-                                            <td>
-                                                <div className="flex h-full justify-evenly items-center text-[#999999]">
-                                                    <div className="cursor-pointer" onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        this.showCreateInfrastructureDialog(value.id)
-                                                    }}><span className="material-symbols-rounded">edit</span></div>
-                                                    <div className="cursor-pointer" onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        this.onDeleteInfrastructure(value)
-                                                    }}><span className="material-symbols-rounded">delete</span></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                    <ColoredPaginatedTable
+                        bloc={this.paginatedBloc}
+                        headers={['', 'Infrastructures Name', 'Type', 'Activites', 'Devices', 'Agents', 'Date of creation', '']}
+                        rowBuilder={value => (
+                            <tr key={value.id} onClick={() => this.onTapInfrastructure(value)} className="cursor-pointer">
+                                <td><div className="flex justify-center"><div className={`w-[12px] h-[12px] rounded-full`} style={{ backgroundColor: getInfrastructuresStatusColor(value) }}></div></div></td>
+                                <td>{value.name}</td>
+                                <td>{value.type}</td>
+                                <td>{value.totalActivities}</td>
+                                <td>{value.totalDevicies}</td>
+                                <td>{value.totalAgents}</td>
+                                <td>{Utils.formatDate(new Date(value.creationDate!))}</td>
+                                <td>
+                                    <div className="flex h-full justify-evenly items-center text-[#999999]">
+                                        <div className="cursor-pointer" onClick={(e) => {
+                                            e.stopPropagation();
+                                            this.showCreateInfrastructureDialog(value.id)
+                                        }}><span className="material-symbols-rounded">edit</span></div>
+                                        <div className="cursor-pointer" onClick={(e) => {
+                                            e.stopPropagation();
+                                            this.onDeleteInfrastructure(value)
+                                        }}><span className="material-symbols-rounded">delete</span></div>
+                                    </div>
+                                </td>
+                            </tr>
                         )}
-                        loadingBuilder={() => (<TableSkeletonComponent count={8} columnCount={5} />)}
-                        errorBuilder={(err) => (<p>Une erreur s'est produite</p>)}
                     />
                 </div>
 

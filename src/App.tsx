@@ -25,6 +25,9 @@ import { Completer } from "./services/completer";
 import { INotification } from "./models/notification_model";
 import { NotificationAlert } from "./components/dialogs/ViewNotificationDialog";
 import { notificationCounterBloc } from "./services/notification_counter_bloc";
+import { registerLicense } from "@syncfusion/ej2-base";
+
+registerLicense('GTIlMmhhYH1ifWBlaGBifGJhfGpqampzYWBpZmppZmpoJzw2MDshOiAnOjI9EzQ+Mjo/fTA8Pg==');
 
 const NOTIFICATION_MAX_COUNT = 7;
 

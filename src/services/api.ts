@@ -12,7 +12,7 @@ import { Utils } from "./utils";
 
 class Api {
 
-    static readonly BASE_URL = 'https://hub-api-test.laafi-concepts.com'
+    static readonly BASE_URL = 'https://hub-api-test.laafi-concepts.com';
 
     private static async paginationHelper<T>(path: string, options: { query?: Record<string, any>,  pageSize?: number, pageNumber?: number } = {}): Promise<PaginatedFetchResult<T>> {
         const query =  { ...(options.query ?? {}) };
@@ -46,6 +46,14 @@ class Api {
             return response.json();
     }
 
+    static async getCurrentDate() {
+        const response = await fetch('http://worldtimeapi.org/api/timezone/Africa/Ouagadougou');
+        if (!response.ok)
+            throw new Error();
+        const body = await response.json();
+        return new Date(body['datetime'])
+    }
+
     static async login(organizationId: string, email: string, password: string) {
         const response = await fetch(`${this.BASE_URL}/auth/web-login`, {
             method: 'POST',
@@ -76,8 +84,8 @@ class Api {
         return this.request<IUser>('GET', `/users/${userId}`, { returnValue: true });
     }
 
-    static async getUsers(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}) {
-        return this.paginationHelper<IUser>('/users', { query: options });
+    static async getUsers(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}, pageSize: number = 10, pageNumber: number = 0) {
+        return this.paginationHelper<IUser>('/users', { query: options, pageSize, pageNumber });
     }
 
     static async getUsersStats(options: { InfrastructureId?: string, NotEnrolled?: 'true' } = {}) {
@@ -136,8 +144,8 @@ class Api {
         return this.request('PUT', `/infrastructures/${id}`, { body: data, returnValue: true });
     }
 
-    static async getInfrastructures() {
-        return this.paginationHelper<IInfrastructure>('/infrastructures');
+    static async getInfrastructures(pageSize: number = 10, pageNumber: number = 0) {
+        return this.paginationHelper<IInfrastructure>('/infrastructures', { pageSize, pageNumber });
     }
 
     static async searchInfrastructures(search: string) {
@@ -194,8 +202,8 @@ class Api {
         return this.request<{ id: string, infrastructureId: string, name: string }>('PUT', `/activities/${activityId}/users`, { body: data, returnValue: true });
     }
 
-    static async getActivities(options: { InfrastructureId?: string, userId?: string, PageSize?: number } = {}) {
-        return await Api.paginationHelper<IActivity>('/activities', { query: options });
+    static async getActivities(options: { InfrastructureId?: string, userId?: string } = {}, pageSize: number = 10, pageNumber: number = 0) {
+        return await Api.paginationHelper<IActivity>('/activities', { query: options, pageSize, pageNumber });
     }
 
     static async getActivitiesStats(options: { InfrastructureId?: string, userId?: string, PageSize?: number } = {}) {

@@ -1,4 +1,4 @@
-import { Paper, Skeleton } from "@mui/material";
+import { CircularProgress, Paper, Skeleton } from "@mui/material";
 import React from "react";
 import { EntityCountCard } from "../components/EntityCountCard";
 import { NotificationsTable } from "../components/NotificationsTable";
@@ -11,6 +11,7 @@ import { NotificationFilterComponent } from "../NotificationFilterComponent";
 import { NearMap } from "../components/NearMap";
 import { Marker } from "react-leaflet";
 import { notificationCounterBloc } from "../services/notification_counter_bloc";
+import { Utils } from "../services/utils";
 
 type Props = {
 
@@ -19,6 +20,7 @@ type Props = {
 type State = {
     stats: Promise<INotificationStats>|null;
     data: PaginationBlocData<INotification>;
+    date: Promise<Date>|null;
 };
 
 class NotificationsPage extends React.Component<Props, State> {
@@ -34,7 +36,8 @@ class NotificationsPage extends React.Component<Props, State> {
 
         this.state = {
             stats: null,
-            data: new PaginationBlocData(PaginationBlocEventType.loading)
+            data: new PaginationBlocData(PaginationBlocEventType.loading),
+            date: null
         };
 
         this.onUpdate = this.onUpdate.bind(this);
@@ -44,7 +47,7 @@ class NotificationsPage extends React.Component<Props, State> {
     componentDidMount(): void {
         this.bloc.listen(this.listen);
         this.bloc.next();
-        this.setState({ stats: Api.getNotificationStats() });
+        this.setState({ stats: Api.getNotificationStats(), date: Api.getCurrentDate() });
         notificationCounterBloc.reset();
     }
 
@@ -85,7 +88,15 @@ class NotificationsPage extends React.Component<Props, State> {
                                 </div>
                             </div>
                             <div className="py-4">
-                                <p className="text-xl text-[#999999]">Current Date:</p>
+                                <p className="text-xl text-[#999999]">
+                                    Current Date:
+                                    <PromiseBuilder
+                                        promise={this.state.date}
+                                        dataBuilder={date => <span className="px-2 text-[#3c4858]">{Utils.formatDate(date, { addSecond: true })}</span>}
+                                        loadingBuilder={() => <span className="px-2"><CircularProgress size={24} /></span>}
+                                        errorBuilder={err => "N/A"}
+                                    />
+                                </p>
                             </div>
                         </div>
 

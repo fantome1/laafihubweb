@@ -57,7 +57,7 @@ class DashboardPage extends React.Component<Props, State> {
             alertPromise: Api.getNotificationStats(),
             // devicesPromise: Api.getDevices(),
             deviceStatsPromise: Api.getDevicesStats(),
-            activitiesPromise: Api.getActivities({ PageSize: 4 }),
+            activitiesPromise: Api.getActivities({}, 4),
             usersPromise: Api.getUsers(),
             usersStatsPromise: Api.getUsersStats(),
             infrastructurePromise: Api.getInfrastructures(),
@@ -70,28 +70,12 @@ class DashboardPage extends React.Component<Props, State> {
         const state = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] p-8 min-h-[1440px]">
-
-                {/* FIXME scroll */}
-                <div className="flex space-x-4 overflow-x-auto fixed-flex-items" style={{ width: 'calc(100vw - 116px)' }}>
-
-                    {/* <EntityCountCard
-                        width={280}
-                        icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">notifications</span>}
-                        label="Alerts"
-                        count="060"
-                        items={[
-                            { label: 'Temperature', count: '020' },
-                            { label: 'Humidity', count: '020' },
-                            { label: 'UX Exposure', count: '020' },
-                        ]}
-                    /> */}
-
+            <div className="bg-[#E5E5E5] p-8">
+                <div className="grid grid-cols-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
                     <PromiseBuilder
                         promise={this.state.alertPromise}
                         dataBuilder={data => (
                             <EntityCountCard
-                                width={460}
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">notifications</span>}
                                 // elevation={0}
                                 label="Alerts"
@@ -113,7 +97,6 @@ class DashboardPage extends React.Component<Props, State> {
                         promise={state.deviceStatsPromise}
                         dataBuilder={data => (
                             <EntityCountCard
-                                width={280}
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">devices_other</span>}
                                 label="Devices"
                                 count={data.count.toString().padStart(3, '0')}
@@ -128,7 +111,6 @@ class DashboardPage extends React.Component<Props, State> {
                         promise={state.usersStatsPromise}
                         dataBuilder={data => (
                             <EntityCountCard
-                                width={320}
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">person</span>}
                                 label="Users"
                                 count={data.count.toString().padStart(3, '0')}
@@ -143,7 +125,6 @@ class DashboardPage extends React.Component<Props, State> {
                         promise={state.infrastructureStatsPromise}
                         dataBuilder={data => (
                             <EntityCountCard
-                                width={280}
                                 icon={<span className="material-symbols-outlined text-[42px] text-[var(--primary)]">domain</span>}
                                 label="Assets"
                                 count={data.total.toString().padStart(3, '0')}
@@ -196,7 +177,7 @@ class DashboardPage extends React.Component<Props, State> {
                                         columnCount={2}
                                         showMoreBtn
                                         data={data.items.map(v => ({ activity: v, showExtraData: true }))}
-                                        onReload={() => this.setState({ activitiesPromise: Api.getActivities({ PageSize: 4 }) })}
+                                        onReload={() => this.setState({ activitiesPromise: Api.getActivities({}, 4) })}
                                     />
                                 </div>
                             )}

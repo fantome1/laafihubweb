@@ -37,7 +37,7 @@ class PaginationBloc<T, P> {
     private listeners: Listener<T>[] = [];
 
     constructor(
-        public readonly count: number,
+        public count: number,
         private params: P,
         private onFetch: (count: number, page: number, params: P) => Promise<{ items: T[], page: number, totalCount: number }>
     ) {}
@@ -52,6 +52,12 @@ class PaginationBloc<T, P> {
 
     get hasParams() {
         return !!this.params;
+    }
+
+    setPageCount(count: number, notify: boolean = true) {
+        this.count = count;
+        if (notify)
+            this.notify(new PaginationBlocData(PaginationBlocEventType.loading));
     }
 
     // FIXME utile ??
