@@ -147,12 +147,12 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
 
                         <div className="grow flex flex-col justify-around mt-2 mb-2">
                             <div className="flex">
-                                <div className="w-[50%]"><p>FW rev:</p></div>
-                                <div className="w-[50%]"><p>SW rev:</p></div>
+                                <div className="w-[50%]"><p>FW rev: {data?.dataSent.data.deviceInfo.firmware}</p></div>
+                                <div className="w-[50%]"><p>SW rev: {data?.dataSent.data.deviceInfo.software}</p></div>
                             </div>
 
                             <div className="flex">
-                                <div className="w-[50%]"><p>Board rev:</p></div>
+                                <div className="w-[50%]"><p>Board rev: {data?.dataSent.data.deviceInfo.hardRevision}</p></div>
                                 <div className="w-[50%]"><p>Last Update:</p></div>
                             </div>
                         </div>

@@ -206,7 +206,6 @@ class NotificationsTable extends React.Component<NotificationsTableProps, Notifi
             <Table
               sx={{ minWidth: 750 }}
               aria-labelledby="tableTitle"
-              size='medium'
             >
               <EnhancedTableHead
                 numSelected={selected.length}

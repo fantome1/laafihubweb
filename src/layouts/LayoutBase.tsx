@@ -19,7 +19,7 @@ function LayoutBase() {
         return (<div></div>);
 
     return (
-        <div className="">
+        <div>
             <Header />
 
             <div className="flex">

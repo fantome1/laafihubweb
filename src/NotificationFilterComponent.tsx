@@ -220,7 +220,7 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
 
     render() {
 
-        const { type, optionSelected, options } = this.state;
+        const { type, optionSelected, options, loading } = this.state;
 
         return (
             <div className="flex space-x-2">
@@ -234,7 +234,7 @@ class MyAutocomplete extends React.PureComponent<AutocompleteProps, Autocomplete
                     onOpen={() => this.onFetchData('')}
                     getOptionLabel={op => op.label}
                     filterOptions={x => x}
-                    loading={true}
+                    loading={loading}
                     onChange={(_, value) => this.onOptionSelected(value)}
                     onInputChange={(_, value) => this.onFetchData(value)}
                     renderInput={params => (<TextField {...params} label="Search" />)}

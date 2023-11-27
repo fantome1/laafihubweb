@@ -92,7 +92,7 @@ class CreateInfrastructureDialog extends React.Component<Props, State> {
 
         const data = {
             name: values.name,
-            type: values.type.value,
+            type: values.type,
             address: {
                 street: values.street,
                 city: values.city,
