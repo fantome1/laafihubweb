@@ -291,7 +291,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
         const { promise, usersPromise, usersStatsPromise, devicesPromise, devicesStatsPromise, activitiesPromise, activitiesStatsPromise, enrollItemsCompleter, updateDialogCompleter, updateUserDialog, userContextMenu, deviceContextMenu, activityContextMenu } = this.state;
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1024px]">
 
                 <div className="flex space-x-4 mt-12">
                     {/* Infrastruture name */}
@@ -401,8 +401,10 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                                 {/* activities */}
                                 <div className="bg-white rounded-md p-2 grow-[5]">
                                     <p className="text-lg text-[#999999] mb-2">Activities</p>
-
+                                    <div className="">
                                     <ActivityChart promise={activitiesStatsPromise} />
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -440,8 +442,8 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                     </div>
                 </div>
 
-                <div className="flex space-x-2 mt-4">
-                    <div className="w-[33%]">
+                <div className="flex space-x-2 mt-4" style={{height: '450px'}}>
+                    <div className="w-[33%]" style={{backgroundColor: '#fff'}}>
                         <PromiseBuilder
                             promise={usersPromise}
                             dataBuilder={data => (
@@ -469,7 +471,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         />
                     </div>
 
-                    <div className="w-[33%]">
+                    <div className="w-[33%]" style={{backgroundColor: '#fff'}}>
                         <PromiseBuilder
                             promise={activitiesPromise}
                             dataBuilder={data => (
@@ -497,7 +499,7 @@ class SuperAdminDashboardPage extends React.Component<Props, State> {
                         />
                     </div>
 
-                    <div className="w-[33%]">
+                    <div className="w-[33%]" style={{backgroundColor: '#fff'}}>
                         <PromiseBuilder
                             promise={devicesPromise}
                             dataBuilder={data => (

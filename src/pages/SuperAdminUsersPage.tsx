@@ -88,7 +88,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
         const state = this.state;    
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2">
+            <div className="bg-[#E5E5E5] px-8 py-2 min-h-[1024px]">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -151,7 +151,7 @@ class SuperAdminUsersPage extends React.Component<Props, State> {
                     </div>
 
                     {/* Edit user */}
-                    <div className="w-[30%]"><EditUserComponent user={state.selectedUser} /></div>
+                    <div className="w-[30%] h-[820px] " style={{overflow: 'auto'}}><EditUserComponent user={state.selectedUser} /></div>
 
                 </div>
 

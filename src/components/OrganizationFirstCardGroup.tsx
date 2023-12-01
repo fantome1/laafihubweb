@@ -95,15 +95,17 @@ function OrganizationFirstCardGroup(props: Props) {
                             <LaafiMonitorDeviceUsageChart promise={props.devicesStatsPromise} />
                         </div>
                         {/* activities */}
-                        <div className="bg-white rounded-md p-2 grow-[5]">
+                        <div className="bg-white rounded-md p-2 grow-[5]" style={{height: '200px'}}>
                             <p className="text-lg text-[#999999] mb-2">Activities</p>
+                            <div className="">
+                                <ActivityChart promise={props.activitiesStatsPromise} />
+                            </div>
 
-                            <ActivityChart promise={props.activitiesStatsPromise} />
                         </div>
                     </div>
 
                     {/* (minotor + centrals + gateways) card */}
-                    <div className="flex divide-x h-[90px] bg-white rounded-md">
+                    <div className="flex divide-x h-[90px] bg-white rounded-md" style={{marginTop: '10px'}}>
                         {<PromiseBuilder
                             promise={props.devicesStatsPromise}
                             dataBuilder={data => (data.totalModel.map((e, index) => (

@@ -232,7 +232,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
                     {/* Pie charts and group */}
                     <div className="w-[380px]">
                         {/* Pie chart */}
-                        <div className="bg-white rounded-lg p-2">
+                        <div className="bg-white rounded-lg p-2 h-[350px]">
                             <p className="text-lg text-[#999999] mb-2">Connection status</p>
                             <div className=" w-[70%]" style={{ margin: '0 auto' }}><ActivitesConnectionStatusChart promise={state.statsPromise} /></div>
                         </div>
@@ -255,7 +255,7 @@ class AnotherLaafiMonitorPage extends React.Component<Props, State> {
             return (<div>Une erreur s'est produite</div>);
 
         return (
-            <div className='bg-white rounded-lg mt-2 pb-4'>
+            <div className='bg-white rounded-lg mt-2 pb-4 h-[490px]' style={{overflow: 'auto'}}>
                 <ActivityList
                     label='Favorite Activities'
                     columnCount={1}

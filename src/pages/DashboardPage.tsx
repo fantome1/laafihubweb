@@ -166,8 +166,8 @@ class DashboardPage extends React.Component<Props, State> {
                     </div>
                 </div>
 
-                <div className="flex space-x-4 mt-12">
-                    <div style={{ flex: '1 1 0' }}>
+                <div className="flex space-x-4 mt-12" style={{alignItems: 'stretch', height: '500px'}}>
+                    <div style={{ flex: '1 1 0', minHeight: '350px'}}>
                         <PromiseBuilder
                             promise={state.activitiesPromise}
                             dataBuilder={(data) => (
@@ -181,18 +181,18 @@ class DashboardPage extends React.Component<Props, State> {
                                     />
                                 </div>
                             )}
-                            loadingBuilder={() => (<Skeleton variant='rounded' width='100%' height='400px' />)}
+                            loadingBuilder={() => (<Skeleton variant='rounded' width='100%' height='350px' />)}
                             errorBuilder={(err) => (<div>Une erreur s'est produite</div>)}
                         />
                     </div>
 
-                    <div className="flex flex-col" style={{ flex: '1 1 0' }}>
+                    <div className="flex flex-col" style={{ flex: '1 1 0', minHeight: '400px'}}>
                         <div style={{ backgroundColor: '#fff', borderRadius: '4px' }}>
                             <div className="bg-[var(--primary)] py-1 text-center" style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
                                 <p className="text-lg text-white font-medium">Devices</p>
                             </div>
 
-                            <div className="flex p-4 grow">
+                            <div className="flex p-4 grow" style={{height: '445px'}}>
                                 <div className="w-[50%] flex flex-col justify-between">
                                     <p className="text-xl text-[#3C4858]">Total Connected</p>
                                     <div className="flex justify-center items-center">

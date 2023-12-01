@@ -40,7 +40,7 @@ function ActivityList(props: Props) {
 
     return (
         <Paper sx={{ borderRadius: '4px' }} elevation={0}>
-            <div className={`bg-[var(--primary)] py-1 ${props.showMoreBtn ? 'flex justify-between px-2' : 'text-center'}`} style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
+            <div className={`bg-[var(--primary)] py-1 ${props.showMoreBtn ? 'flex justify-between px-6' : 'text-center'}`} style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
                 {!props.showMoreBtn && (<p className="text-lg text-white font-medium">{props.label}</p>)}
                 {props.showMoreBtn && (
                     <>

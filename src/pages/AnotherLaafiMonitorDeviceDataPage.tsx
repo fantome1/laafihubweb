@@ -176,7 +176,7 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
         // console.log(data?.temperatures);
 
         return (
-            <div className="bg-[#E5E5E5] px-8 py-2 h-[1440px]">
+            <div className="bg-[#E5E5E5] px-8 py-2 h-[1024px]">
 
                 {/* First row */}
                 <div className="flex space-x-4 mt-12">
@@ -411,7 +411,7 @@ class AnotherLaafiMonitorDeviceDataPage extends React.Component<Props, State> {
 
                 {/* Last row */}
                 <div className="flex space-x-2 mt-4">
-                    <div style={{ flex: '1 1 0' }}>
+                    <div style={{ flex: '1 1 0', backgroundColor: '#fff' }}>
                         <table className="styled-table">
                                     <thead>
                                         <tr>{['Device ID', 'Temp', 'Hum %', 'Cover status', 'Agent', 'Bridge Status'].map((e, index) => (<th key={index}>{e}</th>))}</tr>
