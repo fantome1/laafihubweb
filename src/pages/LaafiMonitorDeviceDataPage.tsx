@@ -11,8 +11,8 @@ import { NavigateFunction } from "react-router-dom";
 import { routes } from "../constants/routes";
 import { signalRHelper } from "../services/signal_r_helper";
 import { FakeData } from "../services/fake_data";
-import { SplineTemperatureChart } from "../components/charts/SplineTemperatureChart";
-import { StepAreaExposureChart } from "../components/charts/StepAreaExposureChart";
+import { TemperatureLineChart } from "../components/charts/TemperatureLineChart";
+import { ExposureChart } from "../components/charts/ExposureChart";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
@@ -289,7 +289,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                         </div>
                         <div className="flex flex-col space-y-4 mt-4">
                             <Paper sx={{ width: '100%', /*height: '300px',*/ padding: '20px' }} elevation={0}>
-                                <SplineTemperatureChart values={this.state.temperature ?? []} />
+                                <TemperatureLineChart values={this.state.temperature ?? []} />
                                 {/* <TemperatureLineChart
                                     data={this.state.temperature ?? []}
                                     minTemp={data?.dataSent?.data?.characteristics?.minTemp}
@@ -300,7 +300,7 @@ class LaafiMonitorDeviceDataPage extends React.PureComponent<Props, State> {
                             </Paper>
 
                             <Paper sx={{ width: '100%', /*height: '300px',*/ padding: '20px' }} elevation={0}>
-                                <StepAreaExposureChart values={this.state.temperature ?? []} />
+                                <ExposureChart values={this.state.temperature ?? []} />
                             </Paper>
                         </div>
                     </Paper>

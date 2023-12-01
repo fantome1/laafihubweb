@@ -16,8 +16,6 @@
     "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "^5.11.16",
     "@mui/x-date-pickers": "^6.11.0",
-    "@syncfusion/ej2-base": "^23.1.41",
-    "@syncfusion/ej2-react-charts": "^23.1.43",
     "chart.js": "^4.2.1",
     "chartjs-plugin-annotation": "^3.0.1",
     "chartjs-plugin-datalabels": "^2.2.0",
@@ -25,6 +23,7 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-google-charts": "^4.0.1",
     "react-leaflet": "^4.2.1",
     "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^6.10.0"

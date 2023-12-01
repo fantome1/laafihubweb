@@ -2,13 +2,11 @@ import React from "react";
 import { LoadingButton } from "@mui/lab";
 import { Alert, Autocomplete, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, TextField } from "@mui/material";
 import { Completer } from "../../services/completer";
-import { MaterialSelectHelper } from "../form/MaterialSelectHelper";
 import { CountrySelector } from "../../packages/country_selector/CountrySelector";
 import { FormValidator, FormValidatorData } from "../../packages/form_validator/form_validator";
 import { Api } from "../../services/api";
 import { getCreateInfrastrutureValidator } from "../../form_validator/create_infrastructure_validator";
 import { ChooseLocationDialog } from "./ChooseLocationDialog";
-
 
 type Props = {
     completer: Completer<boolean>|null;

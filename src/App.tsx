@@ -15,7 +15,6 @@ import AnotherLaafiMonitorPage from "./pages/AnotherLaafiMonitorPage";
 import AnotherLaafiMonitorDeviceDataPage from "./pages/AnotherLaafiMonitorDeviceDataPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { RealtimeTestPage } from "./pages/RealtimeTestPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./mui_theme";
 import CreateActivityPage from "./pages/CreateActivityPage";
@@ -25,9 +24,6 @@ import { Completer } from "./services/completer";
 import { INotification } from "./models/notification_model";
 import { NotificationAlert } from "./components/dialogs/ViewNotificationDialog";
 import { notificationCounterBloc } from "./services/notification_counter_bloc";
-import { registerLicense } from "@syncfusion/ej2-base";
-
-registerLicense('GTIlMmhhYH1ifWBlaGBifGJhfGpqampzYWBpZmppZmpoJzw2MDshOiAnOjI9EzQ+Mjo/fTA8Pg==');
 
 const NOTIFICATION_MAX_COUNT = 7;
 
@@ -156,7 +152,6 @@ function App() {
           <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
           <Route path={routes.HOME} element={<LayoutBase />}>
             <Route index element={<DashboardPage />} />
-            <Route path={'/reatime-test'} element={<RealtimeTestPage />} />
             <Route path={routes.ORGANIZATION} element={<OrganizationPage />} />
             <Route path={routes.SUPER_ADMIN_DASHBOARD.route} element={<SuperAdminDashboardPage />} />
             <Route path={routes.SUPER_ADMIN_USERS} element={<SuperAdminUsersPage />} />

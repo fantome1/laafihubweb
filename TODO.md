@@ -10,7 +10,7 @@
 * Show/hide password
 
 # TODO
-* Activites device
+* Discount on invalid token
 * Enroll button
 * Activites de l'utilisateur des supprimer un utilisateur
 * Notification pagination set height

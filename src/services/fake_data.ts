@@ -57,6 +57,15 @@ class FakeData {
                         deviceMac,
                         type: 'Temperature',
                         value: this.random(-30, 60)
+                    },
+                    deviceInfo: {
+                        deviceMac: "E3:D8:86:AC:E3:4A",
+                        appRevision: 2,
+                        hardRevision: "Board Rev2",
+                        deviceModel: "LM",
+                        software: "Zeph Rev2.6",
+                        manufacturer: "Laafi Concepts SAS",
+                        firmware: ""
                     }
                 },
                 network: {
