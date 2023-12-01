@@ -36,12 +36,11 @@ class ExposureChart extends React.Component<Props, State> {
 
     render() {
         const values = this.state.values;
-        const data = values.map(v => ({ x: Utils.formatTime(new Date(v.date)), y: v.value }));        
 
         return (
             <Chart
                 chartType="SteppedAreaChart"
-                width="80%"
+                width="100%"
                 height="400px"
                 options={{ title: 'Exposure' }}
                 data={[
