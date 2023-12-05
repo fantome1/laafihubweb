@@ -10,7 +10,7 @@ import { PromiseBuilder } from "../components/PromiseBuilder";
 import { IUser, IUserStats } from "../models/user_model";
 import { Api } from "../services/api";
 import { IInfrastructure, IInfrastructureStats } from "../models/infrastructure_model";
-import { CircleMarker, Popup } from "react-leaflet";
+import { Marker, Popup } from "react-leaflet";
 import { NavigateFunction } from "react-router-dom";
 import { WithRouter } from "../components/WithRouterHook";
 import { INotificationStats, getNotificationCountFromStats } from "../models/notification_stats";
@@ -150,14 +150,16 @@ class DashboardPage extends React.Component<Props, State> {
                         <BubleMap>
                             {<PromiseBuilder
                                 promise={state.infrastructurePromise}
-                                dataBuilder={data => (data.items.map((value, index) => <CircleMarker key={index}
-                                    center={[value.coordinates.latitude, value.coordinates.longitude]}
-                                    pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-ignore
-                                    radius={4}>
-                                        <Popup>{value.name}</Popup>
-                                    </CircleMarker>
+                                dataBuilder={data => (data.items.map((value, index) => <Marker key={index}
+                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                        // @ts-ignore
+                                        position={{ lat: value.coordinates.latitude, lng: value.coordinates.longitude }}
+                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                        // @ts-ignore
+                                        pathOptions={{ color: value.status == 'Actived' ? '#4CAF50' : '#F44336' }}
+                                    >
+                                        <Popup>{value.name}: {value.status}</Popup>
+                                    </Marker>
                                 ))}
                                 loadingBuilder={() => null}
                                 errorBuilder={(_) => null}
