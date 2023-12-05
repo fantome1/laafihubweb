@@ -70,11 +70,11 @@ class ResetPasswordDialog extends React.Component<Props, State> {
         this.validator.changeValues({ password, 'confirmPassword': password });
 
         DialogService.showSnackbar({
-            severity: 'info',
+            severity: 'success',
             message: 'Generated password: ' + password,
             action: (
                 <Button
-                    color='error'
+                    sx={{ color: '#2196F3' }}
                     size='small'
                     onClick={() => {
                         navigator.clipboard.writeText(password);
